@@ -1,0 +1,63 @@
+.var-highlight {
+  color: #C0AD60;
+}
+
+.string-highlight {
+  color: rgba(253, 149, 90, 0.8);
+}
+
+body{
+  justify-content: center;
+  align-items: center;
+  margin-top: 35vh;
+}
+
+navbar{
+  position:absolute;
+  top:2vh;
+  right:1.5vw;
+  font-size:1.5em;
+}
+navbar i{
+  margin: 0 2.5px;
+  text-decoration: none;
+  color:black;
+}
+navbar i:hover{
+  opacity: 0.50;
+}
+
+#typewriter {
+  font-size: 2em;
+  margin: 0;
+  font-family: "Courier New";
+}
+#typewriter:after {
+  content: "|";
+  animation: blink 500ms linear infinite alternate;
+}
+
+@-webkit-keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@-moz-keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
