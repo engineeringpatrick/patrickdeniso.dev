@@ -31,9 +31,6 @@ navbar i:hover{
 
 .fa{
   color: #C0AD60;
-  @media screen and (prefers-color-scheme: white) {
-    color: black;
-  }
 }
 
 #typewriter {
