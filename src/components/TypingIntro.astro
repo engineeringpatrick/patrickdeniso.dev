@@ -12,28 +12,20 @@
     deleteSpeed: 20,
   });
 
-  const work_interests = ["'data-intensive, scalable distributed systems'", "'Distributed Systems',"]
-  const interests = ["'Running'", "'Urbanism'", "'Language Learning'", "'History & Philosophy'", "'Anything interesting :)',"]
-  typewriter
-    .pauseFor(500)
-    .typeString('const Patrick = {<br/>')
-    .pauseFor(300)
-    .typeString("<span>&emsp;</span>name: 'Patrick Deniso',<br/>")
-    .pauseFor(250)
-    .typeString("<span>&emsp;</span>role: 'Software Engineer',<br/>")
-    .pauseFor(250)
-    .typeString("<span>&emsp;</span>work_interests: ")
-    // .typeString(work_interests[0])
-    // .deleteChars(work_interests[0].length)
-    .typeString(work_interests[1])
-    .pause(250)
-    .typeString("<br/><span>&emsp;</span>interests: ")
-    .typeString(interests[0]).deleteChars(interests[0].length)
-    .typeString(interests[1]).deleteChars(interests[1].length)
-    .typeString(interests[2]).deleteChars(interests[2].length)
-    .typeString(interests[3]).deleteChars(interests[3].length)
-    .typeString(interests[4])
-    .pause(500)
-    .typeString("<br>};")
-    .start();
+  const lines = ["const Patrick = {", "name: 'Patrick Deniso',", "role: 'Software Engineer',", "workInterests: 'Distributed Systems',"];
+  const interests = ["'Running'", "'Urbanism'", "'Language Learning'", "'History & Philosophy'", "'Anything cool :)',"]
+  typewriter = typewriter.pauseFor(500)
+
+  lines.forEach((line: string) => {
+    typewriter = typewriter.typeString(line);
+    typewriter = typewriter.typeString("<br/><span>&emsp;</span>").pauseFor(300);
+  });
+  
+  typewriter = typewriter.typeString("interests: ");
+  interests.forEach((interest: string, idx: number) => {
+    typewriter = typewriter.typeString(interest);
+    if(idx < interests.length - 1) typewriter = typewriter.deleteChars(interest.length);
+  })
+
+  typewriter.pause(500).typeString("<br>};").start();
 </script>
