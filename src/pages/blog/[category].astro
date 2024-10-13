@@ -1,0 +1,26 @@
+---
+import { getCollection } from "astro:content";
+import PostButton from "../../components/Posts/PostButton.astro";
+
+export function getStaticPaths() {
+  return [
+    {params: { category: 'essays'} },
+    {params: { category: 'notes'} },
+    {params: { category: 'thoughts'} },
+  ];
+}
+
+const { category } = Astro.params;
+const posts = await getCollection('blog');
+
+const filteredPosts = posts.filter(post => post.data.category === category);
+
+---
+<main>
+    <h1>Posts in Category: {category}</h1>
+    <ul>
+        {filteredPosts.map(post => (
+            <PostButton title={post.data.title} description={post.data.description} href={`/${category}/${post.slug}`}></PostButton>
+        ))}
+    </ul>
+</main>

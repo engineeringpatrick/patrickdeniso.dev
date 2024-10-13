@@ -1,0 +1,50 @@
+---
+import { getCollection } from "astro:content";
+import Category from "../../components/Posts/Category.astro";
+import PostButton from "../../components/Posts/PostButton.astro";
+import Layout from "../../layouts/Layout.astro";
+
+export function getStaticPaths() {
+  return [
+    { params: { slug:'notes/distributed-systems' } },
+    { params: { slug:'notes/operating-systems' } },
+    { params: { slug:'notes/compilers' } },
+    { params: { slug: 'thoughts'  } },
+    { params: { slug: 'essays' } },
+  ];
+}
+
+const { slug } = Astro.params;
+const posts = await getCollection('blog');
+
+const filteredPosts = posts.filter(post => true);
+
+---
+
+<Layout title="Blog Posts">
+    <div class="min-h-screen">
+        <div class="container mx-auto py-12 px-4">
+          <div class="grid grid-cols-4 gap-6">
+            
+            <!-- Categories Section -->
+            <div class="col-span-1">
+              <h2 class="text-2xl font-bold mb-4">Categories</h2>
+              <ul class="space-y-2">
+                <Category category="Notes" subCategories={["Operating Systems", "Distributed Systems", "Compilers"]}></Category>
+                <Category category="Thoughts"></Category>
+                <Category category="Essays"></Category>
+              </ul>
+            </div>
+      
+            <!-- Blog Posts Section -->
+            <div class="col-span-3 space-y-8">
+                {
+                  filteredPosts.map((post) => {
+                    <PostButton title={post.data.title} description={post.data.title} href="#"></PostButton>
+                  })
+                }
+            </div>
+          </div>
+        </div>
+      </div>
+</Layout>

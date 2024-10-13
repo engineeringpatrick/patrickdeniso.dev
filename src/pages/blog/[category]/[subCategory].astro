@@ -1,0 +1,26 @@
+---
+import { getCollection } from "astro:content";
+import PostButton from "../../../components/Posts/PostButton.astro";
+
+export function getStaticPaths() {
+  return [
+    {params: { subCategory: 'distributed-systems'} },
+    {params: { subCategory: 'operating-systems'} },
+    {params: { subCategory: 'compilers'} },
+  ];
+}
+
+const { subCategory } = Astro.params;
+const posts = await getCollection('blog');
+
+const filteredPosts = posts.filter(post => post.data.subCategory === subCategory);
+
+---
+<main>
+    <h1>Posts in Subcateogry: {subCategory}</h1>
+    <ul>
+        {filteredPosts.map(post => (
+            <PostButton title={post.data.title} description={post.data.description} href={`/${subCategory}/${post.slug}`}></PostButton>
+        ))}
+    </ul>
+</main>
