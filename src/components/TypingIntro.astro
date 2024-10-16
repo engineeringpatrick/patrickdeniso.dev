@@ -9,7 +9,7 @@
   var typewriter = new Typewriter("#typing-box", {
     loop: false,
     delay: 25,
-    deleteSpeed: 20,
+    deleteSpeed: 10,
   });
 
   const lines = ["const Patrick = {", "name: 'Patrick Deniso',", "role: 'Software Engineer',", "workInterests: 'Distributed Systems',"];
@@ -23,7 +23,7 @@
   
   typewriter = typewriter.typeString("interests: ");
   interests.forEach((interest: string, idx: number) => {
-    typewriter = typewriter.typeString(interest);
+    typewriter = typewriter.typeString(interest).pauseFor(400);
     if(idx < interests.length - 1) typewriter = typewriter.deleteChars(interest.length);
   })
 
