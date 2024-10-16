@@ -1,6 +1,6 @@
 ---
-category: "Notes"
-sub-category: "Distributed Systems"
+category: "notes"
+subCategory: "distributed-systems"
 title: "#5 Replication"
 date: "2024-8-10"
 description: "Fifth chapter of DDIA"

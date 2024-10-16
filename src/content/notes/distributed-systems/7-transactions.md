@@ -1,6 +1,6 @@
 ---
-category: "Notes"
-sub-category: "Distributed Systems"
+category: "notes"
+subCategory: "distributed-systems"
 title: "#7 The Three Pillars"
 date: "2024-8-10"
 description: "Seventh chapter of DDIA"

@@ -1,6 +1,6 @@
 ---
-category: "Notes"
-sub-category: "Distributed Systems"
+category: "notes"
+subCategory: "distributed-systems"
 title: "#2 Data Models and QLs"
 date: "2024-8-10"
 description: "Second chapter of DDIA"

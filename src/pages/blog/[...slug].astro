@@ -2,21 +2,16 @@
 import { getCollection } from "astro:content";
 import Category from "../../components/Posts/Category.astro";
 import PostButton from "../../components/Posts/PostButton.astro";
+import type { category } from "../../content/config";
 import Layout from "../../layouts/Layout.astro";
 
 export function getStaticPaths() {
-  return [
-    { params: { slug: undefined } },
-    { params: { slug:'notes/distributed-systems' } },
-    { params: { slug:'notes/operating-systems' } },
-    { params: { slug:'notes/compilers' } },
-    { params: { slug: 'thoughts'  } },
-    { params: { slug: 'essays' } },
-  ];
+    const slugs = [undefined, 'notes/operating-systems', 'notes/distributed-systems', 'notes/compilers', 'thoughts', 'essays'];
+    return slugs.map((slug) => ({ params: { slug: slug }, props: { category: slug?.split('/')[0], subCategory: slug?.split('/')[1] } }));
 }
 
-const { slug } = Astro.params;
-const posts = await getCollection("notes/distributed-systems");
+const urlCategory = Astro.props.category;
+const posts = urlCategory ? await getCollection(urlCategory as category, ({ data }) => (data.subCategory === Astro.props.subCategory)) : [];
 
 const filteredPosts = posts;
 ---
@@ -39,9 +34,9 @@ const filteredPosts = posts;
             <!-- Blog Posts Section -->
             <div class="col-span-3 space-y-8">
                 {
-                  filteredPosts.map((post) => {
-                    <PostButton title={post.data.title} description={post.data.title} href="#"></PostButton>
-                  })
+                    filteredPosts.map((post) => (
+                        <PostButton title={post.data.title} description={post.data.title} href="#"></PostButton>
+                    ))
                 }
             </div>
           </div>

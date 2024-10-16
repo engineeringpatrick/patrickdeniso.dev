@@ -1,6 +1,6 @@
 ---
-category: "Notes"
-sub-category: "Distributed Systems"
+category: "notes"
+subCategory: "distributed-systems"
 title: "#3 Storage & Retrieval"
 date: "2024-8-10"
 description: "Third chapter of DDIA"

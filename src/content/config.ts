@@ -11,4 +11,5 @@ const blogCollection = defineCollection({
     }),
 });
 
-export const collections = { 'notes/distributed-systems': blogCollection, thoughts: blogCollection, essays: blogCollection };
+export type category = 'notes' | 'thoughts' | 'essays';
+export const collections = { notes: blogCollection, thoughts: blogCollection, essays: blogCollection };
