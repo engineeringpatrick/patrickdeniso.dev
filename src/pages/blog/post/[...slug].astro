@@ -1,0 +1,19 @@
+---
+import { getCollection } from 'astro:content';
+import type { Category } from '../../../content/config';
+
+
+export async function getStaticPaths() {
+    const topCategories: Category[] = ['notes', 'thoughts', 'essays'];
+    
+    return topCategories.map(async category => {
+        const entries = await getCollection(category);
+
+        return entries.map(entry => ({params: { slug: entry.slug }, props: { entry }}));
+    }).flat();
+}
+
+console.log(Astro.props);
+// const blogEntry = Astro.props;
+// console.log(blogEntry);
+---

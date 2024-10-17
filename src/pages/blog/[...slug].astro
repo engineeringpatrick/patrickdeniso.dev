@@ -1,19 +1,37 @@
 ---
+import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
-import Category from "../../components/Posts/Category.astro";
+import CategoryBtn from "../../components/Posts/Category.astro";
 import PostButton from "../../components/Posts/PostButton.astro";
-import type { category } from "../../content/config";
+import type { Category } from "../../content/config";
 import Layout from "../../layouts/Layout.astro";
 
-export function getStaticPaths() {
-    const slugs = [undefined, 'notes/operating-systems', 'notes/distributed-systems', 'notes/compilers', 'thoughts', 'essays'];
-    return slugs.map((slug) => ({ params: { slug: slug }, props: { category: slug?.split('/')[0], subCategory: slug?.split('/')[1] } }));
+interface Props {
+    entry?: CollectionEntry<Category>;
 }
 
-const urlCategory = Astro.props.category;
-const posts = urlCategory ? await getCollection(urlCategory as category, ({ data }) => (data.subCategory === Astro.props.subCategory)) : [];
+export async function getStaticPaths() {
+    const topCategories: Category[] = ['notes', 'thoughts', 'essays'];
+    const fullCategories = new Set<string | undefined>([undefined, ...topCategories]);
+    
+    const postPaths = await Promise.all(topCategories.map(async category => {
+        const entries = await getCollection(category);
 
-const filteredPosts = posts;
+        return entries.map(entry => {
+            fullCategories.add(entry.data.category);
+
+            return { params: { slug: entry.collection + '/' + entry.slug }, props: { entry } };
+        });
+    }));
+    const categoryPaths = Array.from(fullCategories).map(category => ({ params: { slug: category } }));
+
+    return [...postPaths.flat(), ...categoryPaths];
+}
+
+const blogEntry = await Astro.props.entry?.render();
+
+const urlCategory = Astro.params.slug?.split('/')[0];
+const posts = urlCategory ? await getCollection(urlCategory as Category, ({ data }) => (data.category === Astro.params.slug)) : [];
 ---
 
 <Layout title="Blog Posts">
@@ -25,20 +43,25 @@ const filteredPosts = posts;
             <div transition:persist class="col-span-1">
               <h2 class="text-2xl font-bold mb-4">Categories</h2>
               <ul class="space-y-2">
-                <Category category="Notes" subCategories={["Operating Systems", "Distributed Systems", "Compilers"]}></Category>
-                <Category category="Thoughts"></Category>
-                <Category category="Essays"></Category>
+                <CategoryBtn category="Notes" subCategories={["Operating Systems", "Distributed Systems", "Compilers"]}></CategoryBtn>
+                <CategoryBtn category="Thoughts"></CategoryBtn>
+                <CategoryBtn category="Essays"></CategoryBtn>
               </ul>
             </div>
       
             <!-- Blog Posts Section -->
             <div class="col-span-3 space-y-8">
                 {
-                    filteredPosts.map((post) => (
-                        <PostButton title={post.data.title} description={post.data.description} href="#"></PostButton>
-                    ))
+                    blogEntry ? 
+                        <p>{<blogEntry.Content/>}</p>
+                    :
+                        posts.map((post) => (
+                            <PostButton title={post.data.title} description={post.data.description} href={post.slug}></PostButton>
+                        ))
                 }
             </div>
+
+
           </div>
         </div>
       </div>
