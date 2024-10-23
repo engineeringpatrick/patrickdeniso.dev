@@ -1,10 +1,9 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
-import CategoryBtn from "../../components/Posts/Category.astro";
 import PostButton from "../../components/Posts/PostButton.astro";
 import type { Category } from "../../content/config";
-import Layout from "../../layouts/Layout.astro";
+import BlogLayout from "../../layouts/BlogLayout.astro";
 
 interface Props {
     entry?: CollectionEntry<Category>;
@@ -34,35 +33,15 @@ const urlCategory = Astro.params.slug?.split('/')[0];
 const posts = urlCategory ? await getCollection(urlCategory as Category, ({ data }) => (data.category === Astro.params.slug)) : [];
 ---
 
-<Layout title="Blog Posts">
-    <div class="min-h-screen">
-        <div class="container mx-auto py-12 px-4">
-          <div class="grid grid-cols-4 gap-6">
-            
-            <!-- Categories Section -->
-            <div transition:persist class="col-span-1">
-              <h2 class="text-2xl font-bold mb-4">Categories</h2>
-              <ul class="space-y-2">
-                <CategoryBtn category="Notes" subCategories={["Operating Systems", "Distributed Systems", "Compilers"]}></CategoryBtn>
-                <CategoryBtn category="Thoughts"></CategoryBtn>
-                <CategoryBtn category="Essays"></CategoryBtn>
-              </ul>
-            </div>
-      
-            <!-- Blog Posts Section -->
-            <div class="col-span-3 space-y-8">
-                {
-                    blogEntry ? 
-                        <p>{<blogEntry.Content/>}</p>
-                    :
-                        posts.map((post) => (
-                            <PostButton title={post.data.title} description={post.data.description} href={post.slug}></PostButton>
-                        ))
-                }
-            </div>
-
-
-          </div>
-        </div>
-      </div>
-</Layout>
+<BlogLayout transition:persist>
+  <div class="col-span-3 space-y-8">
+    {
+        blogEntry ? 
+          <p>{<blogEntry.Content/>}</p>
+        :
+          posts.map((post) => (
+              <PostButton title={post.data.title} description={post.data.description} href={post.slug}></PostButton>
+          ))
+    }
+  </div>
+</BlogLayout>

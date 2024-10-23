@@ -1,0 +1,25 @@
+---
+import CategoryBtn from "../components/Posts/CategoryBtn.astro";
+import Layout from "./Layout.astro";
+
+
+---
+<Layout title="Blog Posts">
+    <div class="container mx-auto py-12 px-4">
+      <div class="grid grid-cols-4 gap-6">
+        
+        <!-- Categories Section -->
+        <div transition:persist class="col-span-1">
+          <h2 class="text-2xl font-bold mb-4">Categories</h2>
+          <ul class="space-y-2">
+            <CategoryBtn category="Notes" subCategories={["Operating Systems", "Distributed Systems", "Compilers"]}></CategoryBtn>
+            <CategoryBtn category="Thoughts"></CategoryBtn>
+            <CategoryBtn category="Essays"></CategoryBtn>
+          </ul>
+        </div>
+        
+        <slot/>
+
+      </div>
+    </div>
+</Layout>
