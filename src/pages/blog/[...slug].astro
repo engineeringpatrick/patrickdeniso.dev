@@ -33,7 +33,7 @@ const urlCategory = Astro.params.slug?.split('/')[0];
 const posts = urlCategory ? await getCollection(urlCategory as Category, ({ data }) => (data.category === Astro.params.slug)) : [];
 ---
 
-<BlogLayout transition:persist>
+<BlogLayout>
   <div class="col-span-3 space-y-8">
     {
         blogEntry ? 
