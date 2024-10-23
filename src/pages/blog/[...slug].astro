@@ -1,0 +1,47 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
+import PostButton from "../../components/Posts/PostButton.astro";
+import type { Category } from "../../content/config";
+import BlogLayout from "../../layouts/BlogLayout.astro";
+
+interface Props {
+    entry?: CollectionEntry<Category>;
+}
+
+export async function getStaticPaths() {
+    const topCategories: Category[] = ['notes', 'thoughts', 'essays'];
+    const fullCategories = new Set<string | undefined>([undefined, ...topCategories]);
+    
+    const postPaths = await Promise.all(topCategories.map(async category => {
+        const entries = await getCollection(category);
+
+        return entries.map(entry => {
+            fullCategories.add(entry.data.category);
+
+            return { params: { slug: entry.collection + '/' + entry.slug }, props: { entry } };
+        });
+    }));
+    const categoryPaths = Array.from(fullCategories).map(category => ({ params: { slug: category } }));
+
+    return [...postPaths.flat(), ...categoryPaths];
+}
+
+const blogEntry = await Astro.props.entry?.render();
+
+const urlCategory = Astro.params.slug?.split('/')[0];
+const posts = urlCategory ? await getCollection(urlCategory as Category, ({ data }) => (data.category === Astro.params.slug)) : [];
+---
+
+<BlogLayout>
+  <div class="col-span-3 space-y-8">
+    {
+        blogEntry ? 
+          <p>{<blogEntry.Content/>}</p>
+        :
+          posts.map((post) => (
+              <PostButton title={post.data.title} description={post.data.description} href={post.slug}></PostButton>
+          ))
+    }
+  </div>
+</BlogLayout>
