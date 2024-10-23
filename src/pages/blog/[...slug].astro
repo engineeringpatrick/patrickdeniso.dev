@@ -40,7 +40,7 @@ const posts = urlCategory ? await getCollection(urlCategory as Category, ({ data
           <p>{<blogEntry.Content/>}</p>
         :
           posts.map((post) => (
-              <PostButton title={post.data.title} description={post.data.description} href={post.slug}></PostButton>
+            <PostButton title={post.data.title} description={post.data.description} href={"/blog/notes/" + post.slug}/>
           ))
     }
   </div>
