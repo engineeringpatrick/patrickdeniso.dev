@@ -45,7 +45,8 @@ Here's an example, Twitter, using data from 2012:
 	- Maintain a cache for each user's home timeline. When a user posts a tweet, look up all the people who follow that user, and insert the new tweet into each of their home timeline caches.
 - Twitter changed from option 1 to option 2. This is because the average rate of tweet published tweets is almost two order of magnitudes lower than the rate of home timeline reads.
 
-![[Pasted image 20240719053329.png]]
+![image.png](../../../assets/Pasted%20image%2020240719053329.png)
+
 
 - Right now, Twitter uses a hybrid approach. For most people, tweets continue to be fanned out, except for celebrities. Users home timelines will fetch celebrities tweets separately and merged with the timeline when read.
 - This avoid the issue of writing to million of users' caches when a celebrity posts a tweet.
@@ -55,14 +56,14 @@ Here's an example, Twitter, using data from 2012:
 - Response time: the time between a client sending a request and receiving a response.
 	- VS lantency? Not synonyms. Response time is what the client sees. Latency is the duration that a request is waiting to be handled.
 
-![[Pasted image 20240719054216.png]]
+![image.png](../../../assets/Pasted%20image%2020240719054216.png)
 Using percentiles (and the median which is p50) is a why of dealing with ouliers. X p95 means 95% of response times are faster than X.
 
 Service Level Objective (SLO) and Service Level Agreement (SLA), contracts that define the expected performance and availability of a service. An SLA may state that the service is considered to be up if it has a median response time of less than 200ms and a 99th percentile under 1 s. And service may be required to be up at least 99.9% of the time.
 
 Tail latency amplification: if you have your request needs to call multiple backend service, each service increases the probability of your request being slow (it takes just 1 slow request and it can queue up a service).
 
-![[Pasted image 20240719055522.png]]
+![image.png](../../../assets/Pasted%20image%2020240719055522.png)
 
 ###### Coping with Load
 Machines can scale up or scale our or both. An elastic system is one that adds computing resources when they detect a load increase, whereas other systems are scaled manually by a human.

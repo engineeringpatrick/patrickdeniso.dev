@@ -24,7 +24,7 @@ Threads are similar to separate processes.
     - NO NEED to switch which page table we’re using. as threads use the same address space.
 - we have 1 stack per thread. obviously because each thread runs independently and may call into various routines
     
-    ![Screenshot 2024-09-14 at 4.08.23 PM.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/e2e24c21-4927-46a9-89a9-7d0f4c4b62b6/Screenshot_2024-09-14_at_4.08.23_PM.png)
+    ![Screenshot 2024-09-14 at 4.08.23 PM.png](../../../assets/3-concurrency/Screenshot_2024-09-14_at_4.08.23_PM.png)
     
     The above address space is less beautiful but normally ok, as stacks do not have to be very large.
     
@@ -40,13 +40,13 @@ You could use processes too, but threads share an address space and thus make it
 
 ## Simple Thread Example
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/7a3e02e2-27ba-421b-b970-078f659f40f4/image.png)
+![image.png](../../../assets/3-concurrency/image.png)
 
 as you can see from the right, there multiple possible thread traces, depending on when the OS scheduler decides to run each thread.
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/00334822-3e2b-4efe-be4d-e322f2196c89/image.png)
+![image.png](../../../assets/3-concurrency/image%201.png)
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/991a2eb1-4061-4b71-9809-1ab667fecde8/image.png)
+![image.png](../../../assets/3-concurrency/image%202.png)
 
 ## Shared Data
 
@@ -54,11 +54,11 @@ If two threads try to add 1 million to a counter (naively), we might expect the 
 
 This is what happens when `counter++` runs:
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/b0deb14a-9b42-4d53-b708-89dcf36e3cb3/image.png)
+![image.png](../../../assets/3-concurrency/image%203.png)
 
 A timer interrupt could be dispatched while T1 is in this block of code, the OS saves the state of T1 (its PC, its registers, including `eax` , etc, to T1’s TCB), and then T2 runs. This could yield unexpected results.
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/dd0f598d-171c-4f98-9594-e4099dc56a54/image.png)
+![image.png](../../../assets/3-concurrency/image%204.png)
 
 This code is called a ***critical section***, because it can result in ***race conditions*** (where results depend on the timing of the code’s execution).
 
@@ -78,17 +78,17 @@ The hardware will need to provide us with some instructions we can use to build 
 int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine)(void*), void *arg);
 ```
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/d3d714bb-bd49-4abd-a7cd-885839125937/image.png)
+![image.png](../../../assets/3-concurrency/image%205.png)
 
 ### Waiting for thread completion
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/d2e6c27d-0de2-4b5f-a29d-48b0736ff57d/image.png)
+![image.png](../../../assets/3-concurrency/image%206.png)
 
 `pthread_join()` takes in a double pointer to the return value, because it can modify the existing pointer (ofc, it needs to put the return value inside).
 
 ### Locks
 
-![Screenshot 2024-09-14 at 5.26.33 PM.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/3db6668d-e0e8-4c1e-b095-47ca05b10928/Screenshot_2024-09-14_at_5.26.33_PM.png)
+![Screenshot 2024-09-14 at 5.26.33 PM.png](../../../assets/3-concurrency/Screenshot_2024-09-14_at_5.26.33_PM.png)
 
 lock function is blocking, thread waits until it can grab the lock.
 
@@ -103,19 +103,19 @@ These are used when some kind of signaling has to take place among threads (one 
 `int pthread_cond_wait(pthread_cond_t *cond,
 pthread_mutex_t *mutex);`  → puts the calling thread to sleep until it’s signaled by `int pthread_cond_signal(pthread_cond_t *cond);`
 
-![Screenshot 2024-09-14 at 5.32.03 PM.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/73d631a5-9e50-4a7a-bef1-a0b43556feef/Screenshot_2024-09-14_at_5.32.03_PM.png)
+![Screenshot 2024-09-14 at 5.32.03 PM.png](../../../assets/3-concurrency/Screenshot_2024-09-14_at_5.32.03_PM.png)
 
 Use a while loop instead of an if. The thread could be awaken at random, and think `ready = 1` when it’s not.
 
 Why does `pthread_cond_wait()` take in the lock? because while waiting, the lock is released, of course. otherwise, the other thread wouldnt be able to acquire it. However, just before it’s awaken, it grabs the lock again. 
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/6a1d9b28-6b56-437f-b96a-f738bef6b46f/image.png)
+![image.png](../../../assets/3-concurrency/image%207.png)
 
 Why are we using locks and condition variables at the same time? Well, ready is a shared resource, we wouldn’t want a race condition.
 
 Why use condition variables instead of waiting just like this?
 
-![Screenshot 2024-09-14 at 5.34.43 PM.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/6efe5b18-820c-48fb-8882-b8996e35e18e/Screenshot_2024-09-14_at_5.34.43_PM.png)
+![Screenshot 2024-09-14 at 5.34.43 PM.png](../../../assets/3-concurrency/Screenshot_2024-09-14_at_5.34.43_PM.png)
 
 **^^^ BAD BAD BAD ^^^** → it wastes CPU cycles instead of being blocked, and it’s error prone.
 
@@ -247,7 +247,7 @@ You can use a binary semaphore as a lock (value can be [-1, 1]):
 
 Semaphores can also be used for ordering, and for solving the producer consumer problem.
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/416ac935-3448-495f-9a58-9085d7ade241/image.png)
+![image.png](../../../assets/3-concurrency/image%208.png)
 
 why do you need a mutex lock too? 3 semaphores??
 
@@ -255,7 +255,7 @@ yes. what if you have 2 producers, that at the same time put a value in the queu
 
 ## Reader-Writer Locks
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/d10fcfe4-1d3c-4ee8-939b-3ebfa2517c0d/image.png)
+![image.png](../../../assets/3-concurrency/image%209.png)
 
 If a thread wants to update a data structure, it will acquire the write lock, and then release it when done.
 
@@ -263,17 +263,17 @@ If a reader wants to read, the reader will first acquire lock, then increment th
 
 ## The Dining Philosophers Problem
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/eaf38c94-a709-40ac-8c07-c506d7b55d3c/image.png)
+![image.png](../../../assets/3-concurrency/image%2010.png)
 
 To eat a philosopher needs both forks, but only one is in between all philosophers.
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/c33c21cf-40cc-485a-90a3-7a3d7cfb8612/image.png)
+![image.png](../../../assets/3-concurrency/image%2011.png)
 
 A simple solution like this doesnt work because of deadlocking. If each philosopher happens to grab the fork on their left before any philosopher can grab the fork on their right, each will be stuck holding one fork and waiting for another, forever.
 
 The simplest way to fix this is this: make one philosopher grab the forks in a different order from the others. That’s it! It breaks the cycle of waiting.
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/6738e28b-ff8d-4704-a43d-8c86bf7478da/image.png)
+![image.png](../../../assets/3-concurrency/image%2012.png)
 
 ## Thread Throttling
 
@@ -283,4 +283,4 @@ You can just initialize the value of the semaphore to the maximum number of thre
 
 ## Semaphore Implementation (the Linux way)
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/564a55d7-3362-45ac-a09b-45981e909818/image.png)
+![image.png](../../../assets/3-concurrency/image%2013.png)

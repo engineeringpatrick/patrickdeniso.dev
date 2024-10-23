@@ -49,9 +49,9 @@ It's not that document models are schema less, because the code usually assumes 
 Schema on read is like dynamic typing in programming languages, where schema on write is like static type checking.
 For example changing the format of a schema with already existing data:
 - document dbs, start writing new data with the new format and add app code to handle the old format
-	![[Pasted image 20240723210430.png]]
+	![image.png](../../../assets/Pasted%20image%2020240723210430.png)
 - relational dbs, you gotta make a migration
-	![[Pasted image 20240723210442.png]]
+	![image.png](../../../assets/Pasted%20image%2020240723210442.png)
 
 Schema on read advantageous if items in collection dont all have the same structure (data is heterogeneous).
 
@@ -68,14 +68,14 @@ Declarative languages also lend themselves to parallel execution. It's harder fo
 #### MapReduce Querying
 MapReduce is a programming model for processing large amounts of data in bulk across many machines.
 Here's how MongoDB implements it:
-![[Pasted image 20240724002706.png]]
+![image.png](../../../assets/Pasted%20image%2020240724002706.png)
 The map function emits a key-value pairs and these will then be grouped by key.
 The reduce function is then called once.
 The map and reduce functions must be pure functions and this allows them to be run anywhere, in any order and be rerun on failure. Perfect for distributed execution on a cluster of machines.
 
 
 This shares the same negatives of any other imperative language though. MongoDB added support for a declarative query language called the aggregation pipeline. The same query would look like this:
-![[Pasted image 20240724003217.png]]
+![image.png](../../../assets/Pasted%20image%2020240724003217.png)
 
 ## Graph-Like Data Models
 If our data primarily has many-to-many relationships we should use a graph to store it (social graph, the web, road/rail networks, ...). Data doesnt even need to be homogenous, there can be different types of vertices (people, locations, events) and different types of edges (who's friends with who, who lives where, who attented which event) in the same graph.
@@ -98,7 +98,7 @@ This allows us of having heterogeneous data with different level of granularity 
 
 ##### The Cypher Query Language
 Declarative QL for graphs created for the Neo4j graph db.
-![[Pasted image 20240724005625.png]]
+![image.png](../../../assets/Pasted%20image%2020240724005625.png)
 Cypher query to find people who emigrated from the US to Europe:
 ```
 MATCH
@@ -111,15 +111,16 @@ It could scan all people in the database, examine their birthplace / residence, 
 
 ##### Graph Queries in SQL
 We can store all vertices in a table and all edges in another table. How do we query a graph like this tough? How to represent `WITHIN\*0..`?  Meaning, follow this edge 0 or more times. 
-SQL introduced *recursive common table expressions* that can express the idea of variable-length traversal paths.![[Pasted image 20240724011038.png]]
+SQL introduced *recursive common table expressions* that can express the idea of variable-length traversal paths.
+![image.png](../../../assets/Pasted%20image%2020240724011038.png)
 4 lines of code vs 29 lines of code LOL.
 #### Triple Store Model
 In a triple store, all information is stored in the form of very simple three-part statements (subject, predicate, object). The subject is a vertex and the object can either be a value in a primitive datatype or another vertex. 
-![[Pasted image 20240724011320.png]]
+![image.png](../../../assets/Pasted%20image%2020240724011320.png)
 As you can see the predicate can either be an edge or a property.
 
 You can use a semicolon to not repeat yourself.
-![[Pasted image 20240724011405.png]]
+![image.png](../../../assets/Pasted%20image%2020240724011405.png)
 
 
 #### SPARQL, RDF and the Semantic Web
@@ -128,14 +129,14 @@ RDF (Resource Description Framework) was intended as a mechanism for different w
 The Turtle language we saw earlier is a human-readable format for RDF data, RDF only uses URI for referring to vertices and edges.
 SPARQL is a query language for triple stores using the RDF data model. 
 Here's how the same query, "finding people who emigrated from the US to Europe", looks like:
-![[Pasted image 20240724012522.png]]
+![image.png](../../../assets/Pasted%20image%2020240724012522.png)
 
 #### Datalog
 Datalog is one of the oldest graph QL, it provides the foundation that other QLs built upon.
 Its data model is similar to the triple-store model, and Datalog is a subset of Prolog so it shares similarities.
-![[Pasted image 20240724014334.png]]
+![image.png](../../../assets/Pasted%20image%2020240724014334.png)
 That's how we define the model, *predicate(subject, object)*
 
 
-![[Pasted image 20240724014401.png]]
+![image.png](../../../assets/Pasted%20image%2020240724014401.png)
 We basically define rules that tell the DB about new predicates. 

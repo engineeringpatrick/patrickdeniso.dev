@@ -5,15 +5,15 @@ date: "2024-9-10"
 description: ""
 tags: []
 ---
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/9a1479d8-2241-443f-82be-0a2f0be83f0f/image.png)
+![image.png](../../../assets/4-io-systems/image.png)
 
 ## Example of small device:
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/d519096a-b82b-4c95-9011-e29fadffbab9/image.png)
+![image.png](../../../assets/4-io-systems/image%201.png)
 
 Status register will tell you current status of device. Command will tell the device to perform some kind of task. Data is to pass data to the device.
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/a0a45a1c-fb75-4c6a-9d82-402584755bce/image.png)
+![image.png](../../../assets/4-io-systems/image%202.png)
 
 The while loop you see is called **polling** a device. 
 
@@ -29,7 +29,7 @@ Two-phase approach (polling for a little and if the device isnt finished using i
 
 The CPU would waste a lot of time transferring data to and from the device’s data register. Instead, there’s an engine that does this kind of work called the DMA: (diagram with process 1 and process 2 computation)
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/dd76e813-7499-4651-a72d-453bedba4987/image.png)
+![image.png](../../../assets/4-io-systems/image%203.png)
 
 The OS programs the DMA engine telling it where the data lives in memory, how much data to copy, and which device to send it to. At that point, the OS is done with the transfer and can proceed with other work. 
 
@@ -41,6 +41,6 @@ How does the OS know how a device works? With a piece of software called device 
 
 All of this is abstracted away then. Here’s an example for a file system and some storage devices.
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/994717fe-209a-4128-9856-2572f62afd05/6c9f5d2a-1ccf-4bfa-b48f-6efb2c34d0d4/image.png)
+![image.png](../../../assets/4-io-systems/image%204.png)
 
 This much abstraction actually has some downsides. For example the SCSI has better capabilities for error handling, but ASA/IDE don’t. Thereforet he interface loses that extra capability because it needs to be generic for all devices.

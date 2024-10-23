@@ -1,6 +1,6 @@
 ---
 category: "notes/distributed-systems"
-title: "#7 The Three Pillars"
+title: "#7 Transactions"
 date: "2024-8-10"
 description: "Seventh chapter of DDIA"
 tags: []

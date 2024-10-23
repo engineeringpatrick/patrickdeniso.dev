@@ -25,7 +25,7 @@ Basically a tree traversal. Each node has a range of values and a reference to e
 For reads, just traverse the tree, for writes, find an empty leaf to put your value in. If the leaf is full, you have to traverse up the tree and split the ranges until it fits.
 
 The branching factor is the number of references we keep per page. Usually it's several hundred.
-![[Pasted image 20240724032325.png]]
+![image.png](../../../assets/Pasted%20image%2020240724032325.png)
 
 
 Overall, good in terms of read, just a couple of traversal on disk
@@ -52,7 +52,8 @@ If the db crashes, we'll lose our lsm tree! Not necessarily, we'll keep a WAL an
 
 ##### Optimizations
 Instead of checking LSM tree first, then if key isnt there check SSTable etc, we can add 2 optimizations:
-- **SPARSE INDEX:** We can take certain keys and write their location on disk. We can say: "A" starts at 0x000, J starts at 0x11f, S at 0x2ab, Q at 0x3c6. Then when we read from this SSTable we can just see in what range our filter falls into and start our binary search from there already.![[Pasted image 20240724030044.png]]
+- **SPARSE INDEX:** We can take certain keys and write their location on disk. We can say: "A" starts at 0x000, J starts at 0x11f, S at 0x2ab, Q at 0x3c6. Then when we read from this SSTable we can just see in what range our filter falls into and start our binary search from there already.
+![image.png](../../../assets/Pasted%20image%2020240724030044.png)
 - **BLOOM FILTER:** This is needed because checking for a non-existant key is a slow process. We then implement a filter that tells you if a key is 100% not in the set. It may have false positives.
   Is "X" in sstable? No! definitely correct. Yes! may be wrong. 
   Works by hashing keys, sampling bits from the hash and setting them in a bitfield. On a lookup operation, we check if the hashed key was entered before.
