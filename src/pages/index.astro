@@ -1,11 +1,16 @@
 ---
+import HeatMap from '../components/HeatMap.astro';
 import TypingIntro from '../components/TypingIntro.astro';
 import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="Patrick Deniso">
-	<main class="flex md:flex-row flex-col items-center md:gap-0 gap-8">
-		<TypingIntro/>
-		<img class="w-64 h-64" src="profile_picture.jpeg" alt="Me!">
+	<main class="flex flex-col items-center md:gap-0 gap-8">
+		<div class="flex flex-col md:flex-row items-center">
+			<TypingIntro/>
+			<img class="w-64 h-64" src="profile_picture.jpeg" alt="Me!">
+		</div>
+		<h2>Wall of <s>shame</s> habits</h2>
+		<HeatMap/>
 	</main>
 </Layout>

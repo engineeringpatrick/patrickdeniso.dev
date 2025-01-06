@@ -1,0 +1,66 @@
+---
+const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+const squareSize = "w-3 h-3";
+const getColor = (value: number) => {
+  if (value === 0) return 'bg-white';
+  const intensity = Math.floor((value / 5) * 4);
+  switch (intensity) {
+    case 0: return 'bg-green-50';
+    case 1: return 'bg-green-200';
+    case 2: return 'bg-green-400';
+    case 3: return 'bg-green-600';
+    case 4: return 'bg-green-800';
+    default: return 'bg-white';
+  }
+};
+
+const startYear = 2025;
+const currDay = new Date(startYear, 0, 1);
+let currWeek = [];
+const calendar = [];
+console.log(currDay);
+while(currDay.getFullYear() != 2026) {
+  currWeek.push(structuredClone(currDay));
+  currDay.setDate(currDay.getDate() + 1);
+  if(currDay.getDay() == 0) {
+    calendar.push(currWeek);
+    currWeek = [];
+  }
+}
+if(calendar) calendar.push(currWeek);
+
+
+const res = await fetch("http://localhost:8787/api/habits?date=2025-01-05");
+console.log("bro!!")
+console.log(await res.json())
+---
+
+<div class="min-w-[1200px]">
+  <div class="flex flex-row items-center">
+    <div class="flex-col pr-4">
+      {daysOfWeek.map(day => (
+        <div class={`${squareSize} text-xs text-gray-500 text-center`}> {day} </div>
+      ))}
+    </div>
+
+    {calendar.map((week, _) => (
+      <div class="flex flex-col items-center">
+        {/* <div class="w-4 text-xs font-medium text-gray-700"> </div> */}
+        <div class="flex flex-col flex-1">
+          {Array(7).fill(0).map((_, i) => {
+            const day = week.find((day) => day.getDay() == i);
+            return day ? (
+              <div class={`${squareSize} ${getColor(0)} border border-gray-100 rounded group relative`}>
+                <div class="invisible group-hover:visible absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10">
+                  {`${0}/5 habits on ${day.toDateString()}`}
+                </div>
+              </div>
+            ) : (
+              <div class={`${squareSize} invisible`}/>
+            )
+          })}
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
