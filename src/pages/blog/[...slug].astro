@@ -10,7 +10,7 @@ interface Props {
 }
 
 export async function getStaticPaths() {
-    const topCategories: Category[] = ['notes', 'thoughts', 'essays'];
+    const topCategories: Category[] = ['notes', 'thoughts', 'books'];
     const fullCategories = new Set<string | undefined>([undefined, ...topCategories]);
     
     const postPaths = await Promise.all(topCategories.map(async category => {

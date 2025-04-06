@@ -10,5 +10,5 @@ const blogCollection = defineCollection({
     }),
 });
 
-export type Category = 'notes' | 'thoughts' | 'essays';
-export const collections = { notes: blogCollection, thoughts: blogCollection, essays: blogCollection };
+export type Category = 'notes' | 'thoughts' | 'books';
+export const collections = { notes: blogCollection, thoughts: blogCollection, books: blogCollection };
