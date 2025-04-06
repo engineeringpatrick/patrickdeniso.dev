@@ -3,18 +3,24 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro check && astro build",
+    "dev": "npm run fix-assets && astro dev",
+    "start": "npm run fix-assets && astro dev",
+    "build": "npm run fix-assets && astro check && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "fix-assets": "tsx scripts/fix-markdown-assets.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
     "@astrojs/tailwind": "^5.1.2",
     "astro": "^4.15.12",
+    "glob": "^11.0.1",
     "tailwindcss": "^3.4.13",
     "typescript": "^5.6.3",
     "typewriter-effect": "^2.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "tsx": "^4.19.3"
   }
 }
