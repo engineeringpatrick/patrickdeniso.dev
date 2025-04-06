@@ -11,4 +11,11 @@ const blogCollection = defineCollection({
 });
 
 export type Category = 'notes' | 'thoughts' | 'books';
+export const categories: Record<Category, string[]> = {
+    notes: ['Operating Systems', 'Distributed Systems', 'Compilers', 'Algorithms', 'Deep Learning'],
+    thoughts: [],
+    books: []
+};
+
 export const collections = { notes: blogCollection, thoughts: blogCollection, books: blogCollection };
+

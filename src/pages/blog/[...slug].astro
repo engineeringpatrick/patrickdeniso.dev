@@ -2,7 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
 import PostButton from "../../components/Posts/PostButton.astro";
-import type { Category } from "../../content/config";
+import { categories, type Category } from "../../content/config";
 import BlogLayout from "../../layouts/BlogLayout.astro";
 
 interface Props {
@@ -10,11 +10,10 @@ interface Props {
 }
 
 export async function getStaticPaths() {
-    const topCategories: Category[] = ['notes', 'thoughts', 'books'];
-    const fullCategories = new Set<string | undefined>([undefined, ...topCategories]);
+    const fullCategories = new Set<string | undefined>([undefined, ...Object.keys(categories)]);
     
-    const postPaths = await Promise.all(topCategories.map(async category => {
-        const entries = await getCollection(category);
+    const postPaths = await Promise.all(Object.keys(categories).map(async category => {
+        const entries = await getCollection(category as Category);
 
         return entries.map(entry => {
             fullCategories.add(entry.data.category);
@@ -24,6 +23,7 @@ export async function getStaticPaths() {
     }));
     const categoryPaths = Array.from(fullCategories).map(category => ({ params: { slug: category } }));
 
+    console.log(categoryPaths);
     return [...postPaths.flat(), ...categoryPaths];
 }
 
@@ -31,6 +31,7 @@ const blogEntry = await Astro.props.entry?.render();
 
 const urlCategory = Astro.params.slug?.split('/')[0];
 const posts = urlCategory ? await getCollection(urlCategory as Category, ({ data }) => (data.category === Astro.params.slug)) : [];
+console.log(urlCategory);
 ---
 
 <BlogLayout>
