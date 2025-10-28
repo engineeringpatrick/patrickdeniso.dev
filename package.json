@@ -8,7 +8,8 @@
     "build": "npm run fix-assets && astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "fix-assets": "tsx scripts/fix-markdown-assets.ts"
+    "fix-assets": "tsx scripts/fix-markdown-assets.ts",
+    "pull-notes": "git -C src/content/notes pull origin main"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
