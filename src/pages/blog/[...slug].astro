@@ -30,8 +30,17 @@ export async function getStaticPaths() {
 const blogEntry = await Astro.props.entry?.render();
 
 const urlCategory = Astro.params.slug?.split('/')[0];
-const posts = urlCategory ? await getCollection(urlCategory as Category, ({ data }) => (data.category === Astro.params.slug)) : [];
-console.log(urlCategory);
+let posts = urlCategory ? await getCollection(urlCategory as Category, ({ data }) => (data.category === Astro.params.slug)) : [];
+
+posts = posts.sort((a, b) => {
+  const getLastSegment = (id: string) =>
+    id.split("/").pop()?.replace(/\.m$/, "") ?? "";
+
+  return getLastSegment(a.id).localeCompare(getLastSegment(b.id), undefined, {
+    numeric: true,
+    sensitivity: "base",
+  });
+});
 ---
 
 <BlogLayout>
