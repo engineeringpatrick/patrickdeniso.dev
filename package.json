@@ -3,9 +3,14 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "npm run fix-assets && astro dev",
-    "start": "npm run fix-assets && astro dev",
-    "build": "npm run fix-assets && astro check && astro build",
+    "prepare-notes": "npm run pull-notes && npm run fix-assets",
+    "predev": "npm run prepare-notes",
+    "prestart": "npm run prepare-notes",
+    "prebuild": "npm run prepare-notes",
+
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "fix-assets": "tsx scripts/fix-markdown-assets.ts",
