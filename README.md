@@ -2,3 +2,4 @@
 # Wow
 
 - New personal website made with Astro!
+- Blog portion is made with Quartz: https://github.com/engineeringpatrick/blog
