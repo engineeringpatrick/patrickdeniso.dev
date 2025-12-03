@@ -13,4 +13,7 @@ export default defineConfig({
     remarkPlugins: [remarkMath],
     rehypePlugins: [rehypeKatex],
   },
+  redirects: {
+    '/blog/[...slug]': 'https://blog.patrickdeniso.com',
+  },
 });
