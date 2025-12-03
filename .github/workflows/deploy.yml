@@ -16,11 +16,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout your repository (with submodules)
+      - name: Checkout your repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GH_PAT }}
-          fetch-depth: 0
       - name: Install, build, and upload your site
         uses: withastro/action@v3
   deploy:
