@@ -173,7 +173,7 @@ export default function PhotoMuseum({ language, onClose }: PhotoMuseumProps) {
 								<div className="finder-viewer__main">
 									<div className="finder-viewer__stage">
 										<button className="finder-viewer__step finder-viewer__step--previous" type="button" aria-label={text.previous} onClick={() => step(-1)}><ChevronLeft aria-hidden="true" /></button>
-										<figure className="finder-viewer__frame">
+										<figure className={`finder-viewer__frame${activePhoto.caption ? ' has-caption' : ''}`}>
 											<img src={activePhoto.src} alt={`${text.photoAlt} ${selectedPhotoIndex + 1}`} fetchPriority="high" decoding="async" />
 											{activePhoto.caption ? <figcaption>{activePhoto.caption}</figcaption> : null}
 										</figure>

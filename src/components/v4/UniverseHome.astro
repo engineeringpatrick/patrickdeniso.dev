@@ -78,7 +78,9 @@ const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 			</label>
 		</div>
 		<p class="universe__model-credit"><span data-v4-model-credit>3D models:</span> <a href="https://science.nasa.gov/3d-resources/">NASA / JPL-Caltech, NASA VTAD &amp; DigitalSpace Corporation</a></p>
-		<VersionPicker currentVersion={4} appearance="space" showLabel={false} />
+		<div class="universe__version">
+			<VersionPicker currentVersion={4} appearance="space" showLabel={false} />
+		</div>
 	</footer>
 
 </main>
@@ -497,7 +499,7 @@ const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 	.universe__model-credit { margin: 0; color: rgb(202 204 242 / .48); font: 600 .6rem/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
 	.universe__model-credit a { color: inherit; text-decoration-color: rgb(202 204 242 / .28); text-underline-offset: .16em; }
 	.universe__model-credit a:hover { color: rgb(242 242 255 / .8); }
-	.universe__footer > :last-child { justify-self: end; }
+	.universe__version { justify-self: end; }
 
 	.universe__sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
 	@keyframes console-sheen { 32%, 100% { transform: translateX(140%); } }
@@ -527,7 +529,7 @@ const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 		.universe__console { top: 57%; width: min(32rem, 85vw); }
 		.universe__footer { grid-template-columns: minmax(0, 1fr) auto; }
 		.universe__model-credit { grid-column: 1 / -1; grid-row: 2; }
-		.universe__footer > :last-child { grid-column: 2; grid-row: 1; }
+		.universe__version { grid-column: 2; grid-row: 1; }
 	}
 
 	@media (max-width: 520px) {
@@ -539,7 +541,7 @@ const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 		.universe__console-code :global(.vim-terminal--intro .vim-terminal__buffer),
 		.universe__console-code :global(.vim-terminal--intro .vim-terminal__lines) { font-size: .72rem; }
 		.universe__footer { display: flex; align-items: flex-start; flex-direction: column; padding-top: 1rem; }
-		.universe__footer > :last-child { align-self: flex-end; }
+		.universe__version { align-self: flex-end; margin-left: auto; }
 	}
 
 	@media (prefers-reduced-motion: reduce) {

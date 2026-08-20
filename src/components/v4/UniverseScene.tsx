@@ -82,12 +82,12 @@ const getLayout = (width: number): SceneLayout => {
 			showSun: false,
 			planetSize: 1.72,
 			astronautSize: 1.02,
-			astronautPosition: [-2.18, -3.42, 2.15],
+			astronautPosition: [-1.45, -3.78, 2.15],
 			astronautDriftAmplitude: 0.12,
 			positions: {
 				work: [-1.55, 2.55, 1.1],
 				posts: [2.05, 2.42, 0.45],
-				photos: [1.5, -2.72, 1.3],
+				photos: [1.5, -3.62, 1.3],
 			},
 		};
 	}

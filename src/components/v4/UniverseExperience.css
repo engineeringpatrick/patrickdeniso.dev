@@ -144,9 +144,10 @@
 .finder-viewer__body { display: grid; min-height: 0; flex: 1; grid-template-columns: minmax(0, 1fr) 13rem; overflow: hidden; }
 .finder-viewer__main { display: flex; min-width: 0; min-height: 0; flex-direction: column; }
 .finder-viewer__stage { position: relative; display: grid; min-height: 0; flex: 1; place-items: center; overflow: hidden; padding: 1.2rem 4.4rem; background: linear-gradient(135deg, #e7e7ec, #f9f9fb); }
-.finder-viewer__frame { display: flex; width: 100%; height: 100%; min-width: 0; min-height: 0; flex-direction: column; align-items: center; justify-content: center; margin: 0; overflow: hidden; }
-.finder-viewer__frame img { display: block; width: auto; height: auto; max-width: 100%; max-height: min(29rem, 52svh); box-sizing: border-box; border: .38rem solid #fff; box-shadow: 0 1.2rem 3rem rgb(31 31 47 / .22); object-fit: contain; }
-.finder-viewer__frame figcaption { max-width: min(36rem, 100%); margin-top: .7rem; color: #545565; font-size: .82rem; line-height: 1.45; text-align: center; }
+.finder-viewer__frame { display: grid; width: 100%; height: 100%; min-width: 0; min-height: 0; grid-template-rows: minmax(0, 1fr); place-items: center; margin: 0; overflow: hidden; }
+.finder-viewer__frame.has-caption { grid-template-rows: minmax(0, 1fr) auto; row-gap: .7rem; }
+.finder-viewer__frame img { display: block; width: auto; height: auto; min-height: 0; max-width: 100%; max-height: min(29rem, 52svh, 100%); box-sizing: border-box; border: .38rem solid #fff; box-shadow: 0 1.2rem 3rem rgb(31 31 47 / .22); object-fit: contain; }
+.finder-viewer__frame figcaption { max-width: min(36rem, 100%); color: #545565; font-size: .82rem; line-height: 1.45; text-align: center; }
 .finder-viewer__step { position: absolute; z-index: 1; display: grid; width: 2.25rem; aspect-ratio: 1; place-items: center; border: 1px solid rgb(38 39 58 / .13); border-radius: 50%; background: rgb(255 255 255 / .86); color: #3d3e53; box-shadow: 0 .35rem .8rem rgb(30 30 45 / .13); cursor: pointer; }
 .finder-viewer__step:hover, .finder-viewer__step:focus-visible { background: #fff; outline: 2px solid #0a84ff; outline-offset: 2px; }
 .finder-viewer__step--previous { left: .9rem; }
@@ -196,7 +197,7 @@
 	.universe-planet-label strong { font-size: .66rem; }
 	.universe-planet-label--work { top: 14%; left: 23%; }
 	.universe-planet-label--posts { top: 20%; left: 82%; }
-	.universe-planet-label--photos { top: 76%; left: 75%; }
+	.universe-planet-label--photos { top: 86%; left: 75%; }
 	.universe-click-hint { width: 6rem; font-size: .76rem; }
 	.universe-click-hint svg { width: 5.4rem; }
 	.universe-click-hint--posts svg { height: 6rem; }
@@ -216,9 +217,8 @@
 	.finder-viewer__body { display: flex; flex-direction: column; overflow: auto; }
 	.finder-viewer__main { min-height: 0; flex: 0 0 auto; }
 	.finder-info { max-height: 12rem; border-top: 1px solid rgb(31 32 52 / .1); border-left: 0; }
-	.finder-viewer__stage { height: auto; min-height: 0; flex: 0 0 auto; overflow: visible; padding: 1rem 2.9rem; }
-	.finder-viewer__frame { height: auto; overflow: visible; justify-content: flex-start; }
-	.finder-viewer__frame img { max-width: 100%; max-height: min(52svh, 28rem); }
+	.finder-viewer__stage { height: min(28rem, 48svh); min-height: 0; flex: 0 0 auto; padding: 1rem 2.9rem; }
+	.finder-viewer__frame img { max-width: 100%; max-height: 100%; }
 	.finder-viewer__step--previous { left: .35rem; }
 	.finder-viewer__step--next { right: .35rem; }
 }

@@ -164,11 +164,9 @@ export default function VimEditor({
 		const nextCursor = Math.min(rawIndex, field.value.length);
 		field.setSelectionRange(nextCursor, nextCursor);
 	};
-	const handleBufferPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+	const handleBufferClick = (event: React.MouseEvent<HTMLDivElement>) => {
 		if (isLocked || mode !== 'normal' || event.target instanceof Element && event.target.closest('a')) return;
-		const isTouch = event.pointerType === 'touch' || window.matchMedia('(pointer: coarse)').matches;
-		if (!isTouch) return;
-		event.preventDefault();
+		if (!window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
 		mobileNormalInput.current?.focus({ preventScroll: true });
 	};
 	const enterCommandMode = () => {
@@ -235,7 +233,7 @@ export default function VimEditor({
 						tabIndex={isLocked ? -1 : 0}
 						autoFocus={!isLocked && autoFocus}
 						onKeyDown={isLocked ? undefined : handleNormalKey}
-						onPointerDown={handleBufferPointerDown}
+						onClick={handleBufferClick}
 						onScroll={(event) => {
 							syncLineNumbers(event.currentTarget);
 						}}
