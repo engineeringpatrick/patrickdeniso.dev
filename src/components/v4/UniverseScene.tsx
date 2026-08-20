@@ -53,6 +53,55 @@ const planetColors: Record<PlanetId, string> = {
 };
 
 const planetFloatOffsets: Record<PlanetId, number> = { work: 0, posts: 1.2, photos: 2.3 };
+const milkyWayVertexShader = `
+	varying vec2 vUv;
+	void main() {
+		vUv = uv;
+		gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+	}
+`;
+const milkyWayFragmentShader = `
+	varying vec2 vUv;
+
+	float hash(vec2 point) {
+		return fract(sin(dot(point, vec2(127.1, 311.7))) * 43758.5453);
+	}
+
+	float noise(vec2 point) {
+		vec2 cell = floor(point);
+		vec2 offset = fract(point);
+		offset = offset * offset * (3.0 - 2.0 * offset);
+		return mix(
+			mix(hash(cell), hash(cell + vec2(1.0, 0.0)), offset.x),
+			mix(hash(cell + vec2(0.0, 1.0)), hash(cell + vec2(1.0)), offset.x),
+			offset.y
+		);
+	}
+
+	float fbm(vec2 point) {
+		float value = 0.0;
+		float amplitude = 0.5;
+		for (int octave = 0; octave < 4; octave++) {
+			value += noise(point) * amplitude;
+			point = point * 2.03 + 7.1;
+			amplitude *= 0.5;
+		}
+		return value;
+	}
+
+	void main() {
+		float distanceFromCore = abs(vUv.y - 0.5) * 2.0;
+		float softBand = 1.0 - smoothstep(0.08, 1.0, distanceFromCore);
+		float clouds = fbm(vec2(vUv.x * 8.0, vUv.y * 4.5));
+		float brokenEdge = fbm(vec2(vUv.x * 17.0 + 4.0, vUv.y * 8.0));
+		float alpha = softBand * (0.075 + clouds * 0.27) * (0.35 + brokenEdge * 0.65);
+		vec3 coolDust = vec3(0.32, 0.39, 0.78);
+		vec3 warmCore = vec3(0.82, 0.72, 0.82);
+		vec3 color = mix(coolDust, warmCore, softBand * clouds);
+		if (alpha < 0.004) discard;
+		gl_FragColor = vec4(color, alpha);
+	}
+`;
 const configureGLTFLoader = (loader: GLTFLoader) => loader.setMeshoptDecoder(MeshoptDecoder);
 const pickRandomTarget = (current?: SceneTargetId): SceneTargetId => {
 	const candidates = current ? sceneTargetIds.filter((id) => id !== current) : sceneTargetIds;
@@ -228,31 +277,44 @@ function TwinkleField({ compact, reducedMotion }: { compact: boolean; reducedMot
 	);
 }
 
-function NebulaDust({ compact, reducedMotion }: { compact: boolean; reducedMotion: boolean }) {
-	const points = useRef<THREE.Points>(null);
+function MilkyWayBand({ compact, reducedMotion }: { compact: boolean; reducedMotion: boolean }) {
+	const band = useRef<THREE.Group>(null);
 	const positions = useMemo(() => {
-		const count = compact ? 260 : 560;
+		const count = compact ? 420 : 1100;
 		const values = new Float32Array(count * 3);
+		let seed = 0x51f15e;
+		const random = () => {
+			seed = Math.imul(seed, 1664525) + 1013904223 | 0;
+			return (seed >>> 0) / 4294967296;
+		};
 		for (let index = 0; index < count; index += 1) {
-			const spread = Math.random();
-			values[index * 3] = (Math.random() - 0.5) * 22 * (0.35 + spread);
-			values[index * 3 + 1] = (Math.random() - 0.5) * 8 * (0.35 + spread);
-			values[index * 3 + 2] = -9 - Math.random() * 13;
+			const x = (random() - 0.5) * 42;
+			const clusteredOffset = random() + random() + random() + random() - 2;
+			const center = Math.sin(x * 0.32) * 0.28 + Math.sin(x * 0.11 + 1.4) * 0.42;
+			values[index * 3] = x;
+			values[index * 3 + 1] = center + clusteredOffset * (compact ? 1.2 : 1.65);
+			values[index * 3 + 2] = (random() - 0.5) * 1.8;
 		}
 		return values;
 	}, [compact]);
 
-	useFrame((_, delta) => {
-		if (points.current && !reducedMotion) points.current.rotation.z += delta * 0.0015;
+	useFrame(({ clock }) => {
+		if (band.current && !reducedMotion) band.current.rotation.z = -0.27 + Math.sin(clock.getElapsedTime() * 0.045) * 0.012;
 	});
 
 	return (
-		<points ref={points}>
-			<bufferGeometry>
-				<bufferAttribute attach="attributes-position" args={[positions, 3]} />
-			</bufferGeometry>
-			<pointsMaterial color="#725cc7" size={compact ? 0.12 : 0.16} sizeAttenuation transparent opacity={0.12} depthWrite={false} blending={THREE.AdditiveBlending} />
-		</points>
+		<group ref={band} position={[0, -0.45, -14]} rotation={[0, 0, -0.27]}>
+			<mesh>
+				<planeGeometry args={[80, compact ? 7.5 : 9]} />
+				<shaderMaterial vertexShader={milkyWayVertexShader} fragmentShader={milkyWayFragmentShader} transparent depthWrite={false} blending={THREE.NormalBlending} />
+			</mesh>
+			<points>
+				<bufferGeometry>
+					<bufferAttribute attach="attributes-position" args={[positions, 3]} />
+				</bufferGeometry>
+				<pointsMaterial color="#eef0ff" size={compact ? 0.1 : 0.078} sizeAttenuation transparent opacity={compact ? 0.58 : 0.72} depthWrite={false} blending={THREE.AdditiveBlending} />
+			</points>
+		</group>
 	);
 }
 
@@ -436,12 +498,8 @@ function UniverseContents({
 
 			<StarField compact={layout.compact} reducedMotion={reducedMotion} />
 			<TwinkleField compact={layout.compact} reducedMotion={reducedMotion} />
-			<NebulaDust compact={layout.compact} reducedMotion={reducedMotion} />
+			<MilkyWayBand compact={layout.compact} reducedMotion={reducedMotion} />
 			<Astronaut position={layout.astronautPosition} driftAmplitude={layout.astronautDriftAmplitude} size={layout.astronautSize} hovered={hovered === 'about'} reducedMotion={reducedMotion} onHover={onHover} onSelect={onAstronautSelect} labelElement={astronautLabelElement} hintElement={clickHintTarget === 'about' ? clickHintElement : null} />
-			<mesh position={[1, -3, -13]} scale={[16.2, 5.6, 6.3]}>
-				<sphereGeometry args={[1, 20, 20]} />
-				<meshBasicMaterial color="#4b2d8e" transparent opacity={0.09} side={THREE.BackSide} />
-			</mesh>
 
 			{layout.showSun ? <Suspense fallback={<DistantSunFallback />}><DistantSun reducedMotion={reducedMotion} /></Suspense> : null}
 			{planetIds.map((id) => (

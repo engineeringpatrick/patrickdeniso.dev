@@ -442,7 +442,7 @@ const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 	:global(.universe__shooting-star) { --shooting-angle: 35deg; --shooting-distance-x: 50vw; --shooting-distance-y: 50vh; --shooting-drift-x: 4px; --shooting-drift-y: -3px; --shooting-drift-x-2: -3px; --shooting-drift-y-2: 2px; --shooting-length: 7rem; --shooting-duration: 2200ms; position: absolute; width: 1px; height: 1px; opacity: 0; animation: wordmark-shooting-star var(--shooting-duration) linear forwards; will-change: opacity, transform; }
 	:global(.universe__shooting-star)::before { position: absolute; top: 0; right: 0; width: var(--shooting-length); height: 1px; content: ''; background: linear-gradient(90deg, transparent, rgb(255 255 255 / .18) 45%, rgb(255 255 255 / .95)); filter: drop-shadow(0 0 .2rem rgb(184 197 255 / .7)); transform: translateY(-50%) rotate(var(--shooting-angle)) scaleX(.08); transform-origin: right center; animation: wordmark-shooting-tail var(--shooting-duration) ease-out forwards; }
 	:global(.universe__shooting-star)::after { position: absolute; width: .18rem; height: .18rem; border-radius: 50%; content: ''; background: #fff; box-shadow: 0 0 .4rem rgb(196 207 255 / .9); transform: translate(-50%, -50%); animation: wordmark-shooting-head var(--shooting-duration) ease-in-out forwards; }
-	.universe__scene { flex: 1; min-height: 40rem; }
+	.universe__scene { width: 100vw; max-width: none; flex: 1; min-height: 40rem; margin-inline: calc(50% - 50vw); }
 	.universe.has-maximized-console .universe__scene { z-index: 40; }
 	.universe.has-maximized-console .universe__scene::after { position: fixed; z-index: 50; inset: 0; content: ''; background: rgb(3 4 20 / .72); backdrop-filter: blur(12px); }
 
