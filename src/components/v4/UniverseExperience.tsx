@@ -1,60 +1,66 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState, type ComponentType, type LazyExoticComponent } from 'react';
 import { createPortal } from 'react-dom';
 import UniverseScene from './UniverseScene';
-import { type PlanetId, type V4Language } from './v4Content';
+import { type PlanetId, type V4Language } from '../../locales/v4';
+import { V4_ROOM_CHANGE_EVENT, type V4RoomChangeDetail } from './v4Events';
+import useV4Language from './useV4Language';
 import './UniverseExperience.css';
 
+const AboutMeWindow = lazy(() => import('./AboutMeWindow'));
 const BlogBrowserWindow = lazy(() => import('./BlogBrowserWindow'));
 const PhotoMuseum = lazy(() => import('./PhotoMuseum'));
 const WorkExperienceWindow = lazy(() => import('./WorkExperienceWindow'));
 
-const isLanguage = (value: string | undefined): value is V4Language => value === 'en' || value === 'it' || value === 'fr' || value === 'zh';
+type RoomId = PlanetId | 'about';
+type RoomProps = { language: V4Language; onClose: () => void };
 
-function useV4Language() {
-	const [language, setLanguage] = useState<V4Language>('en');
-
-	useEffect(() => {
-		const updateLanguage = () => {
-			const next = document.documentElement.dataset.v4Language;
-			setLanguage(isLanguage(next) ? next : 'en');
-		};
-		updateLanguage();
-		window.addEventListener('v4:language-change', updateLanguage);
-		return () => window.removeEventListener('v4:language-change', updateLanguage);
-	}, []);
-
-	return language;
-}
+const roomComponents = {
+	about: AboutMeWindow,
+	work: WorkExperienceWindow,
+	posts: BlogBrowserWindow,
+	photos: PhotoMuseum,
+} satisfies Record<RoomId, LazyExoticComponent<ComponentType<RoomProps>>>;
 
 /** The client-only v4 island: Fiber owns the universe and React owns its rooms. */
 export default function UniverseExperience() {
-	const [selectedPlanet, setSelectedPlanet] = useState<PlanetId | null>(null);
+	const [selectedRoom, setSelectedRoom] = useState<RoomId | null>(null);
 	const language = useV4Language();
 
 	useEffect(() => {
-		if (!selectedPlanet) return;
+		window.dispatchEvent(new CustomEvent<V4RoomChangeDetail>(V4_ROOM_CHANGE_EVENT, { detail: { open: selectedRoom !== null } }));
+	}, [selectedRoom]);
+
+	useEffect(() => () => {
+		window.dispatchEvent(new CustomEvent<V4RoomChangeDetail>(V4_ROOM_CHANGE_EVENT, { detail: { open: false } }));
+	}, []);
+
+	useEffect(() => {
+		if (!selectedRoom) return;
 		const onKeyDown = (event: KeyboardEvent) => {
-			if (event.key === 'Escape' && !event.defaultPrevented) setSelectedPlanet(null);
+			if (event.key === 'Escape' && !event.defaultPrevented) setSelectedRoom(null);
 		};
 		document.addEventListener('keydown', onKeyDown);
 		return () => document.removeEventListener('keydown', onKeyDown);
-	}, [selectedPlanet]);
+	}, [selectedRoom]);
 
 	useEffect(() => {
-		if (!selectedPlanet) return;
+		if (!selectedRoom) return;
 		const previousOverflow = document.body.style.overflow;
 		document.body.style.overflow = 'hidden';
 		return () => { document.body.style.overflow = previousOverflow; };
-	}, [selectedPlanet]);
+	}, [selectedRoom]);
 
-	const closeWindow = () => setSelectedPlanet(null);
+	const closeWindow = () => setSelectedRoom(null);
+	const openPlanet = (planet: PlanetId) => setSelectedRoom(planet);
+	const openAbout = () => setSelectedRoom('about');
+	const SelectedRoom = selectedRoom ? roomComponents[selectedRoom] : null;
 
 	return (
 		<div className="universe-experience">
-			<UniverseScene language={language} onPlanetSelect={setSelectedPlanet} />
+			<UniverseScene language={language} onPlanetSelect={openPlanet} onAstronautSelect={openAbout} roomOpen={selectedRoom !== null} />
 
 			{createPortal(
-				selectedPlanet ? (
+				SelectedRoom ? (
 					<div
 						className="universe-experience__panel"
 						onClick={(event) => {
@@ -63,11 +69,7 @@ export default function UniverseExperience() {
 					>
 						<div className="universe-experience__window">
 							<Suspense fallback={<div className="universe-experience__loading" aria-hidden="true" />}>
-								{selectedPlanet === 'work'
-									? <WorkExperienceWindow language={language} onClose={closeWindow} />
-									: selectedPlanet === 'posts'
-										? <BlogBrowserWindow language={language} onClose={closeWindow} />
-										: <PhotoMuseum language={language} onClose={closeWindow} />}
+								<SelectedRoom language={language} onClose={closeWindow} />
 							</Suspense>
 						</div>
 					</div>

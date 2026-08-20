@@ -8,7 +8,7 @@ import {
 	Search,
 } from 'lucide-react';
 import { GridList, GridListItem } from 'react-aria-components';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { copy, type V4Language } from '../../locales/v4';
 import MacWindowControls, { useWindowMode } from './MacWindowControls';
 import { photoCollections, type PhotoCollection } from './v4Content';
@@ -21,18 +21,21 @@ type PhotoMuseumProps = {
 type ViewMode = 'grid' | 'list';
 
 const localeForLanguage: Record<V4Language, string> = { en: 'en-US', it: 'it-IT', fr: 'fr-FR', zh: 'zh-CN' };
+const byteUnits = ['B', 'KB', 'MB', 'GB'];
+const dateFormatters = Object.fromEntries(
+	Object.entries(localeForLanguage).map(([language, locale]) => [language, new Intl.DateTimeFormat(locale, { dateStyle: 'medium' })]),
+) as Record<V4Language, Intl.DateTimeFormat>;
 
 const formatBytes = (bytes: number) => {
 	if (!Number.isFinite(bytes) || bytes < 1) return '—';
-	const units = ['B', 'KB', 'MB', 'GB'];
-	const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
-	return `${(bytes / 1024 ** exponent).toFixed(exponent === 0 ? 0 : 1)} ${units[exponent]}`;
+	const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), byteUnits.length - 1);
+	return `${(bytes / 1024 ** exponent).toFixed(exponent === 0 ? 0 : 1)} ${byteUnits[exponent]}`;
 };
 
 const formatDate = (value: string | undefined, language: V4Language, fallback: string) => {
 	if (!value) return fallback;
 	const date = new Date(/^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T12:00:00` : value);
-	return Number.isNaN(date.valueOf()) ? value : new Intl.DateTimeFormat(localeForLanguage[language], { dateStyle: 'medium' }).format(date);
+	return Number.isNaN(date.valueOf()) ? value : dateFormatters[language].format(date);
 };
 
 export default function PhotoMuseum({ language, onClose }: PhotoMuseumProps) {
@@ -49,12 +52,16 @@ export default function PhotoMuseum({ language, onClose }: PhotoMuseumProps) {
 		[currentCollectionSlug],
 	);
 	const activePhoto = selectedPhotoIndex === null ? null : collection?.photos[selectedPhotoIndex] ?? null;
-	const collectionTitle = (item: PhotoCollection) => text.collections[item.slug] ?? item.title;
+	const photoItems = useMemo(() => collection?.photos.map((photo, index) => ({ id: String(index), photo })) ?? [], [collection]);
+	const selectedPhotoKeys = useMemo(() => selectedPhotoIndex === null ? new Set<string>() : new Set([String(selectedPhotoIndex)]), [selectedPhotoIndex]);
+	const selectedCollectionKeys = useMemo(() => selectedCollectionSlug ? new Set([selectedCollectionSlug]) : new Set<string>(), [selectedCollectionSlug]);
+	const collectionTitle = useCallback((item: PhotoCollection) => text.collections[item.slug] ?? item.title, [text.collections]);
 	const matchingCollections = useMemo(() => {
-		const normalizedQuery = query.trim().toLocaleLowerCase();
+		const normalizedQuery = query.trim().toLocaleLowerCase(localeForLanguage[language]);
 		if (!normalizedQuery) return photoCollections;
-		return photoCollections.filter((item) => collectionTitle(item).toLocaleLowerCase().includes(normalizedQuery));
-	}, [query, text.collections]);
+		return photoCollections.filter((item) => collectionTitle(item).toLocaleLowerCase(localeForLanguage[language]).includes(normalizedQuery)
+			|| item.photos.some((photo) => photo.id.toLocaleLowerCase(localeForLanguage[language]).includes(normalizedQuery)));
+	}, [collectionTitle, language, query]);
 
 	const openCollection = (nextCollection: PhotoCollection) => {
 		setCurrentCollectionSlug(nextCollection.slug);
@@ -62,27 +69,37 @@ export default function PhotoMuseum({ language, onClose }: PhotoMuseumProps) {
 		setSelectedPhotoIndex(null);
 		setQuery('');
 	};
+	const openCollectionBySlug = (slug: string | null) => {
+		if (!slug) return;
+		const nextCollection = matchingCollections.find((item) => item.slug === slug);
+		if (nextCollection) openCollection(nextCollection);
+	};
 
 	const goToArchive = () => {
 		setCurrentCollectionSlug(null);
 		setSelectedPhotoIndex(null);
 	};
 
-	const step = (direction: -1 | 1) => {
-		if (!collection || selectedPhotoIndex === null) return;
-		setSelectedPhotoIndex((current) => current === null ? 0 : (current + direction + collection.photos.length) % collection.photos.length);
-	};
+	const photoCount = collection?.photos.length ?? 0;
+	const isViewingPhoto = selectedPhotoIndex !== null && collection !== null;
+	const step = useCallback((direction: -1 | 1) => {
+		if (!photoCount) return;
+		setSelectedPhotoIndex((current) => current === null ? 0 : (current + direction + photoCount) % photoCount);
+	}, [photoCount]);
 
 	useEffect(() => {
-		if (!activePhoto || !collection) return;
+		if (!isViewingPhoto) return;
 		const onKeyDown = (event: KeyboardEvent) => {
+			if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Escape') return;
+			event.preventDefault();
+			event.stopPropagation();
 			if (event.key === 'ArrowLeft') step(-1);
-			if (event.key === 'ArrowRight') step(1);
-			if (event.key === 'Escape') setSelectedPhotoIndex(null);
+			else if (event.key === 'ArrowRight') step(1);
+			else setSelectedPhotoIndex(null);
 		};
-		window.addEventListener('keydown', onKeyDown);
-		return () => window.removeEventListener('keydown', onKeyDown);
-	}, [activePhoto, collection, selectedPhotoIndex]);
+		window.addEventListener('keydown', onKeyDown, true);
+		return () => window.removeEventListener('keydown', onKeyDown, true);
+	}, [isViewingPhoto, step]);
 
 	const folderName = collection ? collectionTitle(collection) : text.title;
 
@@ -116,7 +133,14 @@ export default function PhotoMuseum({ language, onClose }: PhotoMuseumProps) {
 						<label className="finder-toolbar__search">
 							<Search size={13} aria-hidden="true" />
 							<span className="v4-window__sr-only">{text.searchCollections}</span>
-							<input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={text.searchCollections} />
+							<input
+								value={query}
+								onChange={(event) => {
+									setQuery(event.target.value);
+									setSelectedCollectionSlug(null);
+								}}
+								placeholder={text.searchCollections}
+							/>
 						</label>
 					</div>
 				</div>
@@ -193,55 +217,55 @@ export default function PhotoMuseum({ language, onClose }: PhotoMuseumProps) {
 									aria-label={`${collectionTitle(collection)} ${text.photographs}`}
 									layout="grid"
 									selectionMode="single"
-									selectedKeys={selectedPhotoIndex === null ? new Set() : new Set([String(selectedPhotoIndex)])}
+									selectedKeys={selectedPhotoKeys}
 									onSelectionChange={(keys) => {
 										if (keys === 'all') return;
 										const nextKey = keys.values().next().value;
 										if (typeof nextKey === 'string') setSelectedPhotoIndex(Number(nextKey));
 									}}
 									onAction={(key) => setSelectedPhotoIndex(Number(key))}
-									items={collection.photos}
+									items={photoItems}
 								>
-									{(photo) => {
-										const index = collection.photos.indexOf(photo);
-										return <GridListItem id={String(index)} textValue={photo.id}><img src={photo.thumbnail} alt="" loading="lazy" decoding="async" /><span>{photo.id}</span></GridListItem>;
-									}}
+									{(item) => (
+										<GridListItem id={item.id} textValue={item.photo.id}>
+											<img src={item.photo.thumbnail} alt="" loading="lazy" decoding="async" />
+											<span>{item.photo.id}</span>
+										</GridListItem>
+									)}
 								</GridList>
 							) : (
 								<div
 									className="finder-grid-host"
 									onKeyDown={(event) => {
-										if (event.key !== 'Enter' || !selectedCollectionSlug) return;
-										const selectedCollection = photoCollections.find((item) => item.slug === selectedCollectionSlug);
-										if (selectedCollection) openCollection(selectedCollection);
+										if (event.key === 'Enter') openCollectionBySlug(selectedCollectionSlug);
 									}}
 								>
 									<GridList
-									className={`finder-grid finder-grid--collections finder-grid--${viewMode}`}
-									aria-label={text.title}
-									layout="grid"
-									selectionMode="single"
-									selectedKeys={selectedCollectionSlug ? new Set([selectedCollectionSlug]) : new Set()}
-									onSelectionChange={(keys) => {
-										if (keys === 'all') return;
-										const nextKey = keys.values().next().value;
-										if (typeof nextKey === 'string') setSelectedCollectionSlug(nextKey);
-									}}
-									items={matchingCollections}
-								>
-									{(item) => (
-										<GridListItem
-											id={item.slug}
-											textValue={collectionTitle(item)}
-											onDoubleClick={() => openCollection(item)}
-											onPointerUp={(event) => {
-												if (event.pointerType !== 'mouse') openCollection(item);
-											}}
-										>
-											<img src={item.photos[0]?.thumbnail} alt="" loading="lazy" decoding="async" />
-											<span className="finder-grid__item-label"><strong>{collectionTitle(item)}</strong><small>{item.photos.length} {text.works}</small></span>
-										</GridListItem>
-									)}
+										className={`finder-grid finder-grid--collections finder-grid--${viewMode}`}
+										aria-label={text.title}
+										layout="grid"
+										selectionMode="single"
+										selectedKeys={selectedCollectionKeys}
+										onSelectionChange={(keys) => {
+											if (keys === 'all') return;
+											const nextKey = keys.values().next().value;
+											if (typeof nextKey === 'string') setSelectedCollectionSlug(nextKey);
+										}}
+										items={matchingCollections}
+									>
+										{(item) => (
+											<GridListItem
+												id={item.slug}
+												textValue={collectionTitle(item)}
+												onDoubleClick={() => openCollection(item)}
+												onPointerUp={(event) => {
+													if (event.pointerType !== 'mouse') openCollection(item);
+												}}
+											>
+												<img src={item.photos[0]?.thumbnail} alt="" loading="lazy" decoding="async" />
+												<span className="finder-grid__item-label"><strong>{collectionTitle(item)}</strong><small>{item.photos.length} {text.files}</small></span>
+											</GridListItem>
+										)}
 									</GridList>
 								</div>
 							)}

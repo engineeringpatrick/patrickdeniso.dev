@@ -9,6 +9,8 @@ export type { PlanetId, V4Copy, V4Language, V4Locale, WorkExperience } from './t
 /** Add a locale by creating one file here and registering it in this object. */
 export const locales = { en, it, fr, zh } as const;
 
+export const isV4Language = (value: unknown): value is V4Language => typeof value === 'string' && value in locales;
+
 export const copy: Record<V4Language, V4Copy> = {
 	en: en.copy,
 	it: it.copy,

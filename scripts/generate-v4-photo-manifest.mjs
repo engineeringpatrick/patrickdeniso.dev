@@ -53,14 +53,15 @@ const createThumbnail = async (folder, filename) => {
 
 const readPhotoMetadata = async (folder, filename) => {
 	const metadataPath = join(metadataDirectory, folder, `${filename}.json`);
-	try {
-		const parsed = JSON.parse(await readFile(metadataPath, 'utf8'));
-		return Object.fromEntries(['date', 'location', 'camera']
-			.filter((key) => typeof parsed[key] === 'string' && parsed[key].trim())
-			.map((key) => [key, parsed[key].trim()]));
-	} catch {
-		return {};
-	}
+	const source = await readFile(metadataPath, 'utf8').catch((error) => {
+		if (error?.code === 'ENOENT') return null;
+		throw error;
+	});
+	if (!source) return {};
+	const parsed = JSON.parse(source);
+	return Object.fromEntries(['date', 'location', 'camera']
+		.filter((key) => typeof parsed[key] === 'string' && parsed[key].trim())
+		.map((key) => [key, parsed[key].trim()]));
 };
 
 const folders = await readdir(photosDirectory, { withFileTypes: true });

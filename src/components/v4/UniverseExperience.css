@@ -6,8 +6,23 @@
 .universe-planet-label { position: absolute; width: max-content; max-width: min(15rem, 68vw); padding: .5rem .7rem; border: 1px solid rgb(255 255 255 / .24); border-radius: .75rem; background: rgb(13 9 33 / .88); box-shadow: 0 .55rem 1.4rem rgb(2 1 12 / .35); color: #fff; font: .7rem/1.25 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-align: center; transform: translate(-50%, -50%); }
 .universe-planet-label strong { display: block; font-size: .76rem; letter-spacing: .07em; text-transform: uppercase; }
 .universe-planet-label--work { top: 28%; left: 29%; }
-.universe-planet-label--posts { top: 32%; left: 71%; }
-.universe-planet-label--photos { top: 64%; left: 66%; }
+.universe-planet-label--posts { top: 32%; left: 78%; }
+.universe-planet-label--photos { top: 75%; left: 76%; }
+.universe-planet-label--about { top: 50%; left: 50%; transform: translate(-50%, calc(-100% - .65rem)); }
+.universe-scene__click-hints { position: absolute; z-index: 5; inset: 0; overflow: hidden; pointer-events: none; }
+.universe-click-hint { position: absolute; display: grid; width: 10rem; visibility: hidden; justify-items: center; color: rgb(250 240 184 / .88); filter: drop-shadow(0 .2rem .35rem rgb(2 1 12 / .55)); font: 700 .9rem/1 "Bradley Hand", "Marker Felt", "Comic Sans MS", cursive; letter-spacing: .02em; transition: opacity 160ms ease; }
+.universe-click-hint span { display: block; width: 100%; white-space: nowrap; text-align: center; }
+.universe-click-hint svg { width: 9rem; height: auto; margin-top: -.1rem; overflow: visible; fill: none; stroke: currentColor; stroke-width: 1.35; stroke-linecap: round; stroke-linejoin: round; animation: v4-hint-arrow 2.4s ease-in-out infinite; }
+.universe-click-hint.is-hovered { opacity: 0; }
+.universe-click-hint--work { transform: translate(calc(-100% - .15rem), calc(-100% - .15rem)) rotate(-7deg); }
+.universe-click-hint--work svg { justify-self: end; }
+.universe-click-hint--posts { transform: translate(.15rem, calc(-100% - .15rem)) rotate(6deg); }
+.universe-click-hint--posts svg { justify-self: start; transform: scaleX(-1); }
+.universe-click-hint--about { transform: translate(.15rem, .15rem) rotate(-4deg); }
+.universe-click-hint--about svg { order: -1; justify-self: start; transform: scale(-1); }
+.universe-click-hint--photos svg { transform: scale(-1); }
+.universe-click-hint--photos { transform: translate(.15rem, .15rem) rotate(4deg); }
+.universe-click-hint--photos svg { order: -1; justify-self: start; }
 .universe-scene__accessible-nav { position: absolute; z-index: 12; top: .5rem; left: 50%; display: flex; gap: .35rem; opacity: 0; pointer-events: none; transform: translateX(-50%); }
 .universe-scene__accessible-nav:focus-within { opacity: 1; }
 .universe-scene__accessible-nav button { padding: .45rem .65rem; border: 1px solid rgb(255 255 255 / .3); border-radius: .45rem; background: #11143b; color: #fff; pointer-events: none; white-space: nowrap; }
@@ -20,16 +35,20 @@
 .v4-window--vim { width: min(50rem, calc(100vw - 2rem)); overflow: hidden; border-color: rgb(145 171 173 / .45); background: #080d0e; color: #d5e6d8; }
 .v4-window--browser { width: min(80rem, calc(100vw - 2rem)); height: min(49rem, calc(100svh - 3rem)); display: flex; flex-direction: column; background: #fff; }
 .v4-window--museum { width: min(82rem, calc(100vw - 2rem)); height: min(48rem, calc(100svh - 3rem)); display: flex; flex-direction: column; }
+.v4-window--about { width: min(44rem, calc(100vw - 2rem)); }
 .v4-window--vim.is-minimized, .v4-window--browser.is-minimized { height: auto; }
 .v4-window--vim.is-maximized { width: calc(100vw - 1.5rem); height: calc(100svh - 1.5rem); display: flex; flex-direction: column; }
 .v4-window--browser.is-maximized { width: calc(100vw - 1.5rem); height: calc(100svh - 1.5rem); }
 .v4-window--museum.is-maximized { width: calc(100vw - 1.5rem); height: calc(100svh - 1.5rem); }
 .v4-window--vim.is-maximized .vim-terminal { height: auto; min-height: 0; flex: 1; }
 .v4-window--museum.is-minimized { height: auto; }
-.v4-window__toolbar { display: flex; align-items: center; height: 2.55rem; padding: 0 .85rem; border-bottom: 1px solid rgb(40 40 60 / .13); background: linear-gradient(#f7f7fa, #e8e8ee); box-shadow: inset 0 1px 0 white; }
-.v4-window__toolbar > p { margin: 0 auto; padding-right: 3.75rem; color: #67697a; font: 650 .68rem/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+.v4-window__toolbar { position: relative; display: flex; align-items: center; height: 2.55rem; padding: 0 .85rem; border-bottom: 1px solid rgb(40 40 60 / .13); background: linear-gradient(#f7f7fa, #e8e8ee); box-shadow: inset 0 1px 0 white; }
+.v4-window__toolbar > p { position: absolute; left: 50%; max-width: 45%; margin: 0; overflow: hidden; color: #67697a; font: 650 .68rem/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-overflow: ellipsis; white-space: nowrap; transform: translateX(-50%); }
 .v4-window__toolbar--vim { border-color: rgb(190 220 207 / .13); background: linear-gradient(#283137, #1a2024); box-shadow: inset 0 1px 0 rgb(255 255 255 / .08); }
 .v4-window__toolbar--vim > p { color: rgb(220 237 226 / .72); }
+.v4-window__toolbar-language { display: flex; margin-left: auto; }
+.v4-language-select { height: 1.55rem; min-width: 5.4rem; padding: 0 1.25rem 0 .42rem; border: 1px solid rgb(190 220 207 / .25); border-radius: .35rem; background: rgb(7 13 15 / .64); color: rgb(220 237 226 / .82); cursor: pointer; font: 700 .58rem/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+.v4-language-select:focus-visible { outline: 2px solid rgb(137 208 168 / .72); outline-offset: 1px; }
 .v4-window__toolbar--browser { gap: .85rem; border-color: rgb(40 40 60 / .13); }
 .v4-window__toolbar--finder { min-height: 2.85rem; height: 2.85rem; padding-right: .65rem; }
 .v4-window__traffic { display: flex; gap: .42rem; }
@@ -43,17 +62,27 @@
 .v4-window__body { overflow: auto; }
 .v4-window__eyebrow { margin: 0 0 .6rem; color: #6c6d7d; font: 800 .65rem/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; letter-spacing: .1em; text-transform: uppercase; }
 .v4-window h2 { margin: 0; letter-spacing: -.065em; font-size: clamp(2rem, 5vw, 3.25rem); line-height: .95; }
-
 .vim-terminal { display: flex; height: min(42rem, calc(100svh - 4.55rem)); min-height: min(30rem, calc(100svh - 4.55rem)); flex-direction: column; background: radial-gradient(circle at 86% 0%, rgb(45 97 76 / .17), transparent 30%), #080d0e; font-family: "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
 .vim-terminal__prompt { display: flex; justify-content: space-between; gap: 1rem; padding: .65rem .9rem; border-bottom: 1px solid rgb(190 220 207 / .12); color: #89d0a8; font: 700 .68rem/1.1 inherit; }
 .vim-terminal__prompt span:last-child { color: rgb(211 238 221 / .52); }
 .vim-terminal__editor { display: grid; min-height: 0; flex: 1; grid-template-columns: max-content minmax(0, 1fr); overflow: hidden; }
 .vim-terminal__lines { min-width: 3.2rem; margin: 0; padding: .9rem .65rem .9rem .3rem; overflow: hidden; background: rgb(255 255 255 / .025); color: rgb(159 193 174 / .44); font: 650 .78rem/1.6 inherit; list-style: none; text-align: right; user-select: none; }
-.vim-terminal__buffer { display: block; width: 100%; height: 100%; min-height: 0; resize: none; padding: .9rem .85rem; border: 0; outline: 0; background: transparent; color: #dcefe2; caret-color: #fded8d; font: 500 .78rem/1.6 inherit; letter-spacing: -.02em; white-space: pre; }
+.vim-terminal__buffer { display: block; width: 100%; height: 100%; min-height: 0; resize: none; padding: .9rem .85rem; border: 0; outline: 0; background: transparent; color: #dcefe2; caret-color: #fded8d; font: 500 .78rem/1.6 inherit; letter-spacing: -.02em; white-space: pre-wrap; overflow-wrap: anywhere; }
+.vim-terminal__buffer[hidden] { display: none; }
+.vim-terminal__buffer--linked { overflow: auto; }
+.vim-terminal__visual-line { min-height: 1lh; white-space: pre; }
+.vim-terminal__caret { background: #83c6a0; color: #07110b; }
+.vim-terminal__inline-logo { display: inline-block; width: 1.15em; height: 1.15em; margin-right: .35em; border-radius: .18em; background: rgb(255 255 255 / .92); object-fit: contain; vertical-align: -.2em; }
+.vim-terminal__inline-logo.is-cursor { outline: 2px solid #83c6a0; outline-offset: 1px; }
+.vim-terminal__buffer--linked a.vim-terminal__inline-logo-link { border-bottom: 0; }
+.vim-terminal__buffer--linked a { border-bottom: 1px solid rgb(155 216 181 / .5); color: #9bd8b5; text-decoration: none; }
+.vim-terminal__buffer--linked a:hover, .vim-terminal__buffer--linked a:focus-visible { border-bottom-color: #c2f1d2; color: #c2f1d2; outline: none; }
 .vim-terminal__buffer::selection { background: rgb(111 211 154 / .31); }
 .vim-terminal__buffer[readonly] { caret-color: transparent; cursor: default; }
 .vim-terminal__status { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 1.9rem; padding: .35rem .7rem; background: #83c6a0; color: #07110b; font: 800 .66rem/1 inherit; }
 .vim-terminal__status strong { letter-spacing: .03em; }
+.vim-terminal__command { display: flex; min-width: 0; flex: 1; align-items: center; gap: .15rem; }
+.vim-terminal__command input { width: 100%; min-width: 0; padding: 0; border: 0; outline: 0; background: transparent; color: inherit; font: inherit; }
 
 .browser-toolbar { display: grid; min-width: 0; flex: 1; grid-template-columns: auto minmax(0, 1fr) auto; gap: .55rem; align-items: center; }
 .browser-toolbar__history { display: inline-flex; gap: .08rem; }
@@ -113,9 +142,9 @@
 .finder-viewer__header { min-height: 6.2rem; }
 .finder-viewer__body { display: grid; min-height: 0; flex: 1; grid-template-columns: minmax(0, 1fr) 13rem; overflow: hidden; }
 .finder-viewer__main { display: flex; min-width: 0; min-height: 0; flex-direction: column; }
-.finder-viewer__stage { position: relative; display: grid; min-height: 0; flex: 1; place-items: center; padding: 1.2rem 4.4rem; background: linear-gradient(135deg, #e7e7ec, #f9f9fb); }
-.finder-viewer__frame { display: grid; min-width: 0; min-height: 0; max-width: 100%; max-height: 100%; margin: 0; place-items: center; }
-.finder-viewer__frame img { display: block; max-width: 100%; max-height: min(29rem, 52svh); border: .38rem solid #fff; box-shadow: 0 1.2rem 3rem rgb(31 31 47 / .22); object-fit: contain; }
+.finder-viewer__stage { position: relative; display: grid; min-height: 0; flex: 1; place-items: center; overflow: hidden; padding: 1.2rem 4.4rem; background: linear-gradient(135deg, #e7e7ec, #f9f9fb); }
+.finder-viewer__frame { display: flex; width: 100%; height: 100%; min-width: 0; min-height: 0; flex-direction: column; align-items: center; justify-content: center; margin: 0; overflow: hidden; }
+.finder-viewer__frame img { display: block; width: auto; height: auto; max-width: 100%; max-height: min(29rem, 52svh); box-sizing: border-box; border: .38rem solid #fff; box-shadow: 0 1.2rem 3rem rgb(31 31 47 / .22); object-fit: contain; }
 .finder-viewer__frame figcaption { max-width: min(36rem, 100%); margin-top: .7rem; color: #545565; font-size: .82rem; line-height: 1.45; text-align: center; }
 .finder-viewer__step { position: absolute; z-index: 1; display: grid; width: 2.25rem; aspect-ratio: 1; place-items: center; border: 1px solid rgb(38 39 58 / .13); border-radius: 50%; background: rgb(255 255 255 / .86); color: #3d3e53; box-shadow: 0 .35rem .8rem rgb(30 30 45 / .13); cursor: pointer; }
 .finder-viewer__step:hover, .finder-viewer__step:focus-visible { background: #fff; outline: 2px solid #0a84ff; outline-offset: 2px; }
@@ -136,6 +165,7 @@
 @keyframes v4-panel-in { from { opacity: 0; backdrop-filter: blur(0); } }
 @keyframes v4-window-in { from { opacity: 0; transform: translateY(1.25rem) scale(.97); } }
 @keyframes v4-spin { to { transform: rotate(1turn); } }
+@keyframes v4-hint-arrow { 50% { translate: 0 .18rem; } }
 
 @media (max-width: 760px) {
 	.v4-window--museum { height: min(44rem, calc(100svh - 2rem)); }
@@ -155,8 +185,8 @@
 
 @media (min-width: 561px) and (max-width: 899px) {
 	.universe-planet-label--work { left: 23%; }
-	.universe-planet-label--posts { left: 77%; }
-	.universe-planet-label--photos { left: 74%; }
+	.universe-planet-label--posts { left: 85%; }
+	.universe-planet-label--photos { top: 77%; left: 78%; }
 }
 
 @media (max-width: 560px) {
@@ -164,11 +194,16 @@
 	.universe-planet-label { padding: .38rem .52rem; font-size: .62rem; }
 	.universe-planet-label strong { font-size: .66rem; }
 	.universe-planet-label--work { top: 14%; left: 23%; }
-	.universe-planet-label--posts { top: 20%; left: 77%; }
+	.universe-planet-label--posts { top: 20%; left: 82%; }
 	.universe-planet-label--photos { top: 76%; left: 75%; }
+	.universe-click-hint { width: 6rem; font-size: .76rem; }
+	.universe-click-hint svg { width: 5.4rem; }
+	.universe-click-hint--posts svg { height: 6rem; }
 	.v4-window { width: calc(100vw - .5rem); border-radius: .72rem; }
 	.v4-window--browser, .v4-window--museum { height: calc(100svh - .5rem); }
 	.v4-window__toolbar--browser { gap: .5rem; padding-inline: .65rem; }
+	.v4-window__toolbar > p { max-width: 34%; }
+	.v4-language-select { min-width: 4.8rem; }
 	.browser-toolbar__history { display: none; }
 	.vim-terminal__editor { grid-template-columns: minmax(0, 1fr); }
 	.vim-terminal__lines { display: none; }
@@ -178,14 +213,16 @@
 	.finder-toolbar { grid-template-columns: 1.8rem minmax(0, 1fr) auto; }
 	.finder-toolbar__search { display: none; }
 	.finder-viewer__body { display: flex; flex-direction: column; overflow: auto; }
-	.finder-viewer__main { min-height: 18rem; flex: 1 0 18rem; }
+	.finder-viewer__main { min-height: 0; flex: 0 0 auto; }
 	.finder-info { max-height: 12rem; border-top: 1px solid rgb(31 32 52 / .1); border-left: 0; }
-	.finder-viewer__stage { padding-inline: 2.9rem; }
+	.finder-viewer__stage { height: min(52svh, 28rem); flex: 0 0 auto; padding: 1rem 2.9rem; }
+	.finder-viewer__frame img { max-width: 100%; max-height: 100%; }
 	.finder-viewer__step--previous { left: .35rem; }
 	.finder-viewer__step--next { right: .35rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
 	.universe-experience__panel, .universe-experience__window, .universe-experience__loading { animation-duration: 1ms; }
+	.universe-click-hint svg { animation: none; }
 	.finder-grid [role="row"] { transition: none; }
 }

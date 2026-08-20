@@ -1,12 +1,21 @@
 ---
 import UniverseHome from '../../../components/v4/UniverseHome.astro';
-import { copy } from '../../../locales/v4';
+import { copy, supportedLanguages, type V4Language } from '../../../locales/v4';
 
-const site = copy.en.site;
+export function getStaticPaths() {
+	return supportedLanguages.map(({ code }) => ({ params: { language: code }, props: { language: code } }));
+}
+
+interface Props {
+	language: V4Language;
+}
+
+const { language } = Astro.props;
+const site = copy[language].site;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={language}>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="description" content={site.description} />
@@ -17,6 +26,6 @@ const site = copy.en.site;
 		<title>{site.title}</title>
 	</head>
 	<body>
-		<UniverseHome />
+		<UniverseHome initialLanguage={language} />
 	</body>
 </html>

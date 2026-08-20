@@ -1,5 +1,9 @@
 # v4 photo metadata
 
+Put photos in `public/photos/v4/<collection>/`. The manifest generator scans those folders automatically, so adding, moving, or renaming a photo does not require editing React code.
+
+To add a caption, create a text file beside the photo using the same basename. For example, `rocky.webp` reads its caption from `rocky.txt`.
+
 Add one JSON file next to each collection folder to override the optional facts shown in the Photos inspector. The filename is the exact image filename with `.json` appended:
 
 `src/data/v4-photo-metadata/family/nephew.png.json`

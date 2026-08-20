@@ -319,7 +319,7 @@ export const photoCollections: PhotoCollection[] = [
 					"height": 1600,
 					"bytes": 1181543
 				},
-				"caption": "My sister and my nephew."
+				"caption": "My sister and my nephew"
 			}
 		]
 	},
@@ -526,14 +526,15 @@ export const photoCollections: PhotoCollection[] = [
 		"title": "Other Travels",
 		"photos": [
 			{
-				"id": "IMG_7864.webp",
-				"src": "/photos/v4/other-travels/IMG_7864.webp",
-				"thumbnail": "/photos/v4-thumbnails/other-travels/IMG_7864.webp.webp",
+				"id": "rocky.webp",
+				"src": "/photos/v4/other-travels/rocky.webp",
+				"thumbnail": "/photos/v4-thumbnails/other-travels/rocky.webp.webp",
 				"metadata": {
 					"width": 1200,
 					"height": 1600,
 					"bytes": 184152
-				}
+				},
+				"caption": "Rocky is my favourite movie saga of all time, so this was a pilgrimage for me"
 			}
 		]
 	}

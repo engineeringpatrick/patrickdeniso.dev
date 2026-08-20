@@ -1,0 +1,56 @@
+---
+---
+
+<div id="v3-typing-box" class="w-96 text-xl" aria-label="Patrick Deniso introduction"></div>
+
+<script>
+	const box = document.querySelector<HTMLElement>('#v3-typing-box');
+	const lines = [
+		"const Patrick = {",
+		"name: 'Patrick Deniso',",
+		"role: 'Software Engineer',",
+		"workInterests: 'Distributed Systems',",
+	];
+	const interests = ["'Running'", "'Urbanism'", "'Language Learning'", "'History & Philosophy'", "'Anything cool :)'"];
+	const sleep = (milliseconds: number) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+
+	if (box) {
+		let output = '';
+		const render = () => { box.textContent = output; };
+		const type = async (value: string) => {
+			for (const character of value) {
+				output += character;
+				render();
+				await sleep(25);
+			}
+		};
+		const erase = async (count: number) => {
+			for (let index = 0; index < count; index += 1) {
+				output = output.slice(0, -1);
+				render();
+				await sleep(10);
+			}
+		};
+
+		void (async () => {
+			await sleep(500);
+			for (const line of lines) {
+				await type(line);
+				output += '\n  ';
+				render();
+				await sleep(300);
+			}
+
+			await type('interests: ');
+			for (const [index, interest] of interests.entries()) {
+				await type(interest);
+				await sleep(400);
+				if (index < interests.length - 1) await erase(interest.length);
+			}
+
+			await sleep(500);
+			output += '\n};';
+			render();
+		})();
+	}
+</script>

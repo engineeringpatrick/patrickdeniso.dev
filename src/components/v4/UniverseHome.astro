@@ -1,32 +1,57 @@
 ---
-import TypingIntro from '../TypingIntro.astro';
 import VersionPicker from '../VersionPicker.astro';
-import { supportedLanguages } from '../../locales/v4';
+import { copy, supportedLanguages, type V4Language } from '../../locales/v4';
+import PatrickVimEditor from './PatrickVimEditor';
 import UniverseExperience from './UniverseExperience';
+
+interface Props {
+	initialLanguage?: V4Language;
+}
+
+const { initialLanguage } = Astro.props;
+const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 ---
 
-<main class="universe" data-universe>
+<main class="universe" data-universe data-v4-initial-language={initialLanguage}>
 	<header class="universe__header">
-		<a class="universe__wordmark" href="/" aria-label="Patrick Deniso home">
-			<span aria-hidden="true">✦</span> Patrick Deniso
-		</a>
+		<div class="universe__brand">
+			<button class="universe__wordmark-spark" type="button" aria-label={initialSiteCopy.starSettings.open} aria-expanded="false" aria-controls="star-settings" data-wordmark-spark>✦</button>
+			<a class="universe__wordmark" href="/" aria-label="Patrick Deniso home" data-wordmark>
+			<span class="universe__wordmark-name" data-wordmark-name>Patrick Deniso</span>
+			</a>
+		</div>
+		<div class="universe__star-settings" id="star-settings" role="dialog" aria-labelledby="star-settings-title" hidden data-star-settings>
+			<div class="universe__star-settings-heading">
+				<p id="star-settings-title" data-star-settings-title>{initialSiteCopy.starSettings.title}</p>
+				<button type="button" aria-label={initialSiteCopy.starSettings.close} data-star-settings-close>×</button>
+			</div>
+			<label class="universe__star-slider">
+				<span data-star-frequency-label>{initialSiteCopy.starSettings.frequency}</span>
+				<strong data-star-frequency-value>{initialSiteCopy.starSettings.presets[2]}</strong>
+				<input type="range" min="0" max="3" step="1" value="2" aria-valuetext={initialSiteCopy.starSettings.presets[2]} data-star-frequency />
+			</label>
+			<div class="universe__star-presets" aria-hidden="true">
+				{initialSiteCopy.starSettings.presets.map((preset, index) => <span data-star-preset={index}>{preset}</span>)}
+			</div>
+		</div>
 	</header>
 
 	<section class="universe__scene" aria-label="Patrick Deniso's interactive universe" data-v4-scene>
 		<h1 class="universe__sr-only">Patrick Deniso</h1>
+		<div class="universe__shooting-stars" aria-hidden="true" data-wordmark-stars></div>
 		<UniverseExperience client:only="react" />
 
 		<div class="universe__depth universe__console" aria-label="A code introduction" data-console>
 			<div class="universe__console-bar">
 				<div class="universe__console-controls" aria-label="Window controls">
-					<button class="universe__console-control universe__console-control--close" type="button" aria-label="Close introduction" data-console-action="close"><span aria-hidden="true">×</span></button>
-					<button class="universe__console-control universe__console-control--minimize" type="button" aria-label="Minimize introduction" aria-pressed="false" data-console-action="minimize"><span aria-hidden="true">−</span></button>
-					<button class="universe__console-control universe__console-control--maximize" type="button" aria-label="Maximize introduction" aria-pressed="false" data-console-action="maximize"><span aria-hidden="true">↗</span></button>
+					<button class="universe__console-control universe__console-control--close" type="button" aria-label="Close introduction" data-console-action="close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg></button>
+					<button class="universe__console-control universe__console-control--minimize" type="button" aria-label="Minimize introduction" aria-pressed="false" data-console-action="minimize"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" /></svg></button>
+					<button class="universe__console-control universe__console-control--maximize" type="button" aria-label="Maximize introduction" aria-pressed="false" data-console-action="maximize"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" /></svg></button>
 				</div>
 				<p>patrick.ts</p>
 			</div>
 			<div class="universe__console-code">
-				<TypingIntro />
+				<PatrickVimEditor client:only="react" />
 			</div>
 		</div>
 
@@ -47,36 +72,176 @@ import UniverseExperience from './UniverseExperience';
 			</nav>
 			<label class="universe__language">
 				<span class="universe__sr-only" data-v4-language-label>Website language</span>
-				<select data-v4-language aria-label="Website language">
-					{supportedLanguages.map(({ code, label }) => <option value={code}>{label}</option>)}
+				<select class="v4-language-select" data-v4-language-picker aria-label="Website language">
+					{supportedLanguages.map(({ code, label }) => <option value={code} selected={code === initialLanguage}>{label}</option>)}
 				</select>
 			</label>
 		</div>
-		<p class="universe__model-credit"><span data-v4-model-credit>3D models:</span> <a href="https://science.nasa.gov/3d-resources/">NASA / JPL-Caltech &amp; NASA VTAD</a></p>
+		<p class="universe__model-credit"><span data-v4-model-credit>3D models:</span> <a href="https://science.nasa.gov/3d-resources/">NASA / JPL-Caltech, NASA VTAD &amp; DigitalSpace Corporation</a></p>
 		<VersionPicker currentVersion={4} appearance="space" showLabel={false} />
 	</footer>
 
 </main>
 
 <script>
-	import { copy, supportedLanguages } from '../../locales/v4';
+	import { copy, isV4Language } from '../../locales/v4';
+	import { V4_CONSOLE_CLOSE_EVENT, V4_LANGUAGE_CHANGE_EVENT, V4_LANGUAGE_REQUEST_EVENT, V4_ROOM_CHANGE_EVENT, type V4LanguageRequestDetail, type V4RoomChangeDetail } from './v4Events';
 
 	const universe = document.querySelector<HTMLElement>('[data-universe]');
 	const consoleWindow = universe?.querySelector<HTMLElement>('[data-console]');
 	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-	const languagePicker = document.querySelector<HTMLSelectElement>('[data-v4-language]');
-	const wechatTrigger = document.querySelector<HTMLButtonElement>('[data-wechat-trigger]');
-	const wechatCard = document.querySelector<HTMLElement>('[data-wechat-card]');
-	const wechatClose = document.querySelector<HTMLButtonElement>('[data-wechat-close]');
-	const supportedLanguageCodes = new Set<string>(supportedLanguages.map(({ code }) => code));
+	const languagePickers = [...(universe?.querySelectorAll<HTMLSelectElement>('[data-v4-language-picker]') ?? [])];
+	const wechatTrigger = universe?.querySelector<HTMLButtonElement>('[data-wechat-trigger]');
+	const wechatCard = universe?.querySelector<HTMLElement>('[data-wechat-card]');
+	const wechatClose = universe?.querySelector<HTMLButtonElement>('[data-wechat-close]');
+	const wordmark = universe?.querySelector<HTMLAnchorElement>('[data-wordmark]');
+	const wordmarkName = wordmark?.querySelector<HTMLElement>('[data-wordmark-name]');
+	const wordmarkSpark = universe?.querySelector<HTMLButtonElement>('[data-wordmark-spark]');
+	const shootingStars = universe?.querySelector<HTMLElement>('[data-wordmark-stars]');
+	const starSettings = universe?.querySelector<HTMLElement>('[data-star-settings]');
+	const starSettingsClose = universe?.querySelector<HTMLButtonElement>('[data-star-settings-close]');
+	const starFrequency = universe?.querySelector<HTMLInputElement>('[data-star-frequency]');
+	const starFrequencyValue = universe?.querySelector<HTMLElement>('[data-star-frequency-value]');
+	const wordmarkLetters = [...'PatrickDeniso'];
+	const wordmarkFonts = [
+		'"Helvetica Neue", Helvetica, Arial, sans-serif',
+		'Georgia, "Times New Roman", serif',
+		'"American Typewriter", Rockwell, serif',
+		'"Bradley Hand", "Marker Felt", cursive',
+		'"Courier New", Courier, monospace',
+		'Futura, "Trebuchet MS", sans-serif',
+		'Baskerville, "Palatino Linotype", serif',
+		'"Avenir Next", Avenir, sans-serif',
+		'Copperplate, "Copperplate Gothic Light", fantasy',
+		'ui-rounded, "Arial Rounded MT Bold", sans-serif',
+	];
+	let wordmarkScramble: number | undefined;
+	let wordmarkIsScrambling = false;
+	let wordmarkFontIndex = -1;
+	let wordmarkTargetName = 'Patrick Deniso';
+	const shuffleWordmark = () => {
+		if (!wordmarkName) return;
+		const shuffledName = [...wordmarkLetters];
+		for (let index = shuffledName.length - 1; index > 0; index -= 1) {
+			const swapIndex = Math.floor(Math.random() * (index + 1));
+			[shuffledName[index], shuffledName[swapIndex]] = [shuffledName[swapIndex], shuffledName[index]];
+		}
+		wordmarkName.textContent = shuffledName.join('');
+	};
+	const resolveWordmark = () => {
+		if (!wordmark || !wordmarkName || !wordmarkIsScrambling) return;
+		window.clearInterval(wordmarkScramble);
+		wordmarkName.textContent = wordmarkTargetName;
+		wordmark.classList.remove('is-scrambling');
+		wordmark.classList.add('has-custom-font');
+		wordmarkFontIndex = (wordmarkFontIndex + 1) % wordmarkFonts.length;
+		wordmarkName.style.setProperty('--wordmark-font', wordmarkFonts[wordmarkFontIndex]);
+		wordmarkIsScrambling = false;
+	};
+	const scrambleWordmark = () => {
+		if (!wordmark || !wordmarkName || wordmarkIsScrambling) return;
+		wordmarkTargetName = Math.random() < 0.1 ? '潘德宇' : 'Patrick Deniso';
+		wordmarkIsScrambling = true;
+		if (reduceMotion) {
+			resolveWordmark();
+			return;
+		}
+		wordmark.classList.add('is-scrambling');
+		shuffleWordmark();
+		wordmarkScramble = window.setInterval(shuffleWordmark, 48);
+	};
+	wordmark?.addEventListener('pointerenter', scrambleWordmark);
+	wordmark?.addEventListener('pointerleave', resolveWordmark);
+	wordmark?.addEventListener('focus', scrambleWordmark);
+	wordmark?.addEventListener('blur', resolveWordmark);
 
+	let activeStarPresetLabels = copy.en.site.starSettings.presets;
+	let shootingStarFrequency = 2;
+	let shootingStarTimer: number | undefined;
+	const starFrequencyStorageKey = 'v4-shooting-star-frequency';
+	const shootingStarDelayRanges = [
+		null,
+		{ minimum: 8000, maximum: 20000 },
+		{ minimum: 2000, maximum: 5000 },
+		{ minimum: 1000, maximum: 1000 },
+	] as const;
+	const nextShootingStarDelay = () => {
+		const range = shootingStarDelayRanges[shootingStarFrequency];
+		return range ? range.minimum + Math.random() * (range.maximum - range.minimum) : null;
+	};
+	const emitShootingStar = () => {
+		if (!wordmarkSpark || !shootingStars || document.visibilityState !== 'visible') return;
+		const origin = wordmarkSpark.getBoundingClientRect();
+		const angle = 18 + Math.random() * 48;
+		const radians = angle * Math.PI / 180;
+		const distance = Math.hypot(window.innerWidth, window.innerHeight) * (0.62 + Math.random() * 0.28);
+		const shootingStar = document.createElement('span');
+		shootingStar.className = 'universe__shooting-star';
+		shootingStar.style.left = `${origin.left + origin.width / 2}px`;
+		shootingStar.style.top = `${origin.top + origin.height / 2}px`;
+		shootingStar.style.setProperty('--shooting-angle', `${angle}deg`);
+		shootingStar.style.setProperty('--shooting-distance-x', `${Math.cos(radians) * distance}px`);
+		shootingStar.style.setProperty('--shooting-distance-y', `${Math.sin(radians) * distance}px`);
+		shootingStar.style.setProperty('--shooting-drift-x', `${-5 + Math.random() * 10}px`);
+		shootingStar.style.setProperty('--shooting-drift-y', `${-4 + Math.random() * 8}px`);
+		shootingStar.style.setProperty('--shooting-drift-x-2', `${-4 + Math.random() * 8}px`);
+		shootingStar.style.setProperty('--shooting-drift-y-2', `${-3 + Math.random() * 6}px`);
+		shootingStar.style.setProperty('--shooting-length', `${4.5 + Math.random() * 5.5}rem`);
+		shootingStar.style.setProperty('--shooting-duration', `${1800 + Math.random() * 1000}ms`);
+		shootingStars.append(shootingStar);
+		shootingStar.addEventListener('animationend', () => shootingStar.remove(), { once: true });
+	};
+	const scheduleShootingStar = () => {
+		window.clearTimeout(shootingStarTimer);
+		const delay = nextShootingStarDelay();
+		if (delay === null) {
+			shootingStars?.replaceChildren();
+			return;
+		}
+		shootingStarTimer = window.setTimeout(() => {
+			emitShootingStar();
+			scheduleShootingStar();
+		}, delay);
+	};
+	const setShootingStarFrequency = (value: number, persist = true) => {
+		shootingStarFrequency = Math.min(3, Math.max(0, Math.round(value)));
+		if (starFrequency) {
+			starFrequency.value = String(shootingStarFrequency);
+			starFrequency.setAttribute('aria-valuetext', activeStarPresetLabels[shootingStarFrequency]);
+		}
+		starFrequencyValue?.replaceChildren(activeStarPresetLabels[shootingStarFrequency]);
+		if (persist) window.sessionStorage.setItem(starFrequencyStorageKey, String(shootingStarFrequency));
+		scheduleShootingStar();
+	};
+	const savedStarFrequency = Number.parseInt(window.sessionStorage.getItem(starFrequencyStorageKey) ?? '', 10);
+	setShootingStarFrequency(Number.isInteger(savedStarFrequency) ? savedStarFrequency : reduceMotion ? 0 : 2, false);
+	starFrequency?.addEventListener('input', () => setShootingStarFrequency(starFrequency.valueAsNumber));
+
+	const closeStarSettings = () => {
+		if (!starSettings || starSettings.hidden) return;
+		starSettings.hidden = true;
+		wordmarkSpark?.setAttribute('aria-expanded', 'false');
+	};
+	wordmarkSpark?.addEventListener('click', () => {
+		if (!starSettings) return;
+		const isOpening = starSettings.hidden;
+		starSettings.hidden = !isOpening;
+		wordmarkSpark.setAttribute('aria-expanded', String(isOpening));
+	});
+	starSettingsClose?.addEventListener('click', () => {
+		closeStarSettings();
+		wordmarkSpark?.focus();
+	});
 	const detectLanguage = () => {
+		const routedLanguage = universe?.dataset.v4InitialLanguage;
+		if (isV4Language(routedLanguage)) return routedLanguage;
+
 		const saved = window.localStorage.getItem('v4-language');
-		if (saved && supportedLanguageCodes.has(saved)) return saved;
+		if (isV4Language(saved)) return saved;
 
 		const preferred = navigator.languages?.[0] ?? navigator.language;
 		const localeLanguage = preferred?.slice(0, 2).toLowerCase();
-		if (localeLanguage && supportedLanguageCodes.has(localeLanguage)) return localeLanguage;
+		if (isV4Language(localeLanguage)) return localeLanguage;
 
 		const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 		if (zone === 'Europe/Rome') return 'it';
@@ -86,42 +251,62 @@ import UniverseExperience from './UniverseExperience';
 	};
 
 	const setLanguage = (language: string) => {
-		const nextLanguage = supportedLanguageCodes.has(language) ? language : 'en';
+		const nextLanguage = isV4Language(language) ? language : 'en';
 		document.documentElement.dataset.v4Language = nextLanguage;
 		document.documentElement.lang = nextLanguage;
-		const text = copy[nextLanguage as keyof typeof copy].site;
+		languagePickers.forEach((picker) => { picker.value = nextLanguage; });
+		const text = copy[nextLanguage].site;
 		document.title = text.title;
 		document.querySelector('meta[name="description"]')?.setAttribute('content', text.description);
-		document.querySelector<HTMLElement>('[data-v4-scene]')?.setAttribute('aria-label', text.sceneLabel);
+		universe?.querySelector<HTMLElement>('[data-v4-scene]')?.setAttribute('aria-label', text.sceneLabel);
 		consoleWindow?.setAttribute('aria-label', text.codeIntroduction);
 		consoleWindow?.querySelector<HTMLElement>('.universe__console-controls')?.setAttribute('aria-label', text.windowControls);
 		consoleWindow?.querySelector<HTMLButtonElement>('[data-console-action="close"]')?.setAttribute('aria-label', text.close);
 		consoleWindow?.querySelector<HTMLButtonElement>('[data-console-action="minimize"]')?.setAttribute('aria-label', text.minimize);
 		consoleWindow?.querySelector<HTMLButtonElement>('[data-console-action="maximize"]')?.setAttribute('aria-label', text.maximize);
-		document.querySelector<HTMLElement>('[data-v4-contacts]')?.setAttribute('aria-label', text.contacts);
-		document.querySelectorAll<HTMLElement>('[data-v4-contact]').forEach((contact) => {
+		universe?.querySelector<HTMLElement>('[data-v4-contacts]')?.setAttribute('aria-label', text.contacts);
+		universe?.querySelectorAll<HTMLElement>('[data-v4-contact]').forEach((contact) => {
 			const key = contact.dataset.v4Contact as 'email' | 'instagram' | 'wechat';
 			contact.replaceChildren(text[key]);
 		});
-		document.querySelector<HTMLElement>('[data-v4-language-label]')?.replaceChildren(text.websiteLanguage);
-		languagePicker?.setAttribute('aria-label', text.websiteLanguage);
-		document.querySelector<HTMLElement>('[data-v4-model-credit]')?.replaceChildren(text.modelCredit);
-		document.querySelector<HTMLSelectElement>('.version-picker__select')?.setAttribute('aria-label', text.websiteVersion);
+		universe?.querySelectorAll<HTMLElement>('[data-v4-language-label]').forEach((label) => label.replaceChildren(text.websiteLanguage));
+		languagePickers.forEach((picker) => picker.setAttribute('aria-label', text.websiteLanguage));
+		universe?.querySelector<HTMLElement>('[data-v4-model-credit]')?.replaceChildren(text.modelCredit);
+		universe?.querySelector<HTMLSelectElement>('.version-picker__select')?.setAttribute('aria-label', text.websiteVersion);
 		wechatCard?.setAttribute('aria-label', text.wechatQrCode);
-		document.querySelector<HTMLImageElement>('[data-wechat-image]')?.setAttribute('alt', text.wechatQrCode);
+		universe?.querySelector<HTMLImageElement>('[data-wechat-image]')?.setAttribute('alt', text.wechatQrCode);
 		wechatClose?.setAttribute('aria-label', text.close);
-		window.dispatchEvent(new Event('v4:language-change'));
+		activeStarPresetLabels = text.starSettings.presets;
+		wordmarkSpark?.setAttribute('aria-label', text.starSettings.open);
+		starSettingsClose?.setAttribute('aria-label', text.starSettings.close);
+		universe?.querySelector<HTMLElement>('[data-star-settings-title]')?.replaceChildren(text.starSettings.title);
+		universe?.querySelector<HTMLElement>('[data-star-frequency-label]')?.replaceChildren(text.starSettings.frequency);
+		universe?.querySelectorAll<HTMLElement>('[data-star-preset]').forEach((preset, index) => preset.replaceChildren(text.starSettings.presets[index]));
+		starFrequency?.setAttribute('aria-label', text.starSettings.frequency);
+		starFrequency?.setAttribute('aria-valuetext', activeStarPresetLabels[shootingStarFrequency]);
+		starFrequencyValue?.replaceChildren(activeStarPresetLabels[shootingStarFrequency]);
+		window.dispatchEvent(new Event(V4_LANGUAGE_CHANGE_EVENT));
 	};
 
-	if (languagePicker) {
-		const initialLanguage = detectLanguage();
-		languagePicker.value = initialLanguage;
-		setLanguage(initialLanguage);
-		languagePicker.addEventListener('change', () => {
-			window.localStorage.setItem('v4-language', languagePicker.value);
-			setLanguage(languagePicker.value);
-		});
-	}
+	const chooseLanguage = (language: string, updateUrl = true) => {
+		if (!isV4Language(language)) return;
+		window.localStorage.setItem('v4-language', language);
+		if (updateUrl) {
+			const nextPath = `/v/4/${language}/`;
+			if (window.location.pathname !== nextPath) window.history.pushState(null, '', nextPath);
+		}
+		setLanguage(language);
+	};
+
+	setLanguage(detectLanguage());
+	languagePickers.forEach((picker) => picker.addEventListener('change', () => chooseLanguage(picker.value)));
+	window.addEventListener(V4_LANGUAGE_REQUEST_EVENT, (event) => {
+		if (event instanceof CustomEvent) chooseLanguage((event.detail as V4LanguageRequestDetail).language);
+	});
+	window.addEventListener('popstate', () => {
+		const routedLanguage = window.location.pathname.match(/^\/v\/4\/(en|it|fr|zh)\/?$/)?.[1];
+		setLanguage(isV4Language(routedLanguage) ? routedLanguage : detectLanguage());
+	});
 
 	const closeWechatCard = () => {
 		if (!wechatCard || wechatCard.hidden) return;
@@ -137,12 +322,15 @@ import UniverseExperience from './UniverseExperience';
 	});
 	wechatClose?.addEventListener('click', closeWechatCard);
 	document.addEventListener('click', (event) => {
-		if (!wechatCard || wechatCard.hidden || !(event.target instanceof Node)) return;
-		if (wechatCard.contains(event.target) || wechatTrigger?.contains(event.target)) return;
-		closeWechatCard();
+		if (!(event.target instanceof Node)) return;
+		if (wechatCard && !wechatCard.hidden && !wechatCard.contains(event.target) && !wechatTrigger?.contains(event.target)) closeWechatCard();
+		if (starSettings && !starSettings.hidden && !starSettings.contains(event.target) && !wordmarkSpark?.contains(event.target)) closeStarSettings();
 	});
 	document.addEventListener('keydown', (event) => {
-		if (event.key === 'Escape') closeWechatCard();
+		if (event.key === 'Escape') {
+			closeWechatCard();
+			closeStarSettings();
+		}
 	});
 
 	consoleWindow?.querySelectorAll<HTMLButtonElement>('[data-console-action]').forEach((control) => {
@@ -150,6 +338,7 @@ import UniverseExperience from './UniverseExperience';
 			const action = control.dataset.consoleAction;
 			if (action === 'close') {
 				consoleWindow.classList.add('is-closed');
+				universe?.classList.remove('has-maximized-console');
 				return;
 			}
 
@@ -157,9 +346,19 @@ import UniverseExperience from './UniverseExperience';
 			const alternateStateClass = action === 'minimize' ? 'is-maximized' : 'is-minimized';
 			const isActive = consoleWindow.classList.toggle(stateClass);
 			consoleWindow.classList.remove(alternateStateClass);
+			universe?.classList.toggle('has-maximized-console', action === 'maximize' && isActive);
 			control.setAttribute('aria-pressed', String(isActive));
 			consoleWindow.querySelector<HTMLButtonElement>(`[data-console-action="${action === 'minimize' ? 'maximize' : 'minimize'}"]`)?.setAttribute('aria-pressed', 'false');
 		});
+	});
+	window.addEventListener(V4_CONSOLE_CLOSE_EVENT, () => {
+		consoleWindow?.classList.add('is-closed');
+		universe?.classList.remove('has-maximized-console');
+	});
+
+	window.addEventListener(V4_ROOM_CHANGE_EVENT, (event) => {
+		const roomIsOpen = event instanceof CustomEvent && (event.detail as V4RoomChangeDetail).open;
+		consoleWindow?.classList.toggle('is-room-hidden', roomIsOpen);
 	});
 
 	if (universe && !reduceMotion && !window.matchMedia('(pointer: coarse)').matches) {
@@ -205,6 +404,12 @@ import UniverseExperience from './UniverseExperience';
 	.universe {
 		--pointer-x: 0;
 		--pointer-y: 0;
+		--v4-utility-border: rgb(176 180 255 / .2);
+		--v4-utility-background: rgb(13 15 48 / .36);
+		--v4-utility-color: rgb(202 204 242 / .72);
+		--v4-utility-hover: rgb(133 145 255 / .17);
+		--v4-utility-radius: .52rem;
+		--v4-utility-height: 2rem;
 		position: relative;
 		isolation: isolate;
 		display: flex;
@@ -219,38 +424,76 @@ import UniverseExperience from './UniverseExperience';
 
 
 	.universe__header, .universe__footer, .universe__scene { position: relative; z-index: 1; width: min(1220px, 100%); margin-inline: auto; }
-	.universe__header { display: flex; align-items: center; gap: 1rem; }
-	.universe__wordmark { color: #f8f7ff; font: 700 clamp(.78rem, 1.6vw, .93rem)/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; letter-spacing: -.05em; text-decoration: none; }
-	.universe__wordmark span { color: #f5d979; font-size: 1.08em; }
+	.universe__header { z-index: 8; display: flex; align-items: center; gap: 1rem; }
+	.universe__brand { display: inline-flex; align-items: center; gap: .38rem; }
+	.universe__wordmark { display: inline-flex; align-items: center; color: #f8f7ff; font: 400 clamp(.78rem, 1.6vw, .93rem)/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; letter-spacing: -.05em; text-decoration: none; }
+	.universe__wordmark-spark { position: relative; z-index: 1; display: grid; width: 1.25rem; height: 1.25rem; place-items: center; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #f5d979; cursor: pointer; font: 400 1rem/1 ui-monospace, monospace; transition: color 160ms ease, filter 160ms ease, transform 220ms cubic-bezier(.22, 1, .36, 1); }
+	.universe__wordmark-spark::after { position: absolute; z-index: -1; inset: -.12rem; border: 1px solid rgb(238 241 255 / .7); border-radius: 50%; content: ''; opacity: 0; transform: scale(.5); transition: opacity 160ms ease, transform 220ms cubic-bezier(.22, 1, .36, 1); }
+	.universe__wordmark-spark:hover, .universe__wordmark-spark:focus-visible, .universe__wordmark-spark[aria-expanded="true"] { color: #fff; filter: drop-shadow(0 0 .42rem rgb(200 210 255 / .95)); outline: none; transform: scale(1.38); }
+	.universe__wordmark-spark:hover::after, .universe__wordmark-spark:focus-visible::after, .universe__wordmark-spark[aria-expanded="true"]::after { opacity: 1; transform: scale(1); }
+	.universe__wordmark-name { display: inline-block; min-width: 9.3em; transform-origin: left center; transition: color 180ms ease, text-shadow 180ms ease, transform 180ms ease; }
+	.universe__wordmark.has-custom-font .universe__wordmark-name { font-family: var(--wordmark-font); font-size: 1.08em; font-weight: 400; letter-spacing: .015em; transform: none; }
+	.universe__wordmark.is-scrambling .universe__wordmark-name { color: inherit; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-weight: 400; letter-spacing: .04em; text-shadow: none; transform: none; }
+	.universe__star-settings { position: absolute; top: calc(100% + .7rem); left: 0; width: min(18rem, calc(100vw - 2rem)); padding: .85rem; border: 1px solid rgb(201 208 255 / .28); border-radius: .85rem; background: rgb(11 14 47 / .88); box-shadow: 0 1.15rem 3rem rgb(0 0 0 / .42), inset 0 1px 0 rgb(255 255 255 / .08); backdrop-filter: blur(18px) saturate(130%); }
+	.universe__star-settings[hidden] { display: none; }
+	.universe__star-settings-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+	.universe__star-settings-heading p { margin: 0; color: #f4f4ff; font: 700 .74rem/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+	.universe__star-settings-heading button { display: grid; width: 1.25rem; height: 1.25rem; flex: 0 0 auto; place-items: center; padding: 0; border: 0; border-radius: 50%; background: rgb(219 225 255 / .12); color: rgb(235 237 255 / .72); cursor: pointer; font: 500 1rem/1 system-ui, sans-serif; }
+	.universe__star-settings-heading button:hover, .universe__star-settings-heading button:focus-visible { background: rgb(219 225 255 / .23); color: #fff; outline: 1px solid rgb(255 255 255 / .68); }
+	.universe__star-slider { display: grid; grid-template-columns: 1fr auto; gap: .4rem 1rem; margin-top: .85rem; color: rgb(210 213 246 / .64); font: 600 .6rem/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+	.universe__star-slider strong { color: #fff; font-weight: 700; }
+	.universe__star-slider input { grid-column: 1 / -1; width: 100%; margin: .18rem 0 0; accent-color: #bdc7ff; cursor: pointer; }
+	.universe__star-presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: .25rem; margin-top: .24rem; color: rgb(203 206 240 / .48); font: 500 .48rem/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-align: center; }
+	.universe__star-presets span:first-child { text-align: left; }
+	.universe__star-presets span:last-child { text-align: right; }
+	.universe__shooting-stars { position: fixed; z-index: 2; inset: 0; overflow: hidden; pointer-events: none; }
+	:global(.universe__shooting-star) { --shooting-angle: 35deg; --shooting-distance-x: 50vw; --shooting-distance-y: 50vh; --shooting-drift-x: 4px; --shooting-drift-y: -3px; --shooting-drift-x-2: -3px; --shooting-drift-y-2: 2px; --shooting-length: 7rem; --shooting-duration: 2200ms; position: absolute; width: 1px; height: 1px; opacity: 0; animation: wordmark-shooting-star var(--shooting-duration) linear forwards; will-change: opacity, transform; }
+	:global(.universe__shooting-star)::before { position: absolute; top: 0; right: 0; width: var(--shooting-length); height: 1px; content: ''; background: linear-gradient(90deg, transparent, rgb(255 255 255 / .18) 45%, rgb(255 255 255 / .95)); filter: drop-shadow(0 0 .2rem rgb(184 197 255 / .7)); transform: translateY(-50%) rotate(var(--shooting-angle)) scaleX(.08); transform-origin: right center; animation: wordmark-shooting-tail var(--shooting-duration) ease-out forwards; }
+	:global(.universe__shooting-star)::after { position: absolute; width: .18rem; height: .18rem; border-radius: 50%; content: ''; background: #fff; box-shadow: 0 0 .4rem rgb(196 207 255 / .9); transform: translate(-50%, -50%); animation: wordmark-shooting-head var(--shooting-duration) ease-in-out forwards; }
 	.universe__scene { flex: 1; min-height: 40rem; }
+	.universe.has-maximized-console .universe__scene { z-index: 40; }
+	.universe.has-maximized-console .universe__scene::after { position: fixed; z-index: 50; inset: 0; content: ''; background: rgb(3 4 20 / .72); backdrop-filter: blur(12px); }
 
 	.universe__console { position: absolute; top: 50%; left: 50%; z-index: 4; width: min(33rem, 44vw); overflow: hidden; border: 1px solid rgb(219 226 255 / .24); border-radius: 1rem; background: linear-gradient(135deg, rgb(34 44 104 / .54), rgb(8 11 39 / .5)); box-shadow: 0 1.8rem 4rem rgb(1 1 14 / .32), inset 0 1px 0 rgb(255 255 255 / .14); backdrop-filter: blur(18px) saturate(135%); transition: width 260ms ease, opacity 180ms ease, transform 260ms cubic-bezier(.22, 1, .36, 1); transform: translate3d(calc(-50% + (var(--pointer-x) * 18px)), calc(-50% + (var(--pointer-y) * 14px)), 105px) rotateX(calc(var(--pointer-y) * -2deg)) rotateY(calc(var(--pointer-x) * 3deg)); }
-	.universe__console.is-closed { opacity: 0; pointer-events: none; transform: translate3d(-50%, -50%, 105px) scale(.84); }
+	.universe__console.is-closed,
+	.universe__console.is-room-hidden { opacity: 0; pointer-events: none; transform: translate3d(-50%, -50%, 105px) scale(.84); }
 	.universe__console.is-minimized { width: min(20rem, 44vw); }
 	.universe__console.is-minimized .universe__console-code { display: none; }
 	.universe__console.is-minimized::after { display: none; }
-	.universe__console.is-maximized { width: min(48rem, 72vw); }
+	.universe__console.is-maximized { position: fixed; z-index: 60; inset: .75rem; display: flex; width: auto; height: auto; flex-direction: column; border-radius: 1rem; background: linear-gradient(135deg, rgb(28 36 87 / .98), rgb(8 11 39 / .98)); transform: none; }
 	.universe__console::after { position: absolute; inset: 0; content: ''; background: linear-gradient(110deg, transparent 24%, rgb(255 255 255 / .09) 43%, transparent 60%); transform: translateX(-130%); animation: console-sheen 6.5s 1.4s ease-in-out infinite; pointer-events: none; }
 	.universe__console-bar { display: flex; align-items: center; height: 2.25rem; padding: 0 .85rem; border-bottom: 1px solid rgb(255 255 255 / .11); }
 	.universe__console-controls { display: flex; gap: .38rem; }
+	.universe__console-language { display: flex; margin-left: auto; }
+	.universe__console-language :global(.v4-language-select) { height: 1.45rem; min-width: 5rem; border-color: rgb(219 226 255 / .2); background: rgb(8 11 39 / .56); color: rgb(220 219 246 / .72); }
 	.universe__console-control { display: grid; width: .9rem; height: .9rem; place-items: center; padding: 0; border: 1px solid rgb(0 0 0 / .16); border-radius: 50%; color: rgb(33 33 43 / .72); cursor: pointer; transition: filter 130ms ease, transform 130ms ease; }
-	.universe__console-control span { margin-top: -.06rem; font: 900 .72rem/.8 system-ui, sans-serif; }
-	.universe__console-control--maximize span { font-size: .59rem; }
+	.universe__console-control svg { width: .5rem; height: .5rem; overflow: visible; fill: none; stroke: currentColor; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+	.universe__console-control--maximize svg { width: .44rem; height: .44rem; }
 	.universe__console-control:hover, .universe__console-control:focus-visible { filter: brightness(1.13); outline: 2px solid rgb(255 255 255 / .7); outline-offset: 2px; transform: scale(1.08); }
 	.universe__console-control--close { background: #ff8e7a; }
 	.universe__console-control--minimize { background: #f6d879; }
 	.universe__console-control--maximize { background: #76e4c0; }
-	.universe__console-bar p { margin: 0 auto 0 .45rem; color: rgb(220 219 246 / .55); font: 650 .65rem/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+	.universe__console-bar p { margin: 0 0 0 .45rem; color: rgb(220 219 246 / .55); font: 650 .65rem/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
 	.universe__console-code { min-height: 12.2rem; padding: 1.2rem 1.35rem; }
-	.universe__console-code :global(.typing-intro) { width: 100%; color: #ececff; font: clamp(.74rem, 1.2vw, .95rem)/1.72 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
-	.universe__console-code :global(.typing-intro__buffer) { min-height: 9rem; }
+	.universe__console-code :global(.vim-terminal--intro) { width: 100%; height: auto; min-height: 0; background: transparent; color: #ececff; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+	.universe__console-code :global(.vim-terminal--intro .vim-terminal__editor) { height: 9rem; min-height: 9rem; overflow: hidden; }
+	.universe__console-code :global(.vim-terminal--intro .vim-terminal__lines) { height: 9rem; min-width: 1.4rem; padding: 0 .75rem 0 0; overflow: hidden; background: transparent; color: rgb(202 204 242 / .35); font: clamp(.74rem, 1.2vw, .95rem)/1.72 inherit; }
+	.universe__console-code :global(.vim-terminal--intro .vim-terminal__buffer) { height: 9rem; min-height: 0; padding: 0; overflow: auto; color: #ececff; caret-color: #f5d979; font: 500 clamp(.74rem, 1.2vw, .95rem)/1.72 inherit; letter-spacing: normal; }
+	.universe__console-code :global(.vim-terminal--intro .vim-terminal__status) { min-height: 0; margin-top: .55rem; padding: .25rem .45rem; border-radius: .2rem; background: rgb(122 228 192 / .14); color: rgb(220 219 246 / .68); font: 700 .62rem/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+	.universe__console-code :global(.vim-terminal--intro .vim-terminal__status strong) { color: #9de9cc; }
+	.universe__console-code :global(.vim-terminal--intro .vim-terminal__status > span:last-child) { opacity: .65; }
+	.universe__console.is-maximized .universe__console-code { display: flex; min-height: 0; flex: 1; }
+	.universe__console.is-maximized .universe__console-code :global(.vim-terminal--intro) { min-height: 0; flex: 1; }
+	.universe__console.is-maximized .universe__console-code :global(.vim-terminal--intro .vim-terminal__editor),
+	.universe__console.is-maximized .universe__console-code :global(.vim-terminal--intro .vim-terminal__lines),
+	.universe__console.is-maximized .universe__console-code :global(.vim-terminal--intro .vim-terminal__buffer) { height: auto; min-height: 0; }
 
 
 	.universe__footer { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem; padding-top: .8rem; }
 	.universe__utilities { display: flex; align-items: stretch; justify-self: start; gap: .45rem; }
-	.universe__contacts { display: flex; height: 2rem; gap: .16rem; align-items: stretch; padding: .18rem; border: 1px solid rgb(176 180 255 / .2); border-radius: .52rem; background: rgb(13 15 48 / .36); box-shadow: inset 0 1px 0 rgb(255 255 255 / .04); }
-	.universe__contacts a, .universe__contacts button { display: inline-flex; min-height: 0; align-items: center; justify-content: center; padding: .28rem .36rem; border: 0; border-radius: .33rem; background: transparent; color: rgb(202 204 242 / .72); cursor: pointer; font: 700 clamp(.58rem, .75vw, .66rem)/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-decoration: none; white-space: nowrap; }
-	.universe__contacts a:hover, .universe__contacts button:hover, .universe__contacts button:focus-visible { background: rgb(133 145 255 / .17); color: #fff; text-decoration: none; }
+	.universe__contacts { display: flex; height: var(--v4-utility-height); gap: .16rem; align-items: stretch; padding: .18rem; border: 1px solid var(--v4-utility-border); border-radius: var(--v4-utility-radius); background: var(--v4-utility-background); box-shadow: inset 0 1px 0 rgb(255 255 255 / .04); }
+	.universe__contacts a, .universe__contacts button { display: inline-flex; min-height: 0; align-items: center; justify-content: center; padding: .28rem .36rem; border: 0; border-radius: .33rem; background: transparent; color: var(--v4-utility-color); cursor: pointer; font: 700 clamp(.58rem, .75vw, .66rem)/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-decoration: none; white-space: nowrap; }
+	.universe__contacts a:hover, .universe__contacts button:hover, .universe__contacts button:focus-visible { background: var(--v4-utility-hover); color: #fff; text-decoration: none; }
 	.universe__contacts button:focus-visible { outline: 1px solid rgb(255 255 255 / .78); outline-offset: .1rem; }
 	.universe__wechat { position: relative; display: flex; align-items: stretch; }
 	.universe__wechat-trigger { height: 100%; }
@@ -260,7 +503,8 @@ import UniverseExperience from './UniverseExperience';
 	.universe__wechat-close { position: absolute; top: .58rem; right: .58rem; display: grid; width: 1.35rem; height: 1.35rem; place-items: center; border-radius: 50% !important; background: rgb(0 0 0 / .62) !important; color: #fff !important; font: 700 1rem/1 system-ui, sans-serif !important; text-decoration: none !important; }
 	.universe__wechat-close:hover, .universe__wechat-close:focus-visible { background: rgb(0 0 0 / .8) !important; }
 	.universe__language { display: flex; }
-	.universe__language select { height: 2rem; min-height: 2rem; border: 1px solid rgb(176 180 255 / .4); border-radius: .45rem; background: rgb(17 19 60 / .76); padding: .22rem 1.5rem .22rem .45rem; color: rgb(248 248 255); cursor: pointer; font: 700 clamp(.58rem, .75vw, .66rem)/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+	.universe__language select { height: var(--v4-utility-height); min-height: var(--v4-utility-height); border: 1px solid var(--v4-utility-border); border-radius: var(--v4-utility-radius); background-color: var(--v4-utility-background); box-shadow: inset 0 1px 0 rgb(255 255 255 / .04); padding: .22rem 1.5rem .22rem .55rem; color: var(--v4-utility-color); cursor: pointer; font: 700 clamp(.58rem, .75vw, .66rem)/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+	.universe__language select:hover, .universe__language select:focus-visible { border-color: var(--v4-utility-border); background-color: var(--v4-utility-hover); color: #fff; outline: 1px solid rgb(255 255 255 / .42); outline-offset: 1px; }
 	.universe__model-credit { margin: 0; color: rgb(202 204 242 / .48); font: 600 .6rem/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
 	.universe__model-credit a { color: inherit; text-decoration-color: rgb(202 204 242 / .28); text-underline-offset: .16em; }
 	.universe__model-credit a:hover { color: rgb(242 242 255 / .8); }
@@ -268,6 +512,25 @@ import UniverseExperience from './UniverseExperience';
 
 	.universe__sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
 	@keyframes console-sheen { 32%, 100% { transform: translateX(140%); } }
+	@keyframes wordmark-shooting-star {
+		0% { opacity: 0; transform: translate3d(0, 0, 0); }
+		8% { opacity: .52; }
+		18% { opacity: .9; transform: translate3d(var(--shooting-drift-x), var(--shooting-drift-y), 0); }
+		34% { opacity: .7; transform: translate3d(var(--shooting-drift-x-2), var(--shooting-drift-y-2), 0); }
+		49% { opacity: .96; transform: translate3d(var(--shooting-drift-x-2), var(--shooting-drift-y), 0); }
+		64% { opacity: .9; transform: translate3d(0, 0, 0); }
+		100% { opacity: 0; transform: translate3d(var(--shooting-distance-x), var(--shooting-distance-y), 0); }
+	}
+	@keyframes wordmark-shooting-tail {
+		0%, 18% { opacity: .28; transform: translateY(-50%) rotate(var(--shooting-angle)) scaleX(.08); }
+		38% { opacity: .48; transform: translateY(-50%) rotate(var(--shooting-angle)) scaleX(.18); }
+		64%, 100% { opacity: 1; transform: translateY(-50%) rotate(var(--shooting-angle)) scaleX(1); }
+	}
+	@keyframes wordmark-shooting-head {
+		0%, 64% { opacity: .52; scale: .72; }
+		18%, 49% { opacity: 1; scale: 1.35; }
+		100% { opacity: .88; scale: 1; }
+	}
 
 	@media (max-width: 860px) {
 		.universe { overflow: auto; }
@@ -282,8 +545,10 @@ import UniverseExperience from './UniverseExperience';
 		.universe { padding: 1.25rem 1rem 1rem; }
 		.universe__scene { min-height: max(38rem, calc(100svh - 8rem)); }
 		.universe__console { top: 56%; width: calc(100vw - 1.25rem); border-radius: .85rem; backdrop-filter: blur(10px) saturate(120%); }
+		.universe__console.is-maximized { inset: .25rem; width: auto; border-radius: .75rem; }
 		.universe__console-code { min-height: 12rem; padding: 1rem; }
-		.universe__console-code :global(.typing-intro) { font-size: .72rem; }
+		.universe__console-code :global(.vim-terminal--intro .vim-terminal__buffer),
+		.universe__console-code :global(.vim-terminal--intro .vim-terminal__lines) { font-size: .72rem; }
 		.universe__footer { display: flex; align-items: flex-start; flex-direction: column; padding-top: 1rem; }
 		.universe__footer > :last-child { align-self: flex-end; }
 	}
