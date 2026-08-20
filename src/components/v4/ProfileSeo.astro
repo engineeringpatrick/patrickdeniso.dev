@@ -1,0 +1,102 @@
+---
+import { copy, type V4Language } from '../../locales/v4';
+
+interface Props {
+	language: V4Language;
+	canonicalPath: string;
+	indexable?: boolean;
+}
+
+const { language, canonicalPath, indexable = true } = Astro.props;
+const origin = Astro.site ?? new URL('https://patrickdeniso.dev');
+const canonicalUrl = new URL(canonicalPath, origin).href;
+const title = copy[language].site.title;
+const description = copy[language].site.description;
+const profileImage = new URL('/profile_picture.jpeg', origin).href;
+const languageAlternates = [
+	{ language: 'en', href: new URL('/', origin).href },
+	{ language: 'it', href: new URL('/v/4/it/', origin).href },
+	{ language: 'fr', href: new URL('/v/4/fr/', origin).href },
+	{ language: 'zh-Hans', href: new URL('/v/4/zh/', origin).href },
+] as const;
+const openGraphLocales: Record<V4Language, string> = {
+	en: 'en_US',
+	it: 'it_IT',
+	fr: 'fr_FR',
+	zh: 'zh_CN',
+};
+const socialProfiles = [
+	'https://www.linkedin.com/in/patrick-deniso/',
+	'https://github.com/engineeringpatrick',
+	'https://github.com/TheBigPaff',
+	'https://www.instagram.com/patrick_deniso/',
+	'https://blog.patrickdeniso.com/',
+];
+const structuredData = {
+	'@context': 'https://schema.org',
+	'@graph': [
+		{
+			'@type': 'WebSite',
+			'@id': `${origin.href}#website`,
+			url: origin.href,
+			name: 'Patrick Deniso',
+			alternateName: "Patrick's Universe",
+			inLanguage: ['en', 'it', 'fr', 'zh-Hans'],
+		},
+		{
+			'@type': 'ProfilePage',
+			'@id': `${canonicalUrl}#profile-page`,
+			url: canonicalUrl,
+			name: title,
+			description,
+			inLanguage: language === 'zh' ? 'zh-Hans' : language,
+			isPartOf: { '@id': `${origin.href}#website` },
+			mainEntity: { '@id': `${origin.href}#patrick-deniso` },
+		},
+		{
+			'@type': 'Person',
+			'@id': `${origin.href}#patrick-deniso`,
+			name: 'Patrick Deniso',
+			givenName: 'Patrick',
+			familyName: 'Deniso',
+			alternateName: ['潘德宇', 'engineeringpatrick'],
+			url: origin.href,
+			jobTitle: 'Software Engineer',
+			knowsAbout: ['Software engineering', 'Distributed systems', 'Backend engineering'],
+			sameAs: socialProfiles,
+		},
+	],
+};
+---
+
+<meta name="description" content={description} />
+<meta name="author" content="Patrick Deniso" />
+<meta name="robots" content={`${indexable ? 'index' : 'noindex'}, follow, noimageindex, noarchive`} />
+<link rel="canonical" href={canonicalUrl} />
+<link rel="alternate" hreflang="x-default" href={new URL('/', origin).href} />
+{languageAlternates.map((alternate) => <link rel="alternate" hreflang={alternate.language} href={alternate.href} />)}
+<link rel="me" href={socialProfiles[0]} />
+<link rel="me" href={socialProfiles[1]} />
+<link rel="sitemap" href={new URL('/sitemap.xml', origin).href} />
+
+<meta property="og:type" content="profile" />
+<meta property="og:site_name" content="Patrick Deniso" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:locale" content={openGraphLocales[language]} />
+<meta property="og:image" content={profileImage} />
+<meta property="og:image:width" content="3121" />
+<meta property="og:image:height" content="3189" />
+<meta property="og:image:alt" content="Patrick Deniso" />
+<meta property="profile:first_name" content="Patrick" />
+<meta property="profile:last_name" content="Deniso" />
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={profileImage} />
+<meta name="twitter:image:alt" content="Patrick Deniso" />
+
+<script type="application/ld+json" set:html={JSON.stringify(structuredData)} is:inline></script>
+<title>{title}</title>

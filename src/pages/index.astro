@@ -1,20 +1,16 @@
 ---
 import UniverseHome from '../components/v4/UniverseHome.astro';
-import { copy } from '../locales/v4';
-
-const site = copy.en.site;
+import ProfileSeo from '../components/v4/ProfileSeo.astro';
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="description" content={site.description} />
-		<meta name="robots" content="noimageindex, noarchive" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="theme-color" content="#050617" />
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-		<title>{site.title}</title>
+		<ProfileSeo language="en" canonicalPath="/" />
 	</head>
 	<body>
 		<UniverseHome />

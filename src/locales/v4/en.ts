@@ -4,8 +4,8 @@ import aboutContent from './about/en.txt?raw';
 const en = {
 	copy: {
 		site: {
-			title: 'Patrick\'s Universe',
-			description: "Patrick Deniso's interactive universe.",
+			title: 'Patrick Deniso | Software Engineer',
+			description: 'Patrick Deniso is a software engineer interested in distributed systems. Explore his work experience, writing, photos, and interactive portfolio.',
 			sceneLabel: "Patrick Deniso's interactive universe",
 			codeIntroduction: 'A code introduction',
 			clickMe: 'click me!',

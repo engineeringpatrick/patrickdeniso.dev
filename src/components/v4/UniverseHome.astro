@@ -37,7 +37,7 @@ const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 	</header>
 
 	<section class="universe__scene" aria-label="Patrick Deniso's interactive universe" data-v4-scene>
-		<h1 class="universe__sr-only">Patrick Deniso</h1>
+		<h1 class="universe__sr-only" data-v4-page-title>{initialSiteCopy.title}</h1>
 		<div class="universe__shooting-stars" aria-hidden="true" data-wordmark-stars></div>
 		<UniverseExperience client:only="react" />
 
@@ -243,6 +243,7 @@ const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 		const text = copy[nextLanguage].site;
 		document.title = text.title;
 		document.querySelector('meta[name="description"]')?.setAttribute('content', text.description);
+		universe?.querySelector<HTMLElement>('[data-v4-page-title]')?.replaceChildren(text.title);
 		universe?.querySelector<HTMLElement>('[data-v4-scene]')?.setAttribute('aria-label', text.sceneLabel);
 		consoleWindow?.setAttribute('aria-label', text.codeIntroduction);
 		consoleWindow?.querySelector<HTMLElement>('.universe__console-controls')?.setAttribute('aria-label', text.windowControls);

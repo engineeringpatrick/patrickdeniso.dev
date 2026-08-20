@@ -4,8 +4,8 @@ import aboutContent from './about/zh.txt?raw';
 const zh = {
 	copy: {
 		site: {
-			title: '潘德宇的宇宙',
-			description: '探索潘德宇的交互式宇宙。',
+			title: '潘德宇（Patrick Deniso）| 软件工程师',
+			description: '潘德宇（Patrick Deniso）是一名专注于分布式系统的软件工程师。探索他的工作经历、文章、照片和交互式个人网站。',
 			sceneLabel: '潘德宇的交互式宇宙',
 			codeIntroduction: '代码简介',
 			clickMe: '点我！',

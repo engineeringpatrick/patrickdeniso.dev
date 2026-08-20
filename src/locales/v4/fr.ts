@@ -4,8 +4,8 @@ import aboutContent from './about/fr.txt?raw';
 const fr = {
 	copy: {
 		site: {
-			title: "L’univers de Patrick",
-			description: "Explorez l’univers interactif de Patrick Deniso.",
+			title: "Patrick Deniso | Ingénieur logiciel",
+			description: "Patrick Deniso est un ingénieur logiciel spécialisé dans les systèmes distribués. Découvrez son expérience, ses écrits, ses photos et son portfolio interactif.",
 			sceneLabel: "L’univers interactif de Patrick Deniso",
 			codeIntroduction: "Présentation en code",
 			clickMe: "clique-moi !",
