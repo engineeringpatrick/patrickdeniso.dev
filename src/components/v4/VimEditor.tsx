@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { flushSync } from 'react-dom';
 import { buildVisualLines, cursorForRawIndex, wrapVisualLines, type CursorPosition, type TextCell, type VisualCell } from './vimBuffer';
 import { readVimBuffer, writeVimBuffer } from './vimSession';
 
@@ -68,6 +69,7 @@ export default function VimEditor({
 	const editor = useRef<HTMLTextAreaElement>(null);
 	const editorShell = useRef<HTMLDivElement>(null);
 	const normalBuffer = useRef<HTMLDivElement>(null);
+	const mobileNormalInput = useRef<HTMLInputElement>(null);
 	const lineNumbers = useRef<HTMLOListElement>(null);
 	const commandInput = useRef<HTMLInputElement>(null);
 	const activeSessionKey = useRef(sessionKey);
@@ -155,14 +157,19 @@ export default function VimEditor({
 	const focusNormalBuffer = () => window.requestAnimationFrame(() => normalBuffer.current?.focus());
 	const enterInsertMode = (rawIndex: number) => {
 		setCountPrefix('');
-		setMode('insert');
-		window.requestAnimationFrame(() => {
-			const field = editor.current;
-			if (!field) return;
-			field.focus();
-			const nextCursor = Math.min(rawIndex, field.value.length);
-			field.setSelectionRange(nextCursor, nextCursor);
-		});
+		flushSync(() => setMode('insert'));
+		const field = editor.current;
+		if (!field) return;
+		field.focus({ preventScroll: true });
+		const nextCursor = Math.min(rawIndex, field.value.length);
+		field.setSelectionRange(nextCursor, nextCursor);
+	};
+	const handleBufferPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+		if (isLocked || mode !== 'normal' || event.target instanceof Element && event.target.closest('a')) return;
+		const isTouch = event.pointerType === 'touch' || window.matchMedia('(pointer: coarse)').matches;
+		if (!isTouch) return;
+		event.preventDefault();
+		mobileNormalInput.current?.focus({ preventScroll: true });
 	};
 	const enterCommandMode = () => {
 		setCountPrefix('');
@@ -180,7 +187,7 @@ export default function VimEditor({
 		setMode('normal');
 		focusNormalBuffer();
 	};
-	const handleNormalKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
+	const handleNormalKey = (event: React.KeyboardEvent<HTMLElement>) => {
 		if (/^[0-9]$/.test(event.key) && (event.key !== '0' || countPrefix)) {
 			setCountPrefix(`${countPrefix}${event.key}`);
 			event.preventDefault();
@@ -228,6 +235,7 @@ export default function VimEditor({
 						tabIndex={isLocked ? -1 : 0}
 						autoFocus={!isLocked && autoFocus}
 						onKeyDown={isLocked ? undefined : handleNormalKey}
+						onPointerDown={handleBufferPointerDown}
 						onScroll={(event) => {
 							syncLineNumbers(event.currentTarget);
 						}}
@@ -258,6 +266,21 @@ export default function VimEditor({
 						focusNormalBuffer();
 					}}
 				/>
+				{!isLocked && mode === 'normal' && (
+					<input
+						ref={mobileNormalInput}
+						className="vim-terminal__mobile-input"
+						defaultValue=""
+						tabIndex={-1}
+						autoCapitalize="none"
+						autoComplete="off"
+						autoCorrect="off"
+						spellCheck={false}
+						aria-label={`${editableLabel} — ${normalLabel}`}
+						onInput={(event) => { event.currentTarget.value = ''; }}
+						onKeyDown={handleNormalKey}
+					/>
+				)}
 			</div>
 			<footer className="vim-terminal__status" aria-live="polite">
 				{visibleMode === 'command' ? (

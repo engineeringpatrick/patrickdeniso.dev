@@ -85,6 +85,7 @@ const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 
 <script>
 	import { copy, isV4Language } from '../../locales/v4';
+	import { detectV4Language } from '../../locales/v4/detect';
 	import { V4_CONSOLE_CLOSE_EVENT, V4_LANGUAGE_CHANGE_EVENT, V4_LANGUAGE_REQUEST_EVENT, V4_ROOM_CHANGE_EVENT, type V4LanguageRequestDetail, type V4RoomChangeDetail } from './v4Events';
 
 	const universe = document.querySelector<HTMLElement>('[data-universe]');
@@ -232,24 +233,6 @@ const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 		closeStarSettings();
 		wordmarkSpark?.focus();
 	});
-	const detectLanguage = () => {
-		const routedLanguage = universe?.dataset.v4InitialLanguage;
-		if (isV4Language(routedLanguage)) return routedLanguage;
-
-		const saved = window.localStorage.getItem('v4-language');
-		if (isV4Language(saved)) return saved;
-
-		const preferred = navigator.languages?.[0] ?? navigator.language;
-		const localeLanguage = preferred?.slice(0, 2).toLowerCase();
-		if (isV4Language(localeLanguage)) return localeLanguage;
-
-		const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-		if (zone === 'Europe/Rome') return 'it';
-		if (['Europe/Paris', 'Europe/Brussels', 'Europe/Monaco', 'America/Montreal'].includes(zone)) return 'fr';
-		if (['Asia/Shanghai', 'Asia/Chongqing', 'Asia/Harbin', 'Asia/Urumqi', 'Asia/Hong_Kong', 'Asia/Macau', 'Asia/Taipei'].includes(zone)) return 'zh';
-		return 'en';
-	};
-
 	const setLanguage = (language: string) => {
 		const nextLanguage = isV4Language(language) ? language : 'en';
 		document.documentElement.dataset.v4Language = nextLanguage;
@@ -298,14 +281,20 @@ const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 		setLanguage(language);
 	};
 
-	setLanguage(detectLanguage());
+	void detectV4Language(universe?.dataset.v4InitialLanguage).then((language) => {
+		setLanguage(language);
+		if (!window.location.pathname.match(/^\/v\/4\/(en|it|fr|zh)\/?$/)) {
+			window.history.replaceState(null, '', `/v/4/${language}/`);
+		}
+	});
 	languagePickers.forEach((picker) => picker.addEventListener('change', () => chooseLanguage(picker.value)));
 	window.addEventListener(V4_LANGUAGE_REQUEST_EVENT, (event) => {
 		if (event instanceof CustomEvent) chooseLanguage((event.detail as V4LanguageRequestDetail).language);
 	});
 	window.addEventListener('popstate', () => {
 		const routedLanguage = window.location.pathname.match(/^\/v\/4\/(en|it|fr|zh)\/?$/)?.[1];
-		setLanguage(isV4Language(routedLanguage) ? routedLanguage : detectLanguage());
+		if (isV4Language(routedLanguage)) setLanguage(routedLanguage);
+		else void detectV4Language().then(setLanguage);
 	});
 
 	const closeWechatCard = () => {
@@ -544,7 +533,7 @@ const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 	@media (max-width: 520px) {
 		.universe { padding: 1.25rem 1rem 1rem; }
 		.universe__scene { min-height: max(38rem, calc(100svh - 8rem)); }
-		.universe__console { top: 56%; width: calc(100vw - 1.25rem); border-radius: .85rem; backdrop-filter: blur(10px) saturate(120%); }
+		.universe__console { top: 56%; z-index: 7; width: calc(100vw - 1.25rem); border-radius: .85rem; backdrop-filter: blur(10px) saturate(120%); }
 		.universe__console.is-maximized { inset: .25rem; width: auto; border-radius: .75rem; }
 		.universe__console-code { min-height: 12rem; padding: 1rem; }
 		.universe__console-code :global(.vim-terminal--intro .vim-terminal__buffer),

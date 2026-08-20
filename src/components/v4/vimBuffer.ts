@@ -4,6 +4,8 @@ type ImageCell = { kind: 'image'; alt: string; src: string; rawIndex: number; ra
 export type VisualCell = TextCell | ImageCell;
 
 const markdownInlinePattern = /\[!\[([^\]\n]*)\]\(((?:https?:\/\/|\/)[^)\s]+)\)\]\((https?:\/\/[^)\s]+)\)|!\[([^\]\n]*)\]\(((?:https?:\/\/|\/)[^)\s]+)\)|\[([^\]\n]+)\]\((https?:\/\/[^)\s]+)\)/g;
+const wideCharacterPattern = /[\u2e80-\ua4cf\uac00-\ud7a3\uf900-\ufaff\ufe10-\ufe6f\uff01-\uff60\uffe0-\uffe6\u{20000}-\u{3fffd}]/u;
+const cellWidth = (cell: VisualCell) => cell.kind === 'text' && wideCharacterPattern.test(cell.value) ? 2 : 1;
 
 export function buildVisualLines(buffer: string, renderMarkdown = true): VisualCell[][] {
 	const lines: VisualCell[][] = [[]];
@@ -51,19 +53,21 @@ export function buildVisualLines(buffer: string, renderMarkdown = true): VisualC
 
 export function wrapVisualLines(lines: VisualCell[][], columns: number): VisualCell[][] {
 	return lines.flatMap((cells) => {
-		if (cells.length <= columns) return [cells];
 		const wrapped: VisualCell[][] = [];
 		for (let start = 0; start < cells.length;) {
-			let end = Math.min(start + columns, cells.length);
-			if (end < cells.length) {
-				for (let index = end - 1; index > start; index -= 1) {
-					const cell = cells[index];
-					if (cell.kind === 'text' && /\s/.test(cell.value)) {
-						end = index + 1;
-						break;
-					}
-				}
+			let end = start;
+			let width = 0;
+			let lastWhitespace = -1;
+			while (end < cells.length) {
+				const cell = cells[end];
+				const nextWidth = cellWidth(cell);
+				if (width + nextWidth > columns) break;
+				width += nextWidth;
+				if (cell.kind === 'text' && /\s/.test(cell.value)) lastWhitespace = end + 1;
+				end += 1;
 			}
+			if (end === start) end += 1;
+			else if (end < cells.length && lastWhitespace > start) end = lastWhitespace;
 			wrapped.push(cells.slice(start, end));
 			start = end;
 		}

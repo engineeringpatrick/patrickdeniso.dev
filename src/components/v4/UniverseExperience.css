@@ -65,7 +65,7 @@
 .vim-terminal { display: flex; height: min(42rem, calc(100svh - 4.55rem)); min-height: min(30rem, calc(100svh - 4.55rem)); flex-direction: column; background: radial-gradient(circle at 86% 0%, rgb(45 97 76 / .17), transparent 30%), #080d0e; font-family: "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
 .vim-terminal__prompt { display: flex; justify-content: space-between; gap: 1rem; padding: .65rem .9rem; border-bottom: 1px solid rgb(190 220 207 / .12); color: #89d0a8; font: 700 .68rem/1.1 inherit; }
 .vim-terminal__prompt span:last-child { color: rgb(211 238 221 / .52); }
-.vim-terminal__editor { display: grid; min-height: 0; flex: 1; grid-template-columns: max-content minmax(0, 1fr); overflow: hidden; }
+.vim-terminal__editor { position: relative; display: grid; min-height: 0; flex: 1; grid-template-columns: max-content minmax(0, 1fr); overflow: hidden; }
 .vim-terminal__lines { min-width: 3.2rem; margin: 0; padding: .9rem .65rem .9rem .3rem; overflow: hidden; background: rgb(255 255 255 / .025); color: rgb(159 193 174 / .44); font: 650 .78rem/1.6 inherit; list-style: none; text-align: right; user-select: none; }
 .vim-terminal__buffer { display: block; width: 100%; height: 100%; min-height: 0; resize: none; padding: .9rem .85rem; border: 0; outline: 0; background: transparent; color: #dcefe2; caret-color: #fded8d; font: 500 .78rem/1.6 inherit; letter-spacing: -.02em; white-space: pre-wrap; overflow-wrap: anywhere; }
 .vim-terminal__buffer[hidden] { display: none; }
@@ -79,6 +79,7 @@
 .vim-terminal__buffer--linked a:hover, .vim-terminal__buffer--linked a:focus-visible { border-bottom-color: #c2f1d2; color: #c2f1d2; outline: none; }
 .vim-terminal__buffer::selection { background: rgb(111 211 154 / .31); }
 .vim-terminal__buffer[readonly] { caret-color: transparent; cursor: default; }
+.vim-terminal__mobile-input { position: absolute; top: 0; left: 0; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; pointer-events: none; }
 .vim-terminal__status { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 1.9rem; padding: .35rem .7rem; background: #83c6a0; color: #07110b; font: 800 .66rem/1 inherit; }
 .vim-terminal__status strong { letter-spacing: .03em; }
 .vim-terminal__command { display: flex; min-width: 0; flex: 1; align-items: center; gap: .15rem; }
@@ -215,8 +216,9 @@
 	.finder-viewer__body { display: flex; flex-direction: column; overflow: auto; }
 	.finder-viewer__main { min-height: 0; flex: 0 0 auto; }
 	.finder-info { max-height: 12rem; border-top: 1px solid rgb(31 32 52 / .1); border-left: 0; }
-	.finder-viewer__stage { height: min(52svh, 28rem); flex: 0 0 auto; padding: 1rem 2.9rem; }
-	.finder-viewer__frame img { max-width: 100%; max-height: 100%; }
+	.finder-viewer__stage { height: auto; min-height: 0; flex: 0 0 auto; overflow: visible; padding: 1rem 2.9rem; }
+	.finder-viewer__frame { height: auto; overflow: visible; justify-content: flex-start; }
+	.finder-viewer__frame img { max-width: 100%; max-height: min(52svh, 28rem); }
 	.finder-viewer__step--previous { left: .35rem; }
 	.finder-viewer__step--next { right: .35rem; }
 }
