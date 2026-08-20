@@ -5,7 +5,7 @@ const it = {
 	copy: {
 		site: {
 			title: "Patrick Deniso | Ingegnere del software",
-			description: "Patrick Deniso è un ingegnere del software interessato ai sistemi distribuiti. Scopri la sua esperienza, i suoi scritti, le sue foto e il portfolio interattivo.",
+			description: "Patrick Deniso è un ingegnere del software. Lavoro, scritti, foto e altre cose.",
 			sceneLabel: "L’universo interattivo di Patrick Deniso",
 			codeIntroduction: "Presentazione in codice",
 			clickMe: "cliccami!",

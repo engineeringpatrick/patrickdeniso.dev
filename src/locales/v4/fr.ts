@@ -5,7 +5,7 @@ const fr = {
 	copy: {
 		site: {
 			title: "Patrick Deniso | Ingénieur logiciel",
-			description: "Patrick Deniso est un ingénieur logiciel spécialisé dans les systèmes distribués. Découvrez son expérience, ses écrits, ses photos et son portfolio interactif.",
+			description: "Patrick Deniso est un ingénieur logiciel. Travail, écrits, photos et autres choses.",
 			sceneLabel: "L’univers interactif de Patrick Deniso",
 			codeIntroduction: "Présentation en code",
 			clickMe: "clique-moi !",

@@ -5,7 +5,7 @@ const en = {
 	copy: {
 		site: {
 			title: 'Patrick Deniso | Software Engineer',
-			description: 'Patrick Deniso is a software engineer interested in distributed systems. Explore his work experience, writing, photos, and interactive portfolio.',
+			description: 'Patrick Deniso is a software engineer. Work, writing, photos, and other things.',
 			sceneLabel: "Patrick Deniso's interactive universe",
 			codeIntroduction: 'A code introduction',
 			clickMe: 'click me!',

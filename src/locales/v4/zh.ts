@@ -5,7 +5,7 @@ const zh = {
 	copy: {
 		site: {
 			title: '潘德宇（Patrick Deniso）| 软件工程师',
-			description: '潘德宇（Patrick Deniso）是一名专注于分布式系统的软件工程师。探索他的工作经历、文章、照片和交互式个人网站。',
+			description: '潘德宇（Patrick Deniso）是一名软件工程师。这里有工作、文章、照片和其他东西。',
 			sceneLabel: '潘德宇的交互式宇宙',
 			codeIntroduction: '代码简介',
 			clickMe: '点我！',
