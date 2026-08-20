@@ -9,11 +9,11 @@ type WorkExperienceWindowProps = {
 
 const companyLogos: Record<string, string> = {
 	'Notion Labs, Inc.': '/logos/v4/notion.png',
-	Datacurve: '/logos/v4/datacurve.png',
-	Meta: '/logos/v4/meta.png',
-	Wealthsimple: '/logos/v4/wealthsimple.png',
-	Microsoft: '/logos/v4/microsoft.png',
-	MongoDB: '/logos/v4/mongodb.png',
+	'Datacurve AI Inc.': '/logos/v4/datacurve.png',
+	'Meta Platforms, Inc.': '/logos/v4/meta.png',
+	'Wealthsimple Technologies Inc.': '/logos/v4/wealthsimple.png',
+	'Microsoft Corporation': '/logos/v4/microsoft.png',
+	'MongoDB, Inc.': '/logos/v4/mongodb.png',
 	'National Bank of Canada': '/logos/v4/national-bank.png',
 	'Intact Financial Corporation': '/logos/v4/intact.png',
 };
