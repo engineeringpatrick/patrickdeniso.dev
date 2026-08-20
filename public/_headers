@@ -1,0 +1,5 @@
+/photos/v4/*
+  X-Robots-Tag: noindex, noimageindex, noarchive
+
+/photos/v4-thumbnails/*
+  X-Robots-Tag: noindex, noimageindex, noarchive

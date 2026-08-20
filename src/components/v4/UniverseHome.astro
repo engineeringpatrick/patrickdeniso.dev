@@ -1,0 +1,294 @@
+---
+import TypingIntro from '../TypingIntro.astro';
+import VersionPicker from '../VersionPicker.astro';
+import { supportedLanguages } from '../../locales/v4';
+import UniverseExperience from './UniverseExperience';
+---
+
+<main class="universe" data-universe>
+	<header class="universe__header">
+		<a class="universe__wordmark" href="/" aria-label="Patrick Deniso home">
+			<span aria-hidden="true">✦</span> Patrick Deniso
+		</a>
+	</header>
+
+	<section class="universe__scene" aria-label="Patrick Deniso's interactive universe" data-v4-scene>
+		<h1 class="universe__sr-only">Patrick Deniso</h1>
+		<UniverseExperience client:only="react" />
+
+		<div class="universe__depth universe__console" aria-label="A code introduction" data-console>
+			<div class="universe__console-bar">
+				<div class="universe__console-controls" aria-label="Window controls">
+					<button class="universe__console-control universe__console-control--close" type="button" aria-label="Close introduction" data-console-action="close"><span aria-hidden="true">×</span></button>
+					<button class="universe__console-control universe__console-control--minimize" type="button" aria-label="Minimize introduction" aria-pressed="false" data-console-action="minimize"><span aria-hidden="true">−</span></button>
+					<button class="universe__console-control universe__console-control--maximize" type="button" aria-label="Maximize introduction" aria-pressed="false" data-console-action="maximize"><span aria-hidden="true">↗</span></button>
+				</div>
+				<p>patrick.ts</p>
+			</div>
+			<div class="universe__console-code">
+				<TypingIntro />
+			</div>
+		</div>
+
+	</section>
+
+	<footer class="universe__footer">
+		<div class="universe__utilities">
+			<nav class="universe__contacts" aria-label="Contacts" data-v4-contacts>
+				<a href="mailto:me@patrickdeniso.com" data-v4-contact="email">Email</a>
+				<a href="https://www.instagram.com/patrick_deniso/" target="_blank" rel="noreferrer" data-v4-contact="instagram">Instagram</a>
+				<div class="universe__wechat">
+					<button class="universe__wechat-trigger" type="button" aria-expanded="false" aria-controls="wechat-contact-card" data-wechat-trigger data-v4-contact="wechat">WeChat</button>
+					<div class="universe__wechat-card" id="wechat-contact-card" role="dialog" aria-label="WeChat QR code" hidden data-wechat-card>
+						<img src="/contact/wechat-qr.jpg" alt="WeChat QR code for Patrick Deniso" data-wechat-image />
+						<button class="universe__wechat-close" type="button" aria-label="Close WeChat QR code" data-wechat-close>×</button>
+					</div>
+				</div>
+			</nav>
+			<label class="universe__language">
+				<span class="universe__sr-only" data-v4-language-label>Website language</span>
+				<select data-v4-language aria-label="Website language">
+					{supportedLanguages.map(({ code, label }) => <option value={code}>{label}</option>)}
+				</select>
+			</label>
+		</div>
+		<p class="universe__model-credit"><span data-v4-model-credit>3D models:</span> <a href="https://science.nasa.gov/3d-resources/">NASA / JPL-Caltech &amp; NASA VTAD</a></p>
+		<VersionPicker currentVersion={4} appearance="space" showLabel={false} />
+	</footer>
+
+</main>
+
+<script>
+	import { copy, supportedLanguages } from '../../locales/v4';
+
+	const universe = document.querySelector<HTMLElement>('[data-universe]');
+	const consoleWindow = universe?.querySelector<HTMLElement>('[data-console]');
+	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const languagePicker = document.querySelector<HTMLSelectElement>('[data-v4-language]');
+	const wechatTrigger = document.querySelector<HTMLButtonElement>('[data-wechat-trigger]');
+	const wechatCard = document.querySelector<HTMLElement>('[data-wechat-card]');
+	const wechatClose = document.querySelector<HTMLButtonElement>('[data-wechat-close]');
+	const supportedLanguageCodes = new Set<string>(supportedLanguages.map(({ code }) => code));
+
+	const detectLanguage = () => {
+		const saved = window.localStorage.getItem('v4-language');
+		if (saved && supportedLanguageCodes.has(saved)) return saved;
+
+		const preferred = navigator.languages?.[0] ?? navigator.language;
+		const localeLanguage = preferred?.slice(0, 2).toLowerCase();
+		if (localeLanguage && supportedLanguageCodes.has(localeLanguage)) return localeLanguage;
+
+		const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+		if (zone === 'Europe/Rome') return 'it';
+		if (['Europe/Paris', 'Europe/Brussels', 'Europe/Monaco', 'America/Montreal'].includes(zone)) return 'fr';
+		if (['Asia/Shanghai', 'Asia/Chongqing', 'Asia/Harbin', 'Asia/Urumqi', 'Asia/Hong_Kong', 'Asia/Macau', 'Asia/Taipei'].includes(zone)) return 'zh';
+		return 'en';
+	};
+
+	const setLanguage = (language: string) => {
+		const nextLanguage = supportedLanguageCodes.has(language) ? language : 'en';
+		document.documentElement.dataset.v4Language = nextLanguage;
+		document.documentElement.lang = nextLanguage;
+		const text = copy[nextLanguage as keyof typeof copy].site;
+		document.title = text.title;
+		document.querySelector('meta[name="description"]')?.setAttribute('content', text.description);
+		document.querySelector<HTMLElement>('[data-v4-scene]')?.setAttribute('aria-label', text.sceneLabel);
+		consoleWindow?.setAttribute('aria-label', text.codeIntroduction);
+		consoleWindow?.querySelector<HTMLElement>('.universe__console-controls')?.setAttribute('aria-label', text.windowControls);
+		consoleWindow?.querySelector<HTMLButtonElement>('[data-console-action="close"]')?.setAttribute('aria-label', text.close);
+		consoleWindow?.querySelector<HTMLButtonElement>('[data-console-action="minimize"]')?.setAttribute('aria-label', text.minimize);
+		consoleWindow?.querySelector<HTMLButtonElement>('[data-console-action="maximize"]')?.setAttribute('aria-label', text.maximize);
+		document.querySelector<HTMLElement>('[data-v4-contacts]')?.setAttribute('aria-label', text.contacts);
+		document.querySelectorAll<HTMLElement>('[data-v4-contact]').forEach((contact) => {
+			const key = contact.dataset.v4Contact as 'email' | 'instagram' | 'wechat';
+			contact.replaceChildren(text[key]);
+		});
+		document.querySelector<HTMLElement>('[data-v4-language-label]')?.replaceChildren(text.websiteLanguage);
+		languagePicker?.setAttribute('aria-label', text.websiteLanguage);
+		document.querySelector<HTMLElement>('[data-v4-model-credit]')?.replaceChildren(text.modelCredit);
+		document.querySelector<HTMLSelectElement>('.version-picker__select')?.setAttribute('aria-label', text.websiteVersion);
+		wechatCard?.setAttribute('aria-label', text.wechatQrCode);
+		document.querySelector<HTMLImageElement>('[data-wechat-image]')?.setAttribute('alt', text.wechatQrCode);
+		wechatClose?.setAttribute('aria-label', text.close);
+		window.dispatchEvent(new Event('v4:language-change'));
+	};
+
+	if (languagePicker) {
+		const initialLanguage = detectLanguage();
+		languagePicker.value = initialLanguage;
+		setLanguage(initialLanguage);
+		languagePicker.addEventListener('change', () => {
+			window.localStorage.setItem('v4-language', languagePicker.value);
+			setLanguage(languagePicker.value);
+		});
+	}
+
+	const closeWechatCard = () => {
+		if (!wechatCard || wechatCard.hidden) return;
+		wechatCard.hidden = true;
+		wechatTrigger?.setAttribute('aria-expanded', 'false');
+	};
+
+	wechatTrigger?.addEventListener('click', () => {
+		if (!wechatCard) return;
+		const isOpening = wechatCard.hidden;
+		wechatCard.hidden = !isOpening;
+		wechatTrigger.setAttribute('aria-expanded', String(isOpening));
+	});
+	wechatClose?.addEventListener('click', closeWechatCard);
+	document.addEventListener('click', (event) => {
+		if (!wechatCard || wechatCard.hidden || !(event.target instanceof Node)) return;
+		if (wechatCard.contains(event.target) || wechatTrigger?.contains(event.target)) return;
+		closeWechatCard();
+	});
+	document.addEventListener('keydown', (event) => {
+		if (event.key === 'Escape') closeWechatCard();
+	});
+
+	consoleWindow?.querySelectorAll<HTMLButtonElement>('[data-console-action]').forEach((control) => {
+		control.addEventListener('click', () => {
+			const action = control.dataset.consoleAction;
+			if (action === 'close') {
+				consoleWindow.classList.add('is-closed');
+				return;
+			}
+
+			const stateClass = action === 'minimize' ? 'is-minimized' : 'is-maximized';
+			const alternateStateClass = action === 'minimize' ? 'is-maximized' : 'is-minimized';
+			const isActive = consoleWindow.classList.toggle(stateClass);
+			consoleWindow.classList.remove(alternateStateClass);
+			control.setAttribute('aria-pressed', String(isActive));
+			consoleWindow.querySelector<HTMLButtonElement>(`[data-console-action="${action === 'minimize' ? 'maximize' : 'minimize'}"]`)?.setAttribute('aria-pressed', 'false');
+		});
+	});
+
+	if (universe && !reduceMotion && !window.matchMedia('(pointer: coarse)').matches) {
+		let targetX = 0;
+		let targetY = 0;
+		let currentX = 0;
+		let currentY = 0;
+		let frame: number | undefined;
+
+		const render = () => {
+			currentX += (targetX - currentX) * 0.08;
+			currentY += (targetY - currentY) * 0.08;
+			universe.style.setProperty('--pointer-x', currentX.toFixed(3));
+			universe.style.setProperty('--pointer-y', currentY.toFixed(3));
+			if (Math.abs(targetX - currentX) > 0.002 || Math.abs(targetY - currentY) > 0.002) {
+				frame = window.requestAnimationFrame(render);
+			} else {
+				frame = undefined;
+			}
+		};
+
+		const updatePointer = (event: PointerEvent) => {
+			const bounds = universe.getBoundingClientRect();
+			targetX = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2;
+			targetY = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2;
+			if (!frame) frame = window.requestAnimationFrame(render);
+		};
+
+		universe.addEventListener('pointermove', updatePointer);
+		universe.addEventListener('pointerleave', () => {
+			targetX = 0;
+			targetY = 0;
+			if (!frame) frame = window.requestAnimationFrame(render);
+		});
+	}
+</script>
+
+<style>
+	:global(html) { background: #050617; }
+	:global(body) { margin: 0; min-width: 320px; background: #050617; }
+	:global(*) { box-sizing: border-box; }
+
+	.universe {
+		--pointer-x: 0;
+		--pointer-y: 0;
+		position: relative;
+		isolation: isolate;
+		display: flex;
+		min-height: 100svh;
+		flex-direction: column;
+		overflow: hidden;
+		padding: clamp(1.25rem, 3vw, 2.25rem) clamp(1.25rem, 5vw, 5rem) 1.5rem;
+		background: #050617;
+		color: #f8f7ff;
+		font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	}
+
+
+	.universe__header, .universe__footer, .universe__scene { position: relative; z-index: 1; width: min(1220px, 100%); margin-inline: auto; }
+	.universe__header { display: flex; align-items: center; gap: 1rem; }
+	.universe__wordmark { color: #f8f7ff; font: 700 clamp(.78rem, 1.6vw, .93rem)/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; letter-spacing: -.05em; text-decoration: none; }
+	.universe__wordmark span { color: #f5d979; font-size: 1.08em; }
+	.universe__scene { flex: 1; min-height: 40rem; }
+
+	.universe__console { position: absolute; top: 50%; left: 50%; z-index: 4; width: min(33rem, 44vw); overflow: hidden; border: 1px solid rgb(219 226 255 / .24); border-radius: 1rem; background: linear-gradient(135deg, rgb(34 44 104 / .54), rgb(8 11 39 / .5)); box-shadow: 0 1.8rem 4rem rgb(1 1 14 / .32), inset 0 1px 0 rgb(255 255 255 / .14); backdrop-filter: blur(18px) saturate(135%); transition: width 260ms ease, opacity 180ms ease, transform 260ms cubic-bezier(.22, 1, .36, 1); transform: translate3d(calc(-50% + (var(--pointer-x) * 18px)), calc(-50% + (var(--pointer-y) * 14px)), 105px) rotateX(calc(var(--pointer-y) * -2deg)) rotateY(calc(var(--pointer-x) * 3deg)); }
+	.universe__console.is-closed { opacity: 0; pointer-events: none; transform: translate3d(-50%, -50%, 105px) scale(.84); }
+	.universe__console.is-minimized { width: min(20rem, 44vw); }
+	.universe__console.is-minimized .universe__console-code { display: none; }
+	.universe__console.is-minimized::after { display: none; }
+	.universe__console.is-maximized { width: min(48rem, 72vw); }
+	.universe__console::after { position: absolute; inset: 0; content: ''; background: linear-gradient(110deg, transparent 24%, rgb(255 255 255 / .09) 43%, transparent 60%); transform: translateX(-130%); animation: console-sheen 6.5s 1.4s ease-in-out infinite; pointer-events: none; }
+	.universe__console-bar { display: flex; align-items: center; height: 2.25rem; padding: 0 .85rem; border-bottom: 1px solid rgb(255 255 255 / .11); }
+	.universe__console-controls { display: flex; gap: .38rem; }
+	.universe__console-control { display: grid; width: .9rem; height: .9rem; place-items: center; padding: 0; border: 1px solid rgb(0 0 0 / .16); border-radius: 50%; color: rgb(33 33 43 / .72); cursor: pointer; transition: filter 130ms ease, transform 130ms ease; }
+	.universe__console-control span { margin-top: -.06rem; font: 900 .72rem/.8 system-ui, sans-serif; }
+	.universe__console-control--maximize span { font-size: .59rem; }
+	.universe__console-control:hover, .universe__console-control:focus-visible { filter: brightness(1.13); outline: 2px solid rgb(255 255 255 / .7); outline-offset: 2px; transform: scale(1.08); }
+	.universe__console-control--close { background: #ff8e7a; }
+	.universe__console-control--minimize { background: #f6d879; }
+	.universe__console-control--maximize { background: #76e4c0; }
+	.universe__console-bar p { margin: 0 auto 0 .45rem; color: rgb(220 219 246 / .55); font: 650 .65rem/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+	.universe__console-code { min-height: 12.2rem; padding: 1.2rem 1.35rem; }
+	.universe__console-code :global(.typing-intro) { width: 100%; color: #ececff; font: clamp(.74rem, 1.2vw, .95rem)/1.72 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+	.universe__console-code :global(.typing-intro__buffer) { min-height: 9rem; }
+
+
+	.universe__footer { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem; padding-top: .8rem; }
+	.universe__utilities { display: flex; align-items: stretch; justify-self: start; gap: .45rem; }
+	.universe__contacts { display: flex; height: 2rem; gap: .16rem; align-items: stretch; padding: .18rem; border: 1px solid rgb(176 180 255 / .2); border-radius: .52rem; background: rgb(13 15 48 / .36); box-shadow: inset 0 1px 0 rgb(255 255 255 / .04); }
+	.universe__contacts a, .universe__contacts button { display: inline-flex; min-height: 0; align-items: center; justify-content: center; padding: .28rem .36rem; border: 0; border-radius: .33rem; background: transparent; color: rgb(202 204 242 / .72); cursor: pointer; font: 700 clamp(.58rem, .75vw, .66rem)/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-decoration: none; white-space: nowrap; }
+	.universe__contacts a:hover, .universe__contacts button:hover, .universe__contacts button:focus-visible { background: rgb(133 145 255 / .17); color: #fff; text-decoration: none; }
+	.universe__contacts button:focus-visible { outline: 1px solid rgb(255 255 255 / .78); outline-offset: .1rem; }
+	.universe__wechat { position: relative; display: flex; align-items: stretch; }
+	.universe__wechat-trigger { height: 100%; }
+	.universe__wechat-card { position: absolute; bottom: calc(100% + .8rem); left: -.4rem; z-index: 20; width: min(15rem, calc(100vw - 2rem)); padding: .3rem; border: 1px solid rgb(197 203 255 / .48); border-radius: .75rem; background: #fff; box-shadow: 0 1.1rem 3rem rgb(0 0 0 / .52), 0 0 0 1px rgb(99 108 226 / .16); }
+	.universe__wechat-card[hidden] { display: none; }
+	.universe__wechat-card img { display: block; width: 100%; height: auto; border-radius: .5rem; }
+	.universe__wechat-close { position: absolute; top: .58rem; right: .58rem; display: grid; width: 1.35rem; height: 1.35rem; place-items: center; border-radius: 50% !important; background: rgb(0 0 0 / .62) !important; color: #fff !important; font: 700 1rem/1 system-ui, sans-serif !important; text-decoration: none !important; }
+	.universe__wechat-close:hover, .universe__wechat-close:focus-visible { background: rgb(0 0 0 / .8) !important; }
+	.universe__language { display: flex; }
+	.universe__language select { height: 2rem; min-height: 2rem; border: 1px solid rgb(176 180 255 / .4); border-radius: .45rem; background: rgb(17 19 60 / .76); padding: .22rem 1.5rem .22rem .45rem; color: rgb(248 248 255); cursor: pointer; font: 700 clamp(.58rem, .75vw, .66rem)/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+	.universe__model-credit { margin: 0; color: rgb(202 204 242 / .48); font: 600 .6rem/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+	.universe__model-credit a { color: inherit; text-decoration-color: rgb(202 204 242 / .28); text-underline-offset: .16em; }
+	.universe__model-credit a:hover { color: rgb(242 242 255 / .8); }
+	.universe__footer > :last-child { justify-self: end; }
+
+	.universe__sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+	@keyframes console-sheen { 32%, 100% { transform: translateX(140%); } }
+
+	@media (max-width: 860px) {
+		.universe { overflow: auto; }
+		.universe__scene { min-height: 49rem; }
+		.universe__console { top: 57%; width: min(32rem, 85vw); }
+		.universe__footer { grid-template-columns: minmax(0, 1fr) auto; }
+		.universe__model-credit { grid-column: 1 / -1; grid-row: 2; }
+		.universe__footer > :last-child { grid-column: 2; grid-row: 1; }
+	}
+
+	@media (max-width: 520px) {
+		.universe { padding: 1.25rem 1rem 1rem; }
+		.universe__scene { min-height: max(38rem, calc(100svh - 8rem)); }
+		.universe__console { top: 56%; width: calc(100vw - 1.25rem); border-radius: .85rem; backdrop-filter: blur(10px) saturate(120%); }
+		.universe__console-code { min-height: 12rem; padding: 1rem; }
+		.universe__console-code :global(.typing-intro) { font-size: .72rem; }
+		.universe__footer { display: flex; align-items: flex-start; flex-direction: column; padding-top: 1rem; }
+		.universe__footer > :last-child { align-self: flex-end; }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.universe__console::after { animation: none; }
+	}
+</style>

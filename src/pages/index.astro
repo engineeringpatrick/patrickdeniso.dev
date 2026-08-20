@@ -1,11 +1,19 @@
 ---
-import TypingIntro from '../components/TypingIntro.astro';
-import Layout from '../layouts/Layout.astro';
+import UniverseHome from '../components/v4/UniverseHome.astro';
 ---
 
-<Layout title="Patrick Deniso">
-	<main class="flex md:flex-row flex-col items-center md:gap-0 gap-8">
-		<TypingIntro/>
-		<img class="w-64 h-64" src="profile_picture.jpeg" alt="Me!">
-	</main>
-</Layout>
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Patrick Deniso's interactive universe." />
+		<meta name="robots" content="noimageindex, noarchive" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#050617" />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<title>🚀 Patrick Deniso — Universe</title>
+	</head>
+	<body>
+		<UniverseHome />
+	</body>
+</html>

@@ -1,31 +1,145 @@
----
----
-
-<div id="typing-box" class="w-96 text-xl"> </div>
+<div class="typing-intro" data-typing-intro>
+	<div class="typing-intro__editor">
+		<ol class="typing-intro__lines" aria-hidden="true" data-typing-lines></ol>
+		<textarea class="typing-intro__buffer" data-typing-buffer readonly spellcheck="false" aria-label="Editable code introduction"></textarea>
+	</div>
+	<footer class="typing-intro__status" aria-live="polite">
+		<strong data-typing-mode>-- NORMAL --</strong>
+		<span data-typing-count>0L</span>
+	</footer>
+</div>
 
 <script>
-  import Typewriter from 'typewriter-effect/dist/core';
+	import { copy } from '../locales/v4';
 
-  var typewriter = new Typewriter("#typing-box", {
-    loop: false,
-    delay: 25,
-    deleteSpeed: 10,
-  });
+	const box = document.querySelector<HTMLElement>('[data-typing-intro]');
+	const buffer = box?.querySelector<HTMLTextAreaElement>('[data-typing-buffer]');
+	const lineNumbers = box?.querySelector<HTMLOListElement>('[data-typing-lines]');
+	const modeLabel = box?.querySelector<HTMLElement>('[data-typing-mode]');
+	const lineCount = box?.querySelector<HTMLElement>('[data-typing-count]');
+	const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	let run = 0;
+	let mode: 'normal' | 'insert' = 'normal';
 
-  const lines = ["const Patrick = {", "name: 'Patrick Deniso',", "role: 'Software Engineer',", "workInterests: 'Distributed Systems',"];
-  const interests = ["'Running'", "'Urbanism'", "'Language Learning'", "'History & Philosophy'", "'Anything cool :)',"]
-  typewriter = typewriter.pauseFor(500)
+	const sleep = (milliseconds: number) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 
-  lines.forEach((line: string) => {
-    typewriter = typewriter.typeString(line);
-    typewriter = typewriter.typeString("<br/><span>&emsp;</span>").pauseFor(300);
-  });
-  
-  typewriter = typewriter.typeString("interests: ");
-  interests.forEach((interest: string, idx: number) => {
-    typewriter = typewriter.typeString(interest).pauseFor(400);
-    if(idx < interests.length - 1) typewriter = typewriter.deleteChars(interest.length);
-  })
+	const getLanguage = () => {
+		const language = document.documentElement.dataset.v4Language;
+		return language && language in copy ? language as keyof typeof copy : 'en';
+	};
 
-  typewriter.pause(500).typeString("<br>};").start();
+	const setMode = (nextMode: 'normal' | 'insert') => {
+		mode = nextMode;
+		if (buffer) buffer.readOnly = nextMode === 'normal';
+		if (buffer) buffer.setAttribute('aria-label', copy[getLanguage()].work.editableLabel);
+		if (modeLabel) modeLabel.textContent = copy[getLanguage()].work[nextMode];
+	};
+
+	const updateDecorations = (value: string) => {
+		const lines = value.split('\n').length;
+		if (lineNumbers) lineNumbers.innerHTML = Array.from({ length: lines }, (_, index) => `<li>${index + 1}</li>`).join('');
+		if (lineCount) lineCount.textContent = `${lines}L`;
+	};
+
+	const setText = (value: string) => {
+		if (!buffer) return;
+		buffer.value = value;
+		updateDecorations(value);
+	};
+
+	const type = async (value: string, token: number, output: string) => {
+		let next = output;
+		for (const character of value) {
+			if (token !== run) return next;
+			next += character;
+			setText(next);
+			await sleep(25);
+		}
+		return next;
+	};
+
+	const startTyping = async (language: keyof typeof copy) => {
+		if (!box || !buffer) return;
+		const token = ++run;
+		const { lines, interests, interestLabel } = copy[language].intro;
+		setMode('normal');
+		buffer.blur();
+
+		if (reducedMotion) {
+			setText(`${lines.join('\n  ')}\n  ${interestLabel}: ${interests.at(-1) ?? ''}\n};`);
+			setMode('insert');
+			return;
+		}
+
+		setText('');
+		await sleep(350);
+		if (token !== run) return;
+
+		let output = '';
+		for (const line of lines) {
+			output = await type(line, token, output);
+			if (token !== run) return;
+			output += '\n  ';
+			setText(output);
+			await sleep(220);
+		}
+
+		output = await type(`${interestLabel}: `, token, output);
+		for (const [index, interest] of interests.entries()) {
+			output = await type(interest, token, output);
+			if (token !== run) return;
+			await sleep(360);
+			if (index === interests.length - 1) break;
+			for (let count = 0; count < interest.length; count += 1) {
+				if (token !== run) return;
+				output = output.slice(0, -1);
+				setText(output);
+				await sleep(10);
+			}
+		}
+
+		await sleep(350);
+		if (token === run) {
+			setText(`${output}\n};`);
+			setMode('insert');
+		}
+	};
+
+	buffer?.addEventListener('input', () => updateDecorations(buffer.value));
+	buffer?.addEventListener('keydown', (event) => {
+		if (event.key === 'Escape') {
+			event.preventDefault();
+			setMode('normal');
+			return;
+		}
+		if (mode !== 'normal') return;
+		if (event.key !== 'i' && event.key !== 'a') {
+			event.preventDefault();
+			return;
+		}
+		event.preventDefault();
+		setMode('insert');
+		buffer.focus();
+		if (event.key === 'a') {
+			const cursor = Math.min(buffer.selectionStart + 1, buffer.value.length);
+			buffer.setSelectionRange(cursor, cursor);
+		}
+	});
+
+	void startTyping(getLanguage());
+	window.addEventListener('v4:language-change', () => void startTyping(getLanguage()));
 </script>
+
+<style>
+	.typing-intro { min-height: 1em; }
+	.typing-intro__editor { display: grid; grid-template-columns: max-content minmax(0, 1fr); min-height: 0; }
+	.typing-intro__lines { margin: 0; padding: 0 .75rem 0 0; color: rgb(202 204 242 / .35); font: inherit; line-height: inherit; list-style: none; text-align: right; user-select: none; }
+	.typing-intro__buffer { display: block; width: 100%; min-height: 8.6rem; padding: 0; resize: none; overflow: hidden; border: 0; outline: 0; background: transparent; color: inherit; caret-color: #f5d979; font: inherit; line-height: inherit; white-space: pre-wrap; }
+	.typing-intro__buffer[readonly] { cursor: default; }
+	.typing-intro__buffer::selection { background: rgb(133 145 255 / .28); }
+	.typing-intro__status { display: flex; justify-content: space-between; gap: 1rem; margin-top: .55rem; padding: .25rem .45rem; border-radius: .2rem; background: rgb(122 228 192 / .14); color: rgb(220 219 246 / .68); font: 700 .62rem/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+	.typing-intro__status strong { color: #9de9cc; }
+	.typing-intro__status span { opacity: .65; }
+	@keyframes typing-caret { 50% { opacity: 0; } }
+	@media (max-width: 520px) { .typing-intro__lines { display: none; } .typing-intro__buffer { min-height: 9rem; font-size: .72rem; } }
+</style>

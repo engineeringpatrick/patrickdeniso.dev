@@ -1,0 +1,144 @@
+---
+import VersionPicker from '../../components/VersionPicker.astro';
+---
+
+<!doctype html>
+<!-- Recovered from Git commit 59bdcdf (November 2023). -->
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="color-scheme" content="dark" />
+		<meta name="description" content="Patrick Deniso's 2023 portfolio." />
+		<script is:inline src="https://kit.fontawesome.com/da426b7041.js" crossorigin="anonymous"></script>
+		<title>Patrick Deniso — v2 (2023)</title>
+	</head>
+	<body>
+		<main class="legacy-main">
+			<nav class="legacy-nav" aria-label="Profile links">
+				<a target="_blank" rel="noreferrer" href="https://github.com/engineeringpatrick/patrickdeniso.dev/raw/59bdcdf86a75f9a90f919806327d3a0da604a05a/res/PatrickDeniso_Resume.pdf" aria-label="Resume"><i class="fa fa-file-lines" aria-hidden="true"></i></a>
+				<a target="_blank" rel="noreferrer" href="https://www.linkedin.com/in/patrick-deniso/" aria-label="LinkedIn"><i class="fa fa-linkedin-square" aria-hidden="true"></i></a>
+				<a target="_blank" rel="noreferrer" href="https://github.com/TheBigPaff" aria-label="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>
+			</nav>
+
+			<pre id="typewriter"><span class="var-highlight">const</span> patrick = &lbrace;
+    name: <span class="string-highlight">'Patrick Deniso'</span>,
+    role: <span class="string-highlight">'Software Engineer'</span>,
+    location: <span class="string-highlight">'Montréal, Canada'</span>,
+    resume: <a class="string-highlight" target="_blank" rel="noreferrer" href="https://github.com/engineeringpatrick/patrickdeniso.dev/raw/59bdcdf86a75f9a90f919806327d3a0da604a05a/res/PatrickDeniso_Resume.pdf">click here!</a>,
+    linkedin: <a class="string-highlight" target="_blank" rel="noreferrer" href="https://www.linkedin.com/in/patrick-deniso/">or here!</a>,
+    github: <a class="string-highlight" target="_blank" rel="noreferrer" href="https://github.com/TheBigPaff">or even here!</a>,
+&rbrace;; </pre>
+		</main>
+
+		<footer class="legacy-footer">
+			<VersionPicker currentVersion={2} appearance="legacy" />
+		</footer>
+
+		<script is:inline>
+			function setupTypewriter(t) {
+				var HTML = t.innerHTML;
+				t.innerHTML = "";
+
+				var cursorPosition = 0,
+					tag = "",
+					writingTag = false,
+					tagOpen = false,
+					typeSpeed = 1,
+					tempTypeSpeed = 0;
+
+				var type = function () {
+					if (writingTag === true) tag += HTML[cursorPosition];
+					if (HTML[cursorPosition] === "<") {
+						tempTypeSpeed = 0;
+						if (tagOpen) {
+							tagOpen = false;
+							writingTag = true;
+						} else {
+							tag = "";
+							tagOpen = true;
+							writingTag = true;
+							tag += HTML[cursorPosition];
+						}
+					}
+					if (!writingTag && tagOpen) tag.innerHTML += HTML[cursorPosition];
+					if (!writingTag && !tagOpen) {
+						tempTypeSpeed = HTML[cursorPosition] === " " ? 0 : (Math.random() * typeSpeed) + 50;
+						t.innerHTML += HTML[cursorPosition];
+					}
+					if (writingTag === true && HTML[cursorPosition] === ">") {
+						tempTypeSpeed = (Math.random() * typeSpeed) + 50;
+						writingTag = false;
+						if (tagOpen) {
+							var newSpan = document.createElement("span");
+							t.appendChild(newSpan);
+							newSpan.innerHTML = tag;
+							tag = newSpan.firstChild;
+						}
+					}
+					cursorPosition += 1;
+					if (cursorPosition < HTML.length - 1) setTimeout(type, tempTypeSpeed);
+				};
+
+				return { type: type };
+			}
+
+			setupTypewriter(document.getElementById("typewriter")).type();
+		</script>
+	</body>
+</html>
+
+<style is:global>
+	:root { color-scheme: dark; }
+	body {
+		margin: 0;
+		background: #000;
+		color: #fff;
+	}
+	.legacy-main {
+		box-sizing: border-box;
+		min-height: calc(100vh - 5rem);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 5rem 1.5rem 2rem;
+	}
+	.legacy-nav {
+		position: absolute;
+		top: 2vh;
+		right: 1.5vw;
+		border: 1px solid rgba(192, 173, 96, 0.5);
+		padding: 10px;
+		font-size: 1.5em;
+	}
+	.legacy-nav i {
+		margin: 0 10px;
+		text-decoration: none;
+		color: #C0AD60;
+	}
+	.legacy-nav i:hover { opacity: 0.5; }
+	#typewriter {
+		margin: 0;
+		font-family: "Courier New", monospace;
+		font-size: clamp(1rem, 3vw, 2em);
+		white-space: pre-wrap;
+	}
+	#typewriter::after {
+		content: "|";
+		animation: legacy-blink 500ms linear infinite alternate;
+	}
+	.var-highlight { color: #C0AD60; }
+	.string-highlight { color: rgba(253, 149, 90, 0.8); }
+	.legacy-footer {
+		display: flex;
+		justify-content: center;
+		padding: 1rem 1.5rem 2rem;
+	}
+	.legacy-footer .version-picker__label { color: #a3a3a3; }
+	.legacy-footer .version-picker__select {
+		border-color: rgb(115 115 115 / 0.8);
+		background: rgb(0 9 29 / 0.9);
+		color: #f5f5f5;
+	}
+	@keyframes legacy-blink { from { opacity: 0; } to { opacity: 1; } }
+</style>

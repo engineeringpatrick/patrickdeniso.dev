@@ -2,7 +2,11 @@
   "name": "dev-patrickdeniso-dev2-0",
   "type": "module",
   "version": "0.0.1",
-  "scripts": {
+	"scripts": {
+		"generate:photos": "node scripts/generate-v4-photo-manifest.mjs",
+		"optimize:photos": "node scripts/optimize-v4-photos.mjs",
+    "predev": "npm run generate:photos",
+    "prebuild": "npm run generate:photos",
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro check && astro build",
@@ -13,19 +17,28 @@
     "@astrojs/check": "^0.9.4",
     "@astrojs/cloudflare": "^12.6.12",
     "@astrojs/markdown-remark": "^6.3.8",
+    "@astrojs/react": "^6.0.4",
     "@astrojs/tailwind": "^5.1.2",
+    "@react-three/fiber": "^9.7.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "astro": "^5.15.2",
     "glob": "^11.0.1",
     "katex": "^0.16.25",
+    "lucide-react": "^1.33.0",
+    "react": "^19.2.8",
+    "react-aria-components": "^1.20.0",
+    "react-dom": "^19.2.8",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
     "tailwindcss": "^3.4.13",
-    "typescript": "^5.6.3",
-    "typewriter-effect": "^2.21.0"
+    "three": "^0.185.1",
+    "typescript": "^5.6.3"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^22.14.0",
+    "@types/three": "^0.185.4",
     "tsx": "^4.19.3"
   }
 }

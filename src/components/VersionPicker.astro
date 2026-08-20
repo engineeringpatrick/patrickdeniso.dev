@@ -1,0 +1,78 @@
+---
+interface Props {
+	currentVersion: 1 | 2 | 3 | 4;
+	appearance?: 'default' | 'legacy' | 'space';
+	showLabel?: boolean;
+}
+
+const { currentVersion, appearance = 'default', showLabel = true } = Astro.props;
+
+const versions = [
+	{ number: 1, label: 'v1 · 2022', href: '/v/1/' },
+	{ number: 2, label: 'v2 · 2023', href: '/v/2/' },
+	{ number: 3, label: 'v3 · 2024', href: '/v/3/' },
+	{ number: 4, label: 'v4 · latest', href: '/v/4/' },
+] as const;
+---
+
+<label class:list={['version-picker', `version-picker--${appearance}`]}>
+	{showLabel ? <span class="version-picker__label">Website version</span> : null}
+	<select class="version-picker__select" aria-label="Website version">
+		{versions.map((version) => (
+			<option value={version.href} selected={version.number === currentVersion}>
+				{version.label}
+			</option>
+		))}
+	</select>
+</label>
+
+<script>
+	document.querySelectorAll<HTMLSelectElement>('.version-picker__select').forEach((picker) => {
+		picker.addEventListener('change', () => window.location.assign(picker.value));
+	});
+</script>
+
+<style>
+	.version-picker {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.75rem;
+		letter-spacing: 0.01em;
+	}
+
+	.version-picker__label {
+		color: rgb(115 115 115);
+	}
+
+	.version-picker__select {
+		cursor: pointer;
+		border: 1px solid rgb(163 163 163 / 0.65);
+		border-radius: 0.375rem;
+		background: rgb(255 255 255 / 0.9);
+		padding: 0.25rem 1.6rem 0.25rem 0.5rem;
+		color: rgb(38 38 38);
+		font: inherit;
+	}
+
+	:global(.dark) .version-picker__label {
+		color: rgb(163 163 163);
+	}
+
+	:global(.dark) .version-picker__select {
+		border-color: rgb(115 115 115 / 0.8);
+		background: rgb(0 9 29 / 0.9);
+		color: rgb(245 245 245);
+	}
+
+	.version-picker--space .version-picker__label {
+		color: rgb(202 204 242 / 0.72);
+	}
+
+	.version-picker--space .version-picker__select {
+		border-color: rgb(176 180 255 / 0.4);
+		background: rgb(17 19 60 / 0.76);
+		color: rgb(248 248 255);
+		box-shadow: 0 0.5rem 1.4rem rgb(4 4 24 / 0.25);
+	}
+</style>
