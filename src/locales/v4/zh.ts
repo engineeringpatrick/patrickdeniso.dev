@@ -136,6 +136,8 @@ const zh = {
 			error: '评论暂时不可用。',
 			anonymous: '匿名',
 			unknownLocation: '未知位置',
+			upvote: '赞',
+			downvote: '踩',
 		},
 	},
 	workExperience: [

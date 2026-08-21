@@ -3,7 +3,8 @@ import { copy, languageLocales, type V4Language } from '../../locales/v4';
 import MacBrowserWindow from './MacBrowserWindow';
 
 type Location = { city: string | null; region: string | null; country: string | null };
-type Comment = { id: number; name: string | null; body: string; createdAt: string; location: Location; device: string };
+type Vote = -1 | 0 | 1;
+type Comment = { id: number; name: string | null; body: string; createdAt: string; location: Location; device: string; upvotes: number; downvotes: number; viewerVote: Vote };
 
 type CommentsWindowProps = {
 	language: V4Language;
@@ -12,6 +13,10 @@ type CommentsWindowProps = {
 
 const maxNameLength = 40;
 const maxCommentLength = 500;
+const rankComments = (first: Comment, second: Comment) => second.upvotes - first.upvotes
+	|| first.downvotes - second.downvotes
+	|| Date.parse(second.createdAt) - Date.parse(first.createdAt)
+	|| second.id - first.id;
 
 const formatLocation = (location: Location, regionNames: Intl.DisplayNames | null, fallback: string) => {
 	let country = location.country;
@@ -27,6 +32,7 @@ export default function CommentsWindow({ language, onClose }: CommentsWindowProp
 	const [website, setWebsite] = useState('');
 	const [loading, setLoading] = useState(true);
 	const [posting, setPosting] = useState(false);
+	const [votingCommentId, setVotingCommentId] = useState<number | null>(null);
 	const [hasError, setHasError] = useState(false);
 	const formatter = useMemo(() => new Intl.DateTimeFormat(languageLocales[language], { dateStyle: 'medium', timeStyle: 'short' }), [language]);
 	const regionNames = useMemo(() => {
@@ -71,13 +77,41 @@ export default function CommentsWindow({ language, onClose }: CommentsWindowProp
 			const result = await response.json() as { comment?: Comment; error?: string };
 			if (!response.ok || !result.comment) throw new Error(result.error ?? 'SAVE_FAILED');
 			const comment = result.comment;
-			setComments((current) => [comment, ...current]);
+			setComments((current) => [comment, ...current].sort(rankComments));
 			setName('');
 			setBody('');
 		} catch {
 			setHasError(true);
 		} finally {
 			setPosting(false);
+		}
+	};
+
+	const voteOnComment = async (comment: Comment, vote: Exclude<Vote, 0>) => {
+		if (votingCommentId !== null || comment.viewerVote === vote) return;
+		setVotingCommentId(comment.id);
+		setHasError(false);
+		try {
+			const response = await fetch('/api/v4-comments', {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ commentId: comment.id, vote }),
+			});
+			const result = await response.json() as { commentId?: number; upvotes?: number; downvotes?: number; viewerVote?: Vote; error?: string };
+			if (!response.ok || result.commentId !== comment.id || typeof result.upvotes !== 'number' || typeof result.downvotes !== 'number' || (result.viewerVote !== 1 && result.viewerVote !== -1)) {
+				throw new Error(result.error ?? 'VOTE_FAILED');
+			}
+			const { upvotes, downvotes, viewerVote } = result;
+			setComments((current) => current.map((item) => item.id === comment.id ? {
+				...item,
+				upvotes,
+				downvotes,
+				viewerVote,
+			} : item).sort(rankComments));
+		} catch {
+			setHasError(true);
+		} finally {
+			setVotingCommentId(null);
 		}
 	};
 
@@ -107,7 +141,13 @@ export default function CommentsWindow({ language, onClose }: CommentsWindowProp
 							<article className="comments-card" key={comment.id}>
 								<header><strong>{comment.name || text.anonymous}</strong><time dateTime={comment.createdAt}>{formatter.format(new Date(comment.createdAt))}</time></header>
 								<p>{comment.body}</p>
-								<footer>{formatLocation(comment.location, regionNames, text.unknownLocation)} · {comment.device}</footer>
+								<footer className="comments-card__footer">
+									<span>{formatLocation(comment.location, regionNames, text.unknownLocation)} · {comment.device}</span>
+									<div className="comments-votes">
+										<button type="button" aria-label={`${text.upvote} (${comment.upvotes})`} aria-pressed={comment.viewerVote === 1} disabled={votingCommentId === comment.id} onClick={() => void voteOnComment(comment, 1)}>▲ {comment.upvotes}</button>
+										<button type="button" aria-label={`${text.downvote} (${comment.downvotes})`} aria-pressed={comment.viewerVote === -1} disabled={votingCommentId === comment.id} onClick={() => void voteOnComment(comment, -1)}>▼ {comment.downvotes}</button>
+									</div>
+								</footer>
 							</article>
 						))}
 					</div>

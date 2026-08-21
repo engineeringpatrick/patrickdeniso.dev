@@ -115,6 +115,8 @@ export type V4Copy = {
 		error: string;
 		anonymous: string;
 		unknownLocation: string;
+		upvote: string;
+		downvote: string;
 	};
 };
 

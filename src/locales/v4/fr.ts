@@ -135,6 +135,8 @@ const fr = {
 			error: "Les commentaires sont indisponibles pour le moment.",
 			anonymous: "Anonyme",
 			unknownLocation: "Localisation inconnue",
+			upvote: "Vote positif",
+			downvote: "Vote négatif",
 		},
 	},
 	workExperience: [
