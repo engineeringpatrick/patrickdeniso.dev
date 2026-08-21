@@ -33,6 +33,7 @@ const fr = {
 			work: "Expérience",
 			posts: "Blog",
 			photos: "Photos",
+			comments: "Livre d’or",
 		},
 		intro: {
 			lines: [
@@ -119,6 +120,24 @@ const fr = {
 			forward: "Suivant",
 			openExternal: "Ouvrir le blog dans un nouvel onglet",
 			secureConnection: "Connexion sécurisée",
+		},
+		comments: {
+			appName: "guestbook.app",
+			title: "Livre d’or",
+			intro: "Laissez un message anonyme.",
+			placeholder: "Écrivez un commentaire…",
+			submit: "Publier",
+			posting: "Publication…",
+			empty: "Aucun commentaire pour l’instant. Soyez le premier.",
+			loading: "Chargement des commentaires…",
+			error: "Les commentaires sont indisponibles pour le moment.",
+			rateLimit: "Doucement — quelques commentaires suffisent.",
+			privacy: "Votre localisation approximative et votre type d’appareil seront affichés. Votre adresse IP n’est pas conservée.",
+			acceptPrivacy: "J’ai compris",
+			anonymous: "Anonyme",
+			postingFrom: "Publication depuis",
+			unknownLocation: "Localisation inconnue",
+			charactersLeft: "caractères restants",
 		},
 	},
 	workExperience: [

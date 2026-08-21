@@ -8,6 +8,7 @@ import './UniverseExperience.css';
 
 const AboutMeWindow = lazy(() => import('./AboutMeWindow'));
 const BlogBrowserWindow = lazy(() => import('./BlogBrowserWindow'));
+const CommentsWindow = lazy(() => import('./CommentsWindow'));
 const PhotoMuseum = lazy(() => import('./PhotoMuseum'));
 const WorkExperienceWindow = lazy(() => import('./WorkExperienceWindow'));
 
@@ -19,6 +20,7 @@ const roomComponents = {
 	work: WorkExperienceWindow,
 	posts: BlogBrowserWindow,
 	photos: PhotoMuseum,
+	comments: CommentsWindow,
 } satisfies Record<RoomId, LazyExoticComponent<ComponentType<RoomProps>>>;
 
 /** The client-only v4 island: Fiber owns the universe and React owns its rooms. */

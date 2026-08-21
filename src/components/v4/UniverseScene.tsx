@@ -7,7 +7,7 @@ import { copy, type PlanetId, type V4Language } from '../../locales/v4';
 import { cloneAndFitModel } from './fitModel';
 
 const DistantSun = lazy(() => import('./DistantSun'));
-const planetIds = ['work', 'posts', 'photos'] as const satisfies readonly PlanetId[];
+const planetIds = ['work', 'posts', 'photos', 'comments'] as const satisfies readonly PlanetId[];
 const sceneTargetIds = [...planetIds, 'about'] as const satisfies readonly SceneTargetId[];
 const desktopDpr: [number, number] = [1, 1.5];
 const canvasPerformance = { min: 0.65 };
@@ -17,6 +17,7 @@ type PlanetDetails = {
 	label: string;
 	modelUrl: string;
 	color: string;
+	sizeScale: number;
 };
 
 type UniverseSceneProps = {
@@ -44,15 +45,17 @@ const modelUrls: Record<PlanetId, string> = {
 	work: '/models/v4/work-mars.glb',
 	posts: '/models/v4/posts-saturn.glb',
 	photos: '/models/v4/photos-earth.glb',
+	comments: '/models/v4/comments-mercury.glb',
 };
 
 const planetColors: Record<PlanetId, string> = {
 	work: '#c76848',
 	posts: '#d8b987',
 	photos: '#4e8fc2',
+	comments: '#9b8d79',
 };
 
-const planetFloatOffsets: Record<PlanetId, number> = { work: 0, posts: 1.2, photos: 2.3 };
+const planetFloatOffsets: Record<PlanetId, number> = { work: 0, posts: 1.2, photos: 2.3, comments: 3.1 };
 const milkyWayVertexShader = `
 	varying vec2 vUv;
 	void main() {
@@ -137,6 +140,7 @@ const getLayout = (width: number): SceneLayout => {
 				work: [-1.55, 2.55, 1.1],
 				posts: [2.05, 2.42, 0.45],
 				photos: [1.5, -3.62, 1.3],
+				comments: [0.15, 4.05, 0.25],
 			},
 		};
 	}
@@ -153,6 +157,7 @@ const getLayout = (width: number): SceneLayout => {
 				work: [-2.65, 1.65, 1.1],
 				posts: [3.35, 1.65, 0.45],
 				photos: [2.3, -2.55, 1.3],
+				comments: [0.4, 3.55, 0.25],
 			},
 		};
 	}
@@ -168,6 +173,7 @@ const getLayout = (width: number): SceneLayout => {
 			work: [-4.35, 1.42, 1.1],
 			posts: [5.25, 1.52, 0.45],
 			photos: [3.3, -2.68, 1.35],
+			comments: [1.9, 3.8, 0.2],
 		},
 	};
 };
@@ -351,6 +357,7 @@ function Planet({ planet, position, size, hovered, reducedMotion, onHover, onSel
 	const body = useRef<THREE.Group>(null);
 	const projectedPosition = useMemo(() => new THREE.Vector3(), []);
 	const floatOffset = planetFloatOffsets[planet.id];
+	const renderedSize = size * planet.sizeScale;
 
 	useFrame(({ camera, clock, size: viewport }, delta) => {
 		if (!group.current || !body.current) return;
@@ -387,8 +394,8 @@ function Planet({ planet, position, size, hovered, reducedMotion, onHover, onSel
 	return (
 		<group ref={group} position={position} onPointerOver={handleOver} onPointerOut={handleOut} onPointerDown={handleSelect}>
 			<group ref={body}>
-				<Suspense fallback={<PlanetFallback color={planet.color} size={size} />}>
-					<FittedGLTFModel url={planet.modelUrl} size={size} />
+				<Suspense fallback={<PlanetFallback color={planet.color} size={renderedSize} />}>
+					<FittedGLTFModel url={planet.modelUrl} size={renderedSize} />
 				</Suspense>
 			</group>
 		</group>
@@ -532,9 +539,10 @@ export default function UniverseScene({ onPlanetSelect, onAstronautSelect, roomO
 	const camera = useMemo(() => ({ position: [0, 0.2, compact ? 14.8 : 13.5] as [number, number, number], fov: 42, near: 0.1, far: 100 }), [compact]);
 	const gl = useMemo(() => ({ antialias: !compact, alpha: false, powerPreference: compact ? 'default' as const : 'high-performance' as const }), [compact]);
 	const planets = useMemo<Record<PlanetId, PlanetDetails>>(() => ({
-		work: { id: 'work', label: copy[language].planets.work, modelUrl: modelUrls.work, color: planetColors.work },
-		posts: { id: 'posts', label: copy[language].planets.posts, modelUrl: modelUrls.posts, color: planetColors.posts },
-		photos: { id: 'photos', label: copy[language].planets.photos, modelUrl: modelUrls.photos, color: planetColors.photos },
+		work: { id: 'work', label: copy[language].planets.work, modelUrl: modelUrls.work, color: planetColors.work, sizeScale: 1 },
+		posts: { id: 'posts', label: copy[language].planets.posts, modelUrl: modelUrls.posts, color: planetColors.posts, sizeScale: 1 },
+		photos: { id: 'photos', label: copy[language].planets.photos, modelUrl: modelUrls.photos, color: planetColors.photos, sizeScale: 1 },
+		comments: { id: 'comments', label: copy[language].planets.comments, modelUrl: modelUrls.comments, color: planetColors.comments, sizeScale: 0.48 },
 	}), [language]);
 
 	const setHover = useCallback((id: SceneTargetId | null) => setHovered((current) => current === id ? current : id), []);
@@ -543,6 +551,7 @@ export default function UniverseScene({ onPlanetSelect, onAstronautSelect, roomO
 		work: planets.work.label,
 		posts: planets.posts.label,
 		photos: planets.photos.label,
+		comments: planets.comments.label,
 		about: copy[language].about.title,
 	}), [language, planets]);
 	const visibleLabels: readonly PlanetId[] = compact || coarsePointer ? planetIds : hovered && hovered !== 'about' ? [hovered] : [];

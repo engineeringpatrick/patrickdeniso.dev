@@ -33,6 +33,7 @@ const it = {
 			work: "Esperienze",
 			posts: "Blog",
 			photos: "Foto",
+			comments: "Libro degli ospiti",
 		},
 		intro: {
 			lines: [
@@ -119,6 +120,24 @@ const it = {
 			forward: "Avanti",
 			openExternal: "Apri il blog in una nuova scheda",
 			secureConnection: "Connessione sicura",
+		},
+		comments: {
+			appName: "guestbook.app",
+			title: "Libro degli ospiti",
+			intro: "Lascia un messaggio anonimo.",
+			placeholder: "Scrivi un commento…",
+			submit: "Pubblica",
+			posting: "Pubblicazione…",
+			empty: "Ancora nessun commento. Scrivi il primo.",
+			loading: "Caricamento dei commenti…",
+			error: "I commenti non sono disponibili al momento.",
+			rateLimit: "Piano: qualche commento basta.",
+			privacy: "Verranno mostrati la tua posizione approssimativa e il tipo di dispositivo. Il tuo indirizzo IP non viene memorizzato.",
+			acceptPrivacy: "Ho capito",
+			anonymous: "Anonimo",
+			postingFrom: "Pubblicherai da",
+			unknownLocation: "Posizione sconosciuta",
+			charactersLeft: "caratteri rimasti",
 		},
 	},
 	workExperience: [

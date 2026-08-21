@@ -1,5 +1,5 @@
 export type V4Language = 'en' | 'it' | 'fr' | 'zh';
-export type PlanetId = 'work' | 'posts' | 'photos';
+export type PlanetId = 'work' | 'posts' | 'photos' | 'comments';
 
 export type WorkExperience = {
 	company: string;
@@ -100,6 +100,24 @@ export type V4Copy = {
 		forward: string;
 		openExternal: string;
 		secureConnection: string;
+	};
+	comments: {
+		appName: string;
+		title: string;
+		intro: string;
+		placeholder: string;
+		submit: string;
+		posting: string;
+		empty: string;
+		loading: string;
+		error: string;
+		rateLimit: string;
+		privacy: string;
+		acceptPrivacy: string;
+		anonymous: string;
+		postingFrom: string;
+		unknownLocation: string;
+		charactersLeft: string;
 	};
 };
 

@@ -33,6 +33,7 @@ const zh = {
 			work: '工作经历',
 			posts: '博客',
 			photos: '照片',
+			comments: '留言簿',
 		},
 		intro: {
 			lines: [
@@ -119,6 +120,24 @@ const zh = {
 			forward: '前进',
 			openExternal: '在新标签页中打开博客',
 			secureConnection: '安全连接',
+		},
+		comments: {
+			appName: 'guestbook.app',
+			title: '留言簿',
+			intro: '匿名留个言。',
+			placeholder: '写下评论…',
+			submit: '发布评论',
+			posting: '正在发布…',
+			empty: '还没有评论。来写第一条吧。',
+			loading: '正在加载评论…',
+			error: '评论暂时不可用。',
+			rateLimit: '慢一点，几条评论就够啦。',
+			privacy: '系统会显示你的大致位置和设备类型，但不会存储你的 IP 地址。',
+			acceptPrivacy: '我知道了',
+			anonymous: '匿名',
+			postingFrom: '发布位置',
+			unknownLocation: '未知位置',
+			charactersLeft: '个字符可用',
 		},
 	},
 	workExperience: [
