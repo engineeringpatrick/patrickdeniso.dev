@@ -144,8 +144,8 @@ export default function CommentsWindow({ language, onClose }: CommentsWindowProp
 								<footer className="comments-card__footer">
 									<span>{formatLocation(comment.location, regionNames, text.unknownLocation)} · {comment.device}</span>
 									<div className="comments-votes">
-										<button type="button" aria-label={`${text.upvote} (${comment.upvotes})`} aria-pressed={comment.viewerVote === 1} disabled={votingCommentId === comment.id} onClick={() => void voteOnComment(comment, 1)}>▲ {comment.upvotes}</button>
-										<button type="button" aria-label={`${text.downvote} (${comment.downvotes})`} aria-pressed={comment.viewerVote === -1} disabled={votingCommentId === comment.id} onClick={() => void voteOnComment(comment, -1)}>▼ {comment.downvotes}</button>
+										<button type="button" aria-pressed={comment.viewerVote === 1} disabled={votingCommentId === comment.id} onClick={() => void voteOnComment(comment, 1)}>{text.upvote} ({comment.upvotes})</button>
+										<button type="button" aria-pressed={comment.viewerVote === -1} disabled={votingCommentId === comment.id} onClick={() => void voteOnComment(comment, -1)}>{text.downvote} ({comment.downvotes})</button>
 									</div>
 								</footer>
 							</article>
