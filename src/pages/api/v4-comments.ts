@@ -142,7 +142,7 @@ const getStoredComments = async (database: CommentsDatabase, voterHash: string |
 			GROUP BY comment_id
 		) AS totals ON totals.comment_id = comments.id
 		LEFT JOIN v4_comment_votes AS viewer
-			ON viewer.comment_id = comments.id AND viewer.voter_hash = ?
+			ON viewer.comment_id = comments.id AND viewer.voter_hash = ?1
 		ORDER BY upvotes DESC, downvotes ASC, comments.created_at DESC, comments.id DESC
 		LIMIT 50
 	`).bind(voterHash).all<CommentRow>();
@@ -153,9 +153,9 @@ const getVoteCounts = async (database: CommentsDatabase, commentId: number, vote
 	SELECT
 		COALESCE(SUM(CASE WHEN vote = 1 THEN 1 ELSE 0 END), 0) AS upvotes,
 		COALESCE(SUM(CASE WHEN vote = -1 THEN 1 ELSE 0 END), 0) AS downvotes,
-		COALESCE(MAX(CASE WHEN voter_hash = ? THEN vote END), 0) AS viewer_vote
+		COALESCE(MAX(CASE WHEN voter_hash = ?1 THEN vote END), 0) AS viewer_vote
 	FROM v4_comment_votes
-	WHERE comment_id = ?
+	WHERE comment_id = ?2
 `).bind(voterHash, commentId).first<{ upvotes: number; downvotes: number; viewer_vote: number }>();
 
 export const GET: APIRoute = async ({ locals, request }) => {
@@ -190,7 +190,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		const context = getRequestContext(request, { runtime });
 		const row = await database.prepare(`
 			INSERT INTO v4_comments (name, body, created_at, city, region, country, device)
-			VALUES (?, ?, ?, ?, ?, ?, ?)
+			VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
 			RETURNING id, name, body, created_at, city, region, country, device,
 				0 AS upvotes, 0 AS downvotes, 0 AS viewer_vote
 		`).bind(name || null, body, now, context.location.city, context.location.region, context.location.country, context.device).first<CommentRow>();
@@ -211,15 +211,15 @@ export const PUT: APIRoute = async ({ locals, request }) => {
 	if (!payload) return json({ error: 'INVALID_REQUEST' }, 400);
 	const commentId = payload.commentId;
 	const vote = payload.vote;
-	if (typeof commentId !== 'number' || !Number.isSafeInteger(commentId) || (vote !== 1 && vote !== -1)) return json({ error: 'INVALID_VOTE' }, 400);
+	if (typeof commentId !== 'number' || !Number.isSafeInteger(commentId) || commentId < 1 || (vote !== 1 && vote !== -1)) return json({ error: 'INVALID_VOTE' }, 400);
 
 	try {
-		const comment = await database.prepare('SELECT id FROM v4_comments WHERE id = ?').bind(commentId).first<{ id: number }>();
+		const comment = await database.prepare('SELECT id FROM v4_comments WHERE id = ?1').bind(commentId).first<{ id: number }>();
 		if (!comment) return json({ error: 'NOT_FOUND' }, 404);
 		const voter = await getOrCreateVoter(request);
 		await database.prepare(`
 			INSERT INTO v4_comment_votes (comment_id, voter_hash, vote, updated_at)
-			VALUES (?, ?, ?, ?)
+			VALUES (?1, ?2, ?3, ?4)
 			ON CONFLICT (comment_id, voter_hash) DO UPDATE SET
 				vote = excluded.vote,
 				updated_at = excluded.updated_at
