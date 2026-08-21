@@ -133,7 +133,6 @@ const fr = {
 			empty: "Aucun commentaire pour l’instant. Soyez le premier.",
 			loading: "Chargement des commentaires…",
 			error: "Les commentaires sont indisponibles pour le moment.",
-			rateLimit: "Doucement — quelques commentaires suffisent.",
 			anonymous: "Anonyme",
 			unknownLocation: "Localisation inconnue",
 		},

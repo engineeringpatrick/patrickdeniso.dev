@@ -133,7 +133,6 @@ const zh = {
 			empty: '还没有评论。来写第一条吧。',
 			loading: '正在加载评论…',
 			error: '评论暂时不可用。',
-			rateLimit: '慢一点，几条评论就够啦。',
 			anonymous: '匿名',
 			unknownLocation: '未知位置',
 		},

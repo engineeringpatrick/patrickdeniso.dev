@@ -133,7 +133,6 @@ const it = {
 			empty: "Ancora nessun commento. Scrivi il primo.",
 			loading: "Caricamento dei commenti…",
 			error: "I commenti non sono disponibili al momento.",
-			rateLimit: "Piano: qualche commento basta.",
 			anonymous: "Anonimo",
 			unknownLocation: "Posizione sconosciuta",
 		},

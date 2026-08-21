@@ -19,8 +19,6 @@ const formatLocation = (location: Location, regionNames: Intl.DisplayNames | nul
 	return [location.city, location.region, country].filter(Boolean).join(', ') || fallback;
 };
 
-type ErrorKind = 'generic' | 'rate-limit' | null;
-
 export default function CommentsWindow({ language, onClose }: CommentsWindowProps) {
 	const text = copy[language].comments;
 	const [comments, setComments] = useState<Comment[]>([]);
@@ -29,7 +27,7 @@ export default function CommentsWindow({ language, onClose }: CommentsWindowProp
 	const [website, setWebsite] = useState('');
 	const [loading, setLoading] = useState(true);
 	const [posting, setPosting] = useState(false);
-	const [error, setError] = useState<ErrorKind>(null);
+	const [hasError, setHasError] = useState(false);
 	const formatter = useMemo(() => new Intl.DateTimeFormat(languageLocales[language], { dateStyle: 'medium', timeStyle: 'short' }), [language]);
 	const regionNames = useMemo(() => {
 		try {
@@ -38,7 +36,6 @@ export default function CommentsWindow({ language, onClose }: CommentsWindowProp
 			return null;
 		}
 	}, [language]);
-	const errorMessage = error === 'rate-limit' ? text.rateLimit : error ? text.error : '';
 
 	useEffect(() => {
 		const controller = new AbortController();
@@ -50,7 +47,7 @@ export default function CommentsWindow({ language, onClose }: CommentsWindowProp
 				setComments(result.comments);
 			} catch (reason: unknown) {
 				if (reason instanceof DOMException && reason.name === 'AbortError') return;
-				setError('generic');
+				setHasError(true);
 			} finally {
 				if (!controller.signal.aborted) setLoading(false);
 			}
@@ -64,7 +61,7 @@ export default function CommentsWindow({ language, onClose }: CommentsWindowProp
 		const commentBody = body.trim();
 		if (!commentBody || posting) return;
 		setPosting(true);
-		setError(null);
+		setHasError(false);
 		try {
 			const response = await fetch('/api/v4-comments', {
 				method: 'POST',
@@ -77,8 +74,8 @@ export default function CommentsWindow({ language, onClose }: CommentsWindowProp
 			setComments((current) => [comment, ...current]);
 			setName('');
 			setBody('');
-		} catch (reason) {
-			setError(reason instanceof Error && reason.message === 'RATE_LIMIT' ? 'rate-limit' : 'generic');
+		} catch {
+			setHasError(true);
 		} finally {
 			setPosting(false);
 		}
@@ -101,7 +98,7 @@ export default function CommentsWindow({ language, onClose }: CommentsWindowProp
 						<div className="comments-form__footer">
 							<button type="submit" disabled={!body.trim() || posting}>{posting ? text.posting : text.submit}</button>
 						</div>
-						{errorMessage && <p className="comments-error" role="alert">{errorMessage}</p>}
+						{hasError && <p className="comments-error" role="alert">{text.error}</p>}
 					</form>
 
 					<hr />

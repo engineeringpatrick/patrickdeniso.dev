@@ -113,7 +113,6 @@ export type V4Copy = {
 		empty: string;
 		loading: string;
 		error: string;
-		rateLimit: string;
 		anonymous: string;
 		unknownLocation: string;
 	};

@@ -122,7 +122,6 @@ const en = {
 			empty: 'No comments yet. Be the first.',
 			loading: 'Loading comments…',
 			error: 'Comments are unavailable right now.',
-			rateLimit: 'Slow down—a few comments is plenty.',
 			anonymous: 'Anonymous',
 			unknownLocation: 'Unknown location',
 		},

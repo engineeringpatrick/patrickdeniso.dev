@@ -14,7 +14,7 @@ type CommentRow = {
 	device: string;
 };
 
-type CommentsRuntime = Runtime<Pick<Cloudflare.Env, 'COMMENTS_DB' | 'COMMENTS_HASH_SALT'>>['runtime'];
+type CommentsRuntime = Runtime<Pick<Cloudflare.Env, 'COMMENTS_DB'>>['runtime'];
 type CommentsDatabase = Cloudflare.Env['COMMENTS_DB'];
 type CloudflareLocals = { runtime?: CommentsRuntime };
 
@@ -30,8 +30,6 @@ type PublicComment = {
 const maxCommentLength = 500;
 const maxNameLength = 40;
 const maxRequestBytes = 4096;
-const maxCommentsPerHour = 5;
-const minimumCommentIntervalSeconds = 20;
 
 const json = (body: unknown, status = 200) => Response.json(body, {
 	status,
@@ -67,14 +65,6 @@ const toPublicComment = (row: CommentRow): PublicComment => ({
 	device: row.device,
 });
 
-const visitorHash = async (request: Request, salt: string) => {
-	const address = request.headers.get('cf-connecting-ip') ?? 'local-development';
-	const day = new Date().toISOString().slice(0, 10);
-	const bytes = new TextEncoder().encode(`${salt}:${day}:${address}`);
-	const digest = await crypto.subtle.digest('SHA-256', bytes);
-	return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
-};
-
 const getStoredComments = async (database: CommentsDatabase) => {
 	const result = await database.prepare(`
 		SELECT id, name, body, created_at, city, region, country, device
@@ -101,8 +91,7 @@ export const GET: APIRoute = async ({ locals }) => {
 export const POST: APIRoute = async ({ locals, request }) => {
 	const runtime = (locals as CloudflareLocals).runtime;
 	const database = runtime?.env?.COMMENTS_DB;
-	const hashSalt = runtime?.env?.COMMENTS_HASH_SALT;
-	if (!database || (import.meta.env.PROD && !hashSalt)) return json({ error: 'UNAVAILABLE' }, 503);
+	if (!database) return json({ error: 'UNAVAILABLE' }, 503);
 	const contentType = request.headers.get('content-type') ?? '';
 	const contentLength = request.headers.get('content-length');
 	if (!contentType.toLowerCase().startsWith('application/json') || (contentLength && Number(contentLength) > maxRequestBytes)) {
@@ -127,22 +116,12 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 	try {
 		const now = Math.floor(Date.now() / 1000);
-		const hash = await visitorHash(request, hashSalt ?? 'patrickdeniso-v4-comments-development');
-		const rate = await database.prepare(`
-			SELECT COUNT(*) AS count, MAX(created_at) AS last_created_at
-			FROM v4_comments
-			WHERE visitor_hash = ? AND created_at > ?
-		`).bind(hash, now - 3600).first<{ count: number; last_created_at: number | null }>();
-		if ((rate?.count ?? 0) >= maxCommentsPerHour || (rate?.last_created_at ?? 0) > now - minimumCommentIntervalSeconds) {
-			return json({ error: 'RATE_LIMIT' }, 429);
-		}
-
 		const context = getRequestContext(request, { runtime });
 		const row = await database.prepare(`
-			INSERT INTO v4_comments (name, body, created_at, city, region, country, device, visitor_hash)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+			INSERT INTO v4_comments (name, body, created_at, city, region, country, device)
+			VALUES (?, ?, ?, ?, ?, ?, ?)
 			RETURNING id, name, body, created_at, city, region, country, device
-		`).bind(name || null, body, now, context.location.city, context.location.region, context.location.country, context.device, hash).first<CommentRow>();
+		`).bind(name || null, body, now, context.location.city, context.location.region, context.location.country, context.device).first<CommentRow>();
 		if (!row) return json({ error: 'SAVE_FAILED' }, 500);
 
 		return json({ comment: toPublicComment(row) }, 201);

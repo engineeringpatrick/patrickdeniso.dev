@@ -21,9 +21,6 @@
 	"observability": {
 		"enabled": true
 	},
-	"secrets": {
-		"required": ["COMMENTS_HASH_SALT"]
-	},
 	"d1_databases": [
 		{
 			"binding": "COMMENTS_DB",
