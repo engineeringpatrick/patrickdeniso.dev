@@ -15,9 +15,9 @@ const description = copy[language].site.description;
 const profileImage = new URL('/profile_picture.jpeg', origin).href;
 const languageAlternates = [
 	{ language: 'en', href: new URL('/', origin).href },
-	{ language: 'it', href: new URL('/v/4/it/', origin).href },
-	{ language: 'fr', href: new URL('/v/4/fr/', origin).href },
-	{ language: 'zh-Hans', href: new URL('/v/4/zh/', origin).href },
+	{ language: 'it', href: new URL('/it/', origin).href },
+	{ language: 'fr', href: new URL('/fr/', origin).href },
+	{ language: 'zh-Hans', href: new URL('/zh/', origin).href },
 ] as const;
 const openGraphLocales: Record<V4Language, string> = {
 	en: 'en_US',

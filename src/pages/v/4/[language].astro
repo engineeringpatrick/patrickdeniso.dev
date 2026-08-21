@@ -1,31 +1,13 @@
 ---
-import UniverseHome from '../../../components/v4/UniverseHome.astro';
-import ProfileSeo from '../../../components/v4/ProfileSeo.astro';
-import { supportedLanguages, type V4Language } from '../../../locales/v4';
+import { supportedLanguages } from '../../../locales/v4';
+import { v4Path } from '../../../components/v4/v4Routes';
 
 export function getStaticPaths() {
-	return supportedLanguages.map(({ code }) => ({ params: { language: code }, props: { language: code } }));
+	return supportedLanguages.map(({ code: language }) => ({
+		params: { language },
+		props: { target: v4Path(language) },
+	}));
 }
 
-interface Props {
-	language: V4Language;
-}
-
-const { language } = Astro.props;
-const isEnglishDuplicate = language === 'en';
-const canonicalPath = isEnglishDuplicate ? '/' : `/v/4/${language}/`;
+return Astro.redirect((Astro.props as { target: string }).target, 301);
 ---
-
-<!doctype html>
-<html lang={language}>
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="theme-color" content="#050617" />
-		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-		<ProfileSeo language={language} canonicalPath={canonicalPath} indexable={!isEnglishDuplicate} />
-	</head>
-	<body>
-		<UniverseHome initialLanguage={language} />
-	</body>
-</html>

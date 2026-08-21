@@ -4,7 +4,6 @@ import path from "path";
 
 // Paths
 const NOTES_PATH = path.resolve("src/content/notes");
-const ASSETS_SRC = path.join(NOTES_PATH, "assets");
 const ASSETS_DEST = path.resolve("public/assets");
 
 // Sanitize to kebab-case and remove any percent encodings

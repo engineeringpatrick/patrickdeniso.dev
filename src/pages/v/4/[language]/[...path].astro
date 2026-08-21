@@ -1,0 +1,13 @@
+---
+import { v4StaticTargets, v4TargetPath, v4TargetSuffix } from '../../../../components/v4/v4StaticRoutes';
+import { supportedLanguages } from '../../../../locales/v4';
+
+export function getStaticPaths() {
+	return supportedLanguages.flatMap(({ code: language }) => v4StaticTargets.map((target) => ({
+		params: { language, path: v4TargetSuffix(target) },
+		props: { target: v4TargetPath(language, target) },
+	})));
+}
+
+return Astro.redirect((Astro.props as { target: string }).target, 301);
+---

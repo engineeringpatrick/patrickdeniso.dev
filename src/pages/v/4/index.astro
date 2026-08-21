@@ -1,18 +1,3 @@
 ---
-import UniverseHome from '../../../components/v4/UniverseHome.astro';
-import ProfileSeo from '../../../components/v4/ProfileSeo.astro';
+return Astro.redirect('/', 301);
 ---
-
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="theme-color" content="#050617" />
-		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-		<ProfileSeo language="en" canonicalPath="/" indexable={false} />
-	</head>
-	<body>
-		<UniverseHome />
-	</body>
-</html>

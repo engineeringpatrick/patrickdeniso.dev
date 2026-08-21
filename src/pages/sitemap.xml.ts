@@ -5,9 +5,9 @@ export const prerender = true;
 const origin = 'https://patrickdeniso.dev';
 const pages = [
 	{ language: 'en', path: '/' },
-	{ language: 'it', path: '/v/4/it/' },
-	{ language: 'fr', path: '/v/4/fr/' },
-	{ language: 'zh-Hans', path: '/v/4/zh/' },
+	{ language: 'it', path: '/it/' },
+	{ language: 'fr', path: '/fr/' },
+	{ language: 'zh-Hans', path: '/zh/' },
 ] as const;
 
 const alternates = pages

@@ -1,8 +1,9 @@
-import { lazy, Suspense, useEffect, useState, type ComponentType, type LazyExoticComponent } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState, type ComponentType, type LazyExoticComponent } from 'react';
 import { createPortal } from 'react-dom';
 import UniverseScene from './UniverseScene';
 import { type PlanetId, type V4Language } from '../../locales/v4';
 import { V4_ROOM_CHANGE_EVENT, type V4RoomChangeDetail } from './v4Events';
+import { parseV4Path, pushV4Path, v4Path, type V4RoomId } from './v4Routes';
 import useV4Language from './useV4Language';
 import './UniverseExperience.css';
 
@@ -12,7 +13,7 @@ const CommentsWindow = lazy(() => import('./CommentsWindow'));
 const PhotoMuseum = lazy(() => import('./PhotoMuseum'));
 const WorkExperienceWindow = lazy(() => import('./WorkExperienceWindow'));
 
-type RoomId = PlanetId | 'about';
+type RoomId = V4RoomId;
 type RoomProps = { language: V4Language; onClose: () => void };
 
 const roomComponents = {
@@ -25,8 +26,21 @@ const roomComponents = {
 
 /** The client-only v4 island: Fiber owns the universe and React owns its rooms. */
 export default function UniverseExperience() {
-	const [selectedRoom, setSelectedRoom] = useState<RoomId | null>(null);
+	const [selectedRoom, setSelectedRoom] = useState<RoomId | null>(() => typeof window === 'undefined' ? null : parseV4Path(window.location.pathname)?.room ?? null);
 	const language = useV4Language();
+	const openRoom = useCallback((room: RoomId | null) => {
+		pushV4Path(v4Path(language, room));
+		setSelectedRoom(room);
+	}, [language]);
+	const closeWindow = useCallback(() => openRoom(null), [openRoom]);
+	const openPlanet = useCallback((planet: PlanetId) => openRoom(planet), [openRoom]);
+	const openAbout = useCallback(() => openRoom('about'), [openRoom]);
+
+	useEffect(() => {
+		const syncRoomFromUrl = () => setSelectedRoom(parseV4Path(window.location.pathname)?.room ?? null);
+		window.addEventListener('popstate', syncRoomFromUrl);
+		return () => window.removeEventListener('popstate', syncRoomFromUrl);
+	}, []);
 
 	useEffect(() => {
 		window.dispatchEvent(new CustomEvent<V4RoomChangeDetail>(V4_ROOM_CHANGE_EVENT, { detail: { open: selectedRoom !== null } }));
@@ -39,11 +53,11 @@ export default function UniverseExperience() {
 	useEffect(() => {
 		if (!selectedRoom) return;
 		const onKeyDown = (event: KeyboardEvent) => {
-			if (event.key === 'Escape' && !event.defaultPrevented) setSelectedRoom(null);
+			if (event.key === 'Escape' && !event.defaultPrevented) closeWindow();
 		};
 		document.addEventListener('keydown', onKeyDown);
 		return () => document.removeEventListener('keydown', onKeyDown);
-	}, [selectedRoom]);
+	}, [closeWindow, selectedRoom]);
 
 	useEffect(() => {
 		if (!selectedRoom) return;
@@ -52,9 +66,6 @@ export default function UniverseExperience() {
 		return () => { document.body.style.overflow = previousOverflow; };
 	}, [selectedRoom]);
 
-	const closeWindow = () => setSelectedRoom(null);
-	const openPlanet = (planet: PlanetId) => setSelectedRoom(planet);
-	const openAbout = () => setSelectedRoom('about');
 	const SelectedRoom = selectedRoom ? roomComponents[selectedRoom] : null;
 
 	return (

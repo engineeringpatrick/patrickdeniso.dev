@@ -3,20 +3,23 @@ import VersionPicker from '../VersionPicker.astro';
 import { copy, supportedLanguages, type V4Language } from '../../locales/v4';
 import PatrickVimEditor from './PatrickVimEditor';
 import UniverseExperience from './UniverseExperience';
+import { v4Path } from './v4Routes';
 
 interface Props {
 	initialLanguage?: V4Language;
 }
 
 const { initialLanguage } = Astro.props;
-const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
+const initialLanguageCode = initialLanguage ?? 'en';
+const initialSiteCopy = copy[initialLanguageCode].site;
+const initialHomePath = v4Path(initialLanguageCode);
 ---
 
 <main class="universe" data-universe data-v4-initial-language={initialLanguage}>
 	<header class="universe__header">
 		<div class="universe__brand">
 			<button class="universe__wordmark-spark" type="button" aria-label={initialSiteCopy.starSettings.open} aria-expanded="false" aria-controls="star-settings" data-wordmark-spark>✦</button>
-			<a class="universe__wordmark" href="/" aria-label="Patrick Deniso home" data-wordmark>
+			<a class="universe__wordmark" href={initialHomePath} aria-label={initialSiteCopy.title} data-wordmark>
 			<span class="universe__wordmark-name" data-wordmark-name>Patrick Deniso</span>
 			</a>
 		</div>
@@ -36,17 +39,17 @@ const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 		</div>
 	</header>
 
-	<section class="universe__scene" aria-label="Patrick Deniso's interactive universe" data-v4-scene>
+	<section class="universe__scene" aria-label={initialSiteCopy.sceneLabel} data-v4-scene>
 		<h1 class="universe__sr-only" data-v4-page-title>{initialSiteCopy.title}</h1>
 		<div class="universe__shooting-stars" aria-hidden="true" data-wordmark-stars></div>
 		<UniverseExperience client:only="react" />
 
-		<div class="universe__depth universe__console" aria-label="A code introduction" data-console>
+		<div class="universe__depth universe__console" aria-label={initialSiteCopy.codeIntroduction} data-console>
 			<div class="universe__console-bar">
-				<div class="universe__console-controls" aria-label="Window controls">
-					<button class="universe__console-control universe__console-control--close" type="button" aria-label="Close introduction" data-console-action="close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg></button>
-					<button class="universe__console-control universe__console-control--minimize" type="button" aria-label="Minimize introduction" aria-pressed="false" data-console-action="minimize"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" /></svg></button>
-					<button class="universe__console-control universe__console-control--maximize" type="button" aria-label="Maximize introduction" aria-pressed="false" data-console-action="maximize"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" /></svg></button>
+				<div class="universe__console-controls" aria-label={initialSiteCopy.windowControls}>
+					<button class="universe__console-control universe__console-control--close" type="button" aria-label={initialSiteCopy.close} data-console-action="close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg></button>
+					<button class="universe__console-control universe__console-control--minimize" type="button" aria-label={initialSiteCopy.minimize} aria-pressed="false" data-console-action="minimize"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" /></svg></button>
+					<button class="universe__console-control universe__console-control--maximize" type="button" aria-label={initialSiteCopy.maximize} aria-pressed="false" data-console-action="maximize"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" /></svg></button>
 				</div>
 				<p>patrick.ts</p>
 			</div>
@@ -59,27 +62,27 @@ const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 
 	<footer class="universe__footer">
 		<div class="universe__utilities">
-			<nav class="universe__contacts" aria-label="Contacts" data-v4-contacts>
-				<a href="mailto:me@patrickdeniso.com" data-v4-contact="email">Email</a>
-				<a href="https://www.instagram.com/patrick_deniso/" target="_blank" rel="noreferrer" data-v4-contact="instagram">Instagram</a>
+			<nav class="universe__contacts" aria-label={initialSiteCopy.contacts} data-v4-contacts>
+				<a href="mailto:me@patrickdeniso.com" data-v4-contact="email">{initialSiteCopy.email}</a>
+				<a href="https://www.instagram.com/patrick_deniso/" target="_blank" rel="noreferrer" data-v4-contact="instagram">{initialSiteCopy.instagram}</a>
 				<div class="universe__wechat">
-					<button class="universe__wechat-trigger" type="button" aria-expanded="false" aria-controls="wechat-contact-card" data-wechat-trigger data-v4-contact="wechat">WeChat</button>
-					<div class="universe__wechat-card" id="wechat-contact-card" role="dialog" aria-label="WeChat QR code" hidden data-wechat-card>
-						<img src="/contact/wechat-qr.jpg" alt="WeChat QR code for Patrick Deniso" data-wechat-image />
-						<button class="universe__wechat-close" type="button" aria-label="Close WeChat QR code" data-wechat-close>×</button>
+					<button class="universe__wechat-trigger" type="button" aria-expanded="false" aria-controls="wechat-contact-card" data-wechat-trigger data-v4-contact="wechat">{initialSiteCopy.wechat}</button>
+					<div class="universe__wechat-card" id="wechat-contact-card" role="dialog" aria-label={initialSiteCopy.wechatQrCode} hidden data-wechat-card>
+						<img src="/contact/wechat-qr.jpg" alt={initialSiteCopy.wechatQrCode} data-wechat-image />
+						<button class="universe__wechat-close" type="button" aria-label={initialSiteCopy.close} data-wechat-close>×</button>
 					</div>
 				</div>
 			</nav>
 			<label class="universe__language">
-				<span class="universe__sr-only" data-v4-language-label>Website language</span>
-				<select class="v4-language-select" data-v4-language-picker aria-label="Website language">
+				<span class="universe__sr-only" data-v4-language-label>{initialSiteCopy.websiteLanguage}</span>
+				<select class="v4-language-select" data-v4-language-picker aria-label={initialSiteCopy.websiteLanguage}>
 					{supportedLanguages.map(({ code, label }) => <option value={code} selected={code === initialLanguage}>{label}</option>)}
 				</select>
 			</label>
 		</div>
-		<p class="universe__model-credit"><span data-v4-model-credit>3D models:</span> <a href="https://science.nasa.gov/3d-resources/">NASA / JPL-Caltech, NASA VTAD &amp; DigitalSpace Corporation</a></p>
+		<p class="universe__model-credit"><span data-v4-model-credit>{initialSiteCopy.modelCredit}</span> <a href="https://science.nasa.gov/3d-resources/">NASA / JPL-Caltech, NASA VTAD &amp; DigitalSpace Corporation</a></p>
 		<div class="universe__version">
-			<VersionPicker currentVersion={4} appearance="space" showLabel={false} />
+			<VersionPicker currentVersion={4} appearance="space" showLabel={false} label={initialSiteCopy.websiteVersion} />
 		</div>
 	</footer>
 
@@ -89,6 +92,7 @@ const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 	import { copy, isV4Language } from '../../locales/v4';
 	import { detectV4Language } from '../../locales/v4/detect';
 	import { V4_CONSOLE_CLOSE_EVENT, V4_LANGUAGE_CHANGE_EVENT, V4_LANGUAGE_REQUEST_EVENT, V4_ROOM_CHANGE_EVENT, type V4LanguageRequestDetail, type V4RoomChangeDetail } from './v4Events';
+	import { parseV4Path, v4Path } from './v4Routes';
 
 	const universe = document.querySelector<HTMLElement>('[data-universe]');
 	const consoleWindow = universe?.querySelector<HTMLElement>('[data-console]');
@@ -241,6 +245,7 @@ const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 		document.documentElement.lang = nextLanguage;
 		languagePickers.forEach((picker) => { picker.value = nextLanguage; });
 		const text = copy[nextLanguage].site;
+		wordmark?.setAttribute('href', v4Path(nextLanguage));
 		document.title = text.title;
 		document.querySelector('meta[name="description"]')?.setAttribute('content', text.description);
 		universe?.querySelector<HTMLElement>('[data-v4-page-title]')?.replaceChildren(text.title);
@@ -278,16 +283,20 @@ const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 		if (!isV4Language(language)) return;
 		window.localStorage.setItem('v4-language', language);
 		if (updateUrl) {
-			const nextPath = `/v/4/${language}/`;
+			const route = parseV4Path(window.location.pathname);
+			const nextPath = v4Path(language, route?.room, route?.collectionSlug, route?.photoId);
 			if (window.location.pathname !== nextPath) window.history.pushState(null, '', nextPath);
 		}
 		setLanguage(language);
 	};
 
-	void detectV4Language(universe?.dataset.v4InitialLanguage).then((language) => {
+	const isRootRoute = window.location.pathname === '/';
+	const initialRoute = parseV4Path(window.location.pathname);
+	const routedLanguage = isRootRoute ? undefined : initialRoute?.language;
+	void detectV4Language(routedLanguage ?? universe?.dataset.v4InitialLanguage).then((language) => {
 		setLanguage(language);
-		if (!window.location.pathname.match(/^\/v\/4\/(en|it|fr|zh)\/?$/)) {
-			window.history.replaceState(null, '', `/v/4/${language}/`);
+		if (isRootRoute && language !== 'en') {
+			window.history.replaceState(null, '', v4Path(language));
 		}
 	});
 	languagePickers.forEach((picker) => picker.addEventListener('change', () => chooseLanguage(picker.value)));
@@ -295,7 +304,7 @@ const initialSiteCopy = copy[initialLanguage ?? 'en'].site;
 		if (event instanceof CustomEvent) chooseLanguage((event.detail as V4LanguageRequestDetail).language);
 	});
 	window.addEventListener('popstate', () => {
-		const routedLanguage = window.location.pathname.match(/^\/v\/4\/(en|it|fr|zh)\/?$/)?.[1];
+		const routedLanguage = parseV4Path(window.location.pathname)?.language;
 		if (isV4Language(routedLanguage)) setLanguage(routedLanguage);
 		else void detectV4Language().then(setLanguage);
 	});

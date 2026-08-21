@@ -31,3 +31,10 @@ export const supportedLanguages = [
 	{ code: 'fr', label: 'Français' },
 	{ code: 'zh', label: '中文' },
 ] as const;
+
+export const languageLocales: Record<V4Language, string> = {
+	en: 'en-US',
+	it: 'it-IT',
+	fr: 'fr-FR',
+	zh: 'zh-CN',
+};

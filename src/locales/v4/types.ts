@@ -102,9 +102,11 @@ export type V4Copy = {
 		secureConnection: string;
 	};
 	comments: {
-		appName: string;
 		title: string;
 		intro: string;
+		name: string;
+		namePlaceholder: string;
+		message: string;
 		placeholder: string;
 		submit: string;
 		posting: string;
@@ -112,12 +114,8 @@ export type V4Copy = {
 		loading: string;
 		error: string;
 		rateLimit: string;
-		privacy: string;
-		acceptPrivacy: string;
 		anonymous: string;
-		postingFrom: string;
 		unknownLocation: string;
-		charactersLeft: string;
 	};
 };
 

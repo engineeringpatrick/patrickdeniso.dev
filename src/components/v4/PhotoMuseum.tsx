@@ -9,9 +9,10 @@ import {
 } from 'lucide-react';
 import { GridList, GridListItem } from 'react-aria-components';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { copy, type V4Language } from '../../locales/v4';
+import { copy, languageLocales, type V4Language } from '../../locales/v4';
 import MacWindowControls, { useWindowMode } from './MacWindowControls';
 import { photoCollections, type PhotoCollection } from './v4Content';
+import { parseV4Path, pushV4Path, v4Path } from './v4Routes';
 
 type PhotoMuseumProps = {
 	language: V4Language;
@@ -20,10 +21,9 @@ type PhotoMuseumProps = {
 
 type ViewMode = 'grid' | 'list';
 
-const localeForLanguage: Record<V4Language, string> = { en: 'en-US', it: 'it-IT', fr: 'fr-FR', zh: 'zh-CN' };
 const byteUnits = ['B', 'KB', 'MB', 'GB'];
 const dateFormatters = Object.fromEntries(
-	Object.entries(localeForLanguage).map(([language, locale]) => [language, new Intl.DateTimeFormat(locale, { dateStyle: 'medium' })]),
+	Object.entries(languageLocales).map(([language, locale]) => [language, new Intl.DateTimeFormat(locale, { dateStyle: 'medium' })]),
 ) as Record<V4Language, Intl.DateTimeFormat>;
 
 const formatBytes = (bytes: number) => {
@@ -38,10 +38,21 @@ const formatDate = (value: string | undefined, language: V4Language, fallback: s
 	return Number.isNaN(date.valueOf()) ? value : dateFormatters[language].format(date);
 };
 
+const photoStateFromPath = () => {
+	if (typeof window === 'undefined') return { collectionSlug: null, photoIndex: null };
+	const route = parseV4Path(window.location.pathname);
+	if (route?.room !== 'photos' || !route.collectionSlug) return { collectionSlug: null, photoIndex: null };
+	const collection = photoCollections.find((item) => item.slug === route.collectionSlug);
+	if (!collection) return { collectionSlug: null, photoIndex: null };
+	const photoIndex = route.photoId ? collection.photos.findIndex((photo) => photo.id === route.photoId) : -1;
+	return { collectionSlug: collection.slug, photoIndex: photoIndex >= 0 ? photoIndex : null };
+};
+
 export default function PhotoMuseum({ language, onClose }: PhotoMuseumProps) {
-	const [currentCollectionSlug, setCurrentCollectionSlug] = useState<string | null>(null);
-	const [selectedCollectionSlug, setSelectedCollectionSlug] = useState<string | null>(null);
-	const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
+	const [initialPhotoState] = useState(photoStateFromPath);
+	const [currentCollectionSlug, setCurrentCollectionSlug] = useState<string | null>(initialPhotoState.collectionSlug);
+	const [selectedCollectionSlug, setSelectedCollectionSlug] = useState<string | null>(initialPhotoState.collectionSlug);
+	const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(initialPhotoState.photoIndex);
 	const [viewMode, setViewMode] = useState<ViewMode>('grid');
 	const [query, setQuery] = useState('');
 	const windowState = useWindowMode();
@@ -57,16 +68,20 @@ export default function PhotoMuseum({ language, onClose }: PhotoMuseumProps) {
 	const selectedCollectionKeys = useMemo(() => selectedCollectionSlug ? new Set([selectedCollectionSlug]) : new Set<string>(), [selectedCollectionSlug]);
 	const collectionTitle = useCallback((item: PhotoCollection) => text.collections[item.slug] ?? item.title, [text.collections]);
 	const matchingCollections = useMemo(() => {
-		const normalizedQuery = query.trim().toLocaleLowerCase(localeForLanguage[language]);
+		const normalizedQuery = query.trim().toLocaleLowerCase(languageLocales[language]);
 		if (!normalizedQuery) return photoCollections;
-		return photoCollections.filter((item) => collectionTitle(item).toLocaleLowerCase(localeForLanguage[language]).includes(normalizedQuery)
-			|| item.photos.some((photo) => photo.id.toLocaleLowerCase(localeForLanguage[language]).includes(normalizedQuery)));
+		return photoCollections.filter((item) => collectionTitle(item).toLocaleLowerCase(languageLocales[language]).includes(normalizedQuery)
+			|| item.photos.some((photo) => photo.id.toLocaleLowerCase(languageLocales[language]).includes(normalizedQuery)));
 	}, [collectionTitle, language, query]);
 
+	const showPhotoRoute = useCallback((nextCollection: PhotoCollection | null, photoIndex: number | null, updateUrl = true) => {
+		setCurrentCollectionSlug(nextCollection?.slug ?? null);
+		setSelectedCollectionSlug(nextCollection?.slug ?? null);
+		setSelectedPhotoIndex(photoIndex);
+		if (updateUrl) pushV4Path(v4Path(language, 'photos', nextCollection?.slug, photoIndex === null ? null : nextCollection?.photos[photoIndex]?.id));
+	}, [language]);
 	const openCollection = (nextCollection: PhotoCollection) => {
-		setCurrentCollectionSlug(nextCollection.slug);
-		setSelectedCollectionSlug(nextCollection.slug);
-		setSelectedPhotoIndex(null);
+		showPhotoRoute(nextCollection, null);
 		setQuery('');
 	};
 	const openCollectionBySlug = (slug: string | null) => {
@@ -76,16 +91,32 @@ export default function PhotoMuseum({ language, onClose }: PhotoMuseumProps) {
 	};
 
 	const goToArchive = () => {
-		setCurrentCollectionSlug(null);
-		setSelectedPhotoIndex(null);
+		showPhotoRoute(null, null);
 	};
+	const closePhoto = useCallback(() => {
+		if (collection) showPhotoRoute(collection, null);
+	}, [collection, showPhotoRoute]);
+	const openPhoto = useCallback((index: number) => {
+		if (collection?.photos[index]) showPhotoRoute(collection, index);
+	}, [collection, showPhotoRoute]);
 
 	const photoCount = collection?.photos.length ?? 0;
 	const isViewingPhoto = selectedPhotoIndex !== null && collection !== null;
 	const step = useCallback((direction: -1 | 1) => {
-		if (!photoCount) return;
-		setSelectedPhotoIndex((current) => current === null ? 0 : (current + direction + photoCount) % photoCount);
-	}, [photoCount]);
+		if (!photoCount || !collection) return;
+		const nextIndex = selectedPhotoIndex === null ? 0 : (selectedPhotoIndex + direction + photoCount) % photoCount;
+		showPhotoRoute(collection, nextIndex);
+	}, [collection, photoCount, selectedPhotoIndex, showPhotoRoute]);
+
+	useEffect(() => {
+		const syncPhotoFromUrl = () => {
+			const next = photoStateFromPath();
+			const nextCollection = next.collectionSlug ? photoCollections.find((item) => item.slug === next.collectionSlug) ?? null : null;
+			showPhotoRoute(nextCollection, next.photoIndex, false);
+		};
+		window.addEventListener('popstate', syncPhotoFromUrl);
+		return () => window.removeEventListener('popstate', syncPhotoFromUrl);
+	}, [showPhotoRoute]);
 
 	useEffect(() => {
 		if (!isViewingPhoto) return;
@@ -95,11 +126,11 @@ export default function PhotoMuseum({ language, onClose }: PhotoMuseumProps) {
 			event.stopPropagation();
 			if (event.key === 'ArrowLeft') step(-1);
 			else if (event.key === 'ArrowRight') step(1);
-			else setSelectedPhotoIndex(null);
+			else closePhoto();
 		};
 		window.addEventListener('keydown', onKeyDown, true);
 		return () => window.removeEventListener('keydown', onKeyDown, true);
-	}, [isViewingPhoto, step]);
+	}, [closePhoto, isViewingPhoto, step]);
 
 	const folderName = collection ? collectionTitle(collection) : text.title;
 
@@ -121,7 +152,7 @@ export default function PhotoMuseum({ language, onClose }: PhotoMuseumProps) {
 					onMaximize={windowState.toggleMaximized}
 				/>
 				<div className="finder-toolbar" aria-label={text.toolbar}>
-					<button className="finder-toolbar__back" type="button" aria-label={text.back} disabled={!collection && !activePhoto} onClick={activePhoto ? () => setSelectedPhotoIndex(null) : goToArchive}>
+					<button className="finder-toolbar__back" type="button" aria-label={text.back} disabled={!collection && !activePhoto} onClick={activePhoto ? closePhoto : goToArchive}>
 						<ChevronLeft size={15} aria-hidden="true" />
 					</button>
 					<p>{text.appName}</p>
@@ -181,7 +212,7 @@ export default function PhotoMuseum({ language, onClose }: PhotoMuseumProps) {
 									</div>
 									<div className="finder-viewer__filmstrip" aria-label={`${collectionTitle(collection)} ${text.photographs}`}>
 										{collection.photos.map((photo, index) => (
-											<button className={index === selectedPhotoIndex ? 'is-active' : ''} type="button" key={photo.src} aria-label={`${text.openPhotograph}: ${photo.id}`} onClick={() => setSelectedPhotoIndex(index)}>
+											<button className={index === selectedPhotoIndex ? 'is-active' : ''} type="button" key={photo.src} aria-label={`${text.openPhotograph}: ${photo.id}`} onClick={() => openPhoto(index)}>
 												<img src={photo.thumbnail} alt="" loading="lazy" decoding="async" />
 											</button>
 										))}
@@ -221,9 +252,9 @@ export default function PhotoMuseum({ language, onClose }: PhotoMuseumProps) {
 									onSelectionChange={(keys) => {
 										if (keys === 'all') return;
 										const nextKey = keys.values().next().value;
-										if (typeof nextKey === 'string') setSelectedPhotoIndex(Number(nextKey));
+										if (typeof nextKey === 'string') openPhoto(Number(nextKey));
 									}}
-									onAction={(key) => setSelectedPhotoIndex(Number(key))}
+									onAction={(key) => openPhoto(Number(key))}
 									items={photoItems}
 								>
 									{(item) => (

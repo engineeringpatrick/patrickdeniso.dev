@@ -3,9 +3,10 @@ interface Props {
 	currentVersion: 1 | 2 | 3 | 4;
 	appearance?: 'default' | 'legacy' | 'space';
 	showLabel?: boolean;
+	label?: string;
 }
 
-const { currentVersion, appearance = 'default', showLabel = true } = Astro.props;
+const { currentVersion, appearance = 'default', showLabel = true, label = 'Website version' } = Astro.props;
 
 const versions = [
 	{ number: 1, label: 'v1 · 2022', href: '/v/1/' },
@@ -16,8 +17,8 @@ const versions = [
 ---
 
 <label class:list={['version-picker', `version-picker--${appearance}`]}>
-	{showLabel ? <span class="version-picker__label">Website version</span> : null}
-	<select class="version-picker__select" aria-label="Website version">
+	{showLabel ? <span class="version-picker__label">{label}</span> : null}
+	<select class="version-picker__select" aria-label={label}>
 		{versions.map((version) => (
 			<option value={version.href} selected={version.number === currentVersion}>
 				{version.label}
