@@ -135,8 +135,9 @@ const it = {
 			error: "I commenti non sono disponibili al momento.",
 			anonymous: "Anonimo",
 			unknownLocation: "Posizione sconosciuta",
-			upvote: "Voto positivo",
-			downvote: "Voto negativo",
+			upvote: "voto positivo",
+			downvote: "voto negativo",
+			score: "punteggio",
 		},
 	},
 	workExperience: [

@@ -124,8 +124,9 @@ const en = {
 			error: 'Comments are unavailable right now.',
 			anonymous: 'Anonymous',
 			unknownLocation: 'Unknown location',
-			upvote: 'Upvote',
-			downvote: 'Downvote',
+			upvote: 'upvote',
+			downvote: 'downvote',
+			score: 'score',
 		},
 	},
 	workExperience: [

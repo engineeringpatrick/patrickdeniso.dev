@@ -117,6 +117,7 @@ export type V4Copy = {
 		unknownLocation: string;
 		upvote: string;
 		downvote: string;
+		score: string;
 	};
 };
 

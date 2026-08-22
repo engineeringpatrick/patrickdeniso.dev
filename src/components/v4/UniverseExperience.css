@@ -134,6 +134,7 @@
 .comments-votes button[aria-pressed="true"] { color: #551a8b; font-weight: bold; }
 .comments-votes button:focus-visible { outline: 1px dotted #000; outline-offset: 2px; }
 .comments-votes button:disabled { color: #777; cursor: wait; }
+.comments-votes output { color: #000; font: 12px/1.2 Arial, sans-serif; }
 
 .v4-window__sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; clip-path: inset(50%); }
 .v4-window--museum.is-minimized .finder-shell { display: none; }

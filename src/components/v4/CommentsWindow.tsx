@@ -4,7 +4,7 @@ import MacBrowserWindow from './MacBrowserWindow';
 
 type Location = { city: string | null; region: string | null; country: string | null };
 type Vote = -1 | 0 | 1;
-type Comment = { id: number; name: string | null; body: string; createdAt: string; location: Location; device: string; upvotes: number; downvotes: number; viewerVote: Vote };
+type Comment = { id: number; name: string | null; body: string; createdAt: string; location: Location; device: string; score: number; viewerVote: Vote };
 
 type CommentsWindowProps = {
 	language: V4Language;
@@ -13,8 +13,7 @@ type CommentsWindowProps = {
 
 const maxNameLength = 40;
 const maxCommentLength = 500;
-const rankComments = (first: Comment, second: Comment) => second.upvotes - first.upvotes
-	|| first.downvotes - second.downvotes
+const rankComments = (first: Comment, second: Comment) => second.score - first.score
 	|| Date.parse(second.createdAt) - Date.parse(first.createdAt)
 	|| second.id - first.id;
 
@@ -97,15 +96,14 @@ export default function CommentsWindow({ language, onClose }: CommentsWindowProp
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ commentId: comment.id, vote }),
 			});
-			const result = await response.json() as { commentId?: number; upvotes?: number; downvotes?: number; viewerVote?: Vote; error?: string };
-			if (!response.ok || result.commentId !== comment.id || typeof result.upvotes !== 'number' || typeof result.downvotes !== 'number' || (result.viewerVote !== 1 && result.viewerVote !== -1)) {
+			const result = await response.json() as { commentId?: number; score?: number; viewerVote?: Vote; error?: string };
+			if (!response.ok || result.commentId !== comment.id || typeof result.score !== 'number' || (result.viewerVote !== 1 && result.viewerVote !== -1)) {
 				throw new Error(result.error ?? 'VOTE_FAILED');
 			}
-			const { upvotes, downvotes, viewerVote } = result;
+			const { score, viewerVote } = result;
 			setComments((current) => current.map((item) => item.id === comment.id ? {
 				...item,
-				upvotes,
-				downvotes,
+				score,
 				viewerVote,
 			} : item).sort(rankComments));
 		} catch {
@@ -144,8 +142,9 @@ export default function CommentsWindow({ language, onClose }: CommentsWindowProp
 								<footer className="comments-card__footer">
 									<span>{formatLocation(comment.location, regionNames, text.unknownLocation)} · {comment.device}</span>
 									<div className="comments-votes">
-										<button type="button" aria-pressed={comment.viewerVote === 1} disabled={votingCommentId === comment.id} onClick={() => void voteOnComment(comment, 1)}>{text.upvote} ({comment.upvotes})</button>
-										<button type="button" aria-pressed={comment.viewerVote === -1} disabled={votingCommentId === comment.id} onClick={() => void voteOnComment(comment, -1)}>{text.downvote} ({comment.downvotes})</button>
+										<button type="button" aria-pressed={comment.viewerVote === 1} disabled={votingCommentId === comment.id} onClick={() => void voteOnComment(comment, 1)}>{text.upvote}</button>
+										<button type="button" aria-pressed={comment.viewerVote === -1} disabled={votingCommentId === comment.id} onClick={() => void voteOnComment(comment, -1)}>{text.downvote}</button>
+										<output aria-live="polite">{text.score}: {comment.score}</output>
 									</div>
 								</footer>
 							</article>

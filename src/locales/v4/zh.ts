@@ -138,6 +138,7 @@ const zh = {
 			unknownLocation: '未知位置',
 			upvote: '赞',
 			downvote: '踩',
+			score: '得分',
 		},
 	},
 	workExperience: [

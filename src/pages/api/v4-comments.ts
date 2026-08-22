@@ -12,8 +12,7 @@ type CommentRow = {
 	region: string | null;
 	country: string | null;
 	device: string;
-	upvotes: number;
-	downvotes: number;
+	score: number;
 	viewer_vote: number;
 };
 
@@ -28,8 +27,7 @@ type PublicComment = {
 	createdAt: string;
 	location: { city: string | null; region: string | null; country: string | null };
 	device: string;
-	upvotes: number;
-	downvotes: number;
+	score: number;
 	viewerVote: -1 | 0 | 1;
 };
 
@@ -113,8 +111,7 @@ const toPublicComment = (row: CommentRow): PublicComment => ({
 	createdAt: new Date(row.created_at * 1000).toISOString(),
 	location: { city: row.city, region: row.region, country: row.country },
 	device: row.device,
-	upvotes: row.upvotes,
-	downvotes: row.downvotes,
+	score: row.score,
 	viewerVote: row.viewer_vote === 1 ? 1 : row.viewer_vote === -1 ? -1 : 0,
 });
 
@@ -129,21 +126,19 @@ const getStoredComments = async (database: CommentsDatabase, voterHash: string |
 			comments.region,
 			comments.country,
 			comments.device,
-			COALESCE(totals.upvotes, 0) AS upvotes,
-			COALESCE(totals.downvotes, 0) AS downvotes,
+			COALESCE(totals.score, 0) AS score,
 			COALESCE(viewer.vote, 0) AS viewer_vote
 		FROM v4_comments AS comments
 		LEFT JOIN (
 			SELECT
 				comment_id,
-				SUM(CASE WHEN vote = 1 THEN 1 ELSE 0 END) AS upvotes,
-				SUM(CASE WHEN vote = -1 THEN 1 ELSE 0 END) AS downvotes
+				SUM(vote) AS score
 			FROM v4_comment_votes
 			GROUP BY comment_id
 		) AS totals ON totals.comment_id = comments.id
 		LEFT JOIN v4_comment_votes AS viewer
 			ON viewer.comment_id = comments.id AND viewer.voter_hash = ?1
-		ORDER BY upvotes DESC, downvotes ASC, comments.created_at DESC, comments.id DESC
+		ORDER BY score DESC, comments.created_at DESC, comments.id DESC
 		LIMIT 50
 	`).bind(voterHash).all<CommentRow>();
 	return result.results ?? [];
@@ -151,12 +146,11 @@ const getStoredComments = async (database: CommentsDatabase, voterHash: string |
 
 const getVoteCounts = async (database: CommentsDatabase, commentId: number, voterHash: string) => database.prepare(`
 	SELECT
-		COALESCE(SUM(CASE WHEN vote = 1 THEN 1 ELSE 0 END), 0) AS upvotes,
-		COALESCE(SUM(CASE WHEN vote = -1 THEN 1 ELSE 0 END), 0) AS downvotes,
+		COALESCE(SUM(vote), 0) AS score,
 		COALESCE(MAX(CASE WHEN voter_hash = ?1 THEN vote END), 0) AS viewer_vote
 	FROM v4_comment_votes
 	WHERE comment_id = ?2
-`).bind(voterHash, commentId).first<{ upvotes: number; downvotes: number; viewer_vote: number }>();
+`).bind(voterHash, commentId).first<{ score: number; viewer_vote: number }>();
 
 export const GET: APIRoute = async ({ locals, request }) => {
 	const runtime = (locals as CloudflareLocals).runtime;
@@ -192,7 +186,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			INSERT INTO v4_comments (name, body, created_at, city, region, country, device)
 			VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
 			RETURNING id, name, body, created_at, city, region, country, device,
-				0 AS upvotes, 0 AS downvotes, 0 AS viewer_vote
+				0 AS score, 0 AS viewer_vote
 		`).bind(name || null, body, now, context.location.city, context.location.region, context.location.country, context.device).first<CommentRow>();
 		if (!row) return json({ error: 'SAVE_FAILED' }, 500);
 
@@ -228,8 +222,7 @@ export const PUT: APIRoute = async ({ locals, request }) => {
 		if (!counts) return json({ error: 'SAVE_FAILED' }, 500);
 		return json({
 			commentId,
-			upvotes: counts.upvotes ?? 0,
-			downvotes: counts.downvotes ?? 0,
+			score: counts.score ?? 0,
 			viewerVote: counts.viewer_vote === 1 ? 1 : -1,
 		}, 200, { 'Set-Cookie': voter.cookie });
 	} catch (error) {
