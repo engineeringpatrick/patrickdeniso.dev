@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ComponentProps, type CSSProperties }
 import { v4CommentPolicy } from '../../data/v4CommentPolicy';
 import { copy, languageLocales, type V4Language } from '../../locales/v4';
 import MacBrowserWindow from './MacBrowserWindow';
+import { v4Path } from './v4Routes';
 
 type Location = { city: string | null; region: string | null; country: string | null };
 type Vote = -1 | 0 | 1;
@@ -145,7 +146,7 @@ export default function CommentsWindow({ language, onClose }: CommentsWindowProp
 	};
 
 	return (
-		<MacBrowserWindow language={language} onClose={onClose} address="patrickdeniso.com/guestbook.html" title={text.title}>
+		<MacBrowserWindow language={language} onClose={onClose} address={`patrickdeniso.com${v4Path(language, 'comments')}`} title={text.title}>
 			<div className="comments-shell">
 				<div className="comments-page">
 					<header className="comments-heading">

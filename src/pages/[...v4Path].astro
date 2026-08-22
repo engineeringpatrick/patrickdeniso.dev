@@ -9,15 +9,22 @@ export function getStaticPaths() {
 	return supportedLanguages.flatMap(({ code: language }) => {
 		const routes = v4StaticTargets.map((target) => ({ path: v4TargetPath(language, target), language }));
 		if (language !== 'en') routes.unshift({ path: v4Path(language), language });
-		return routes.map(({ path, language }) => ({ params: { v4Path: path.slice(1, -1) }, props: { language } }));
+		const pages = routes.map(({ path, language }) => ({ params: { v4Path: path.slice(1, -1) }, props: { language } }));
+		const oldCommentsPath = language === 'en' ? '/comments/' : `/${language}/comments/`;
+		return [...pages, {
+			params: { v4Path: oldCommentsPath.slice(1, -1) },
+			props: { language, redirectTo: v4Path(language, 'comments') },
+		}];
 	});
 }
 
 interface Props {
 	language: V4Language;
+	redirectTo?: string;
 }
 
-const { language } = Astro.props;
+const { language, redirectTo } = Astro.props;
+if (redirectTo) return Astro.redirect(redirectTo, 301);
 const indexable = Astro.url.pathname === v4Path(language);
 ---
 

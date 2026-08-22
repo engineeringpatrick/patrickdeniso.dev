@@ -11,6 +11,10 @@ export type V4Route = {
 
 export const v4RoomIds = ['work', 'posts', 'photos', 'comments', 'about'] as const satisfies readonly V4RoomId[];
 const roomIds = new Set<V4RoomId>(v4RoomIds);
+const roomFromSegment = (segment: string): V4RoomId | null => {
+	if (segment === 'guestbook') return 'comments';
+	return roomIds.has(segment as V4RoomId) ? segment as V4RoomId : null;
+};
 const safelyDecode = (segment: string) => {
 	try { return decodeURIComponent(segment); } catch { return segment; }
 };
@@ -24,7 +28,7 @@ export const parseV4Path = (pathname: string): V4Route | null => {
 	const roomOffset = isLegacyV4Path ? 3 : hasLanguagePrefix ? 1 : 0;
 	const roomSegment = segments[roomOffset];
 	if (!roomSegment) return segments.length === roomOffset ? { language, room: null, collectionSlug: null, photoId: null } : null;
-	const room = roomSegment && roomIds.has(roomSegment as V4RoomId) ? roomSegment as V4RoomId : null;
+	const room = roomFromSegment(roomSegment);
 	if (!room) return null;
 	if (room !== 'photos') return segments.length === roomOffset + 1 ? { language, room, collectionSlug: null, photoId: null } : null;
 	if (segments.length > roomOffset + 3) return null;
@@ -38,7 +42,7 @@ export const parseV4Path = (pathname: string): V4Route | null => {
 
 export const v4Path = (language: V4Language, room: V4RoomId | null = null, collectionSlug: string | null = null, photoId: string | null = null) => {
 	const segments: string[] = language === 'en' ? [] : [language];
-	if (room) segments.push(room);
+	if (room) segments.push(room === 'comments' ? 'guestbook' : room);
 	if (room === 'photos' && collectionSlug) segments.push(encodeURIComponent(collectionSlug));
 	if (room === 'photos' && collectionSlug && photoId) segments.push(encodeURIComponent(photoId));
 	return segments.length ? `/${segments.join('/')}/` : '/';
