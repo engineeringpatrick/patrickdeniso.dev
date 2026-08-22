@@ -15,7 +15,6 @@ const it = {
 			maximize: "Ingrandisci",
 			websiteLanguage: "Lingua del sito",
 			websiteVersion: "Versione del sito",
-			modelCredit: "Modelli 3D:",
 			contacts: "Contatti",
 			email: "Email",
 			instagram: "Instagram",

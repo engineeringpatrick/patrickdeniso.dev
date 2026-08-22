@@ -80,7 +80,6 @@ const initialHomePath = v4Path(initialLanguageCode);
 				</select>
 			</label>
 		</div>
-		<p class="universe__model-credit"><span data-v4-model-credit>{initialSiteCopy.modelCredit}</span> <a href="https://science.nasa.gov/3d-resources/">NASA / JPL-Caltech, NASA VTAD &amp; DigitalSpace Corporation</a></p>
 		<div class="universe__version">
 			<VersionPicker currentVersion={4} appearance="space" showLabel={false} label={initialSiteCopy.websiteVersion} />
 		</div>
@@ -262,7 +261,6 @@ const initialHomePath = v4Path(initialLanguageCode);
 		});
 		universe?.querySelectorAll<HTMLElement>('[data-v4-language-label]').forEach((label) => label.replaceChildren(text.websiteLanguage));
 		languagePickers.forEach((picker) => picker.setAttribute('aria-label', text.websiteLanguage));
-		universe?.querySelector<HTMLElement>('[data-v4-model-credit]')?.replaceChildren(text.modelCredit);
 		universe?.querySelector<HTMLSelectElement>('.version-picker__select')?.setAttribute('aria-label', text.websiteVersion);
 		wechatCard?.setAttribute('aria-label', text.wechatQrCode);
 		universe?.querySelector<HTMLImageElement>('[data-wechat-image]')?.setAttribute('alt', text.wechatQrCode);
@@ -506,9 +504,6 @@ const initialHomePath = v4Path(initialLanguageCode);
 	.universe__language { display: flex; }
 	.universe__language select { height: var(--v4-utility-height); min-height: var(--v4-utility-height); border: 1px solid var(--v4-utility-border); border-radius: var(--v4-utility-radius); background-color: var(--v4-utility-background); box-shadow: inset 0 1px 0 rgb(255 255 255 / .04); padding: .22rem 1.5rem .22rem .55rem; color: var(--v4-utility-color); cursor: pointer; font: 700 clamp(.58rem, .75vw, .66rem)/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
 	.universe__language select:hover, .universe__language select:focus-visible { border-color: var(--v4-utility-border); background-color: var(--v4-utility-hover); color: #fff; outline: 1px solid rgb(255 255 255 / .42); outline-offset: 1px; }
-	.universe__model-credit { margin: 0; color: rgb(202 204 242 / .48); font: 600 .6rem/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
-	.universe__model-credit a { color: inherit; text-decoration-color: rgb(202 204 242 / .28); text-underline-offset: .16em; }
-	.universe__model-credit a:hover { color: rgb(242 242 255 / .8); }
 	.universe__version { justify-self: end; }
 
 	.universe__sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
@@ -538,7 +533,6 @@ const initialHomePath = v4Path(initialLanguageCode);
 		.universe__scene { min-height: 49rem; }
 		.universe__console { top: 57%; width: min(32rem, 85vw); }
 		.universe__footer { grid-template-columns: minmax(0, 1fr) auto; }
-		.universe__model-credit { grid-column: 1 / -1; grid-row: 2; }
 		.universe__version { grid-column: 2; grid-row: 1; }
 	}
 

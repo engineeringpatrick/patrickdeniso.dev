@@ -15,7 +15,6 @@ const zh = {
 			maximize: '最大化',
 			websiteLanguage: '网站语言',
 			websiteVersion: '网站版本',
-			modelCredit: '3D 模型：',
 			contacts: '联系方式',
 			email: '邮箱',
 			instagram: 'Ins',

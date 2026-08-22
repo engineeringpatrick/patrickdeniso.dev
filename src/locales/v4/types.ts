@@ -21,7 +21,6 @@ export type V4Copy = {
 		maximize: string;
 		websiteLanguage: string;
 		websiteVersion: string;
-		modelCredit: string;
 		contacts: string;
 		email: string;
 		instagram: string;

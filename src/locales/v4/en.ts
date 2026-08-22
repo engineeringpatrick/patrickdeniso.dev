@@ -15,7 +15,6 @@ const en = {
 			maximize: 'Maximize',
 			websiteLanguage: 'Website language',
 			websiteVersion: 'Website version',
-			modelCredit: '3D models:',
 			contacts: 'Contacts',
 			email: 'Email',
 			instagram: 'Instagram',
