@@ -127,6 +127,9 @@ const en = {
 			upvote: 'upvote',
 			downvote: 'downvote',
 			score: 'score',
+			rateLimited: 'Too many comments. Try again in',
+			seconds: 'seconds',
+			voteCooldown: 'Voting reopens in',
 		},
 	},
 	workExperience: [

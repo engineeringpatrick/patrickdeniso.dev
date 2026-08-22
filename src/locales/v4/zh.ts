@@ -139,6 +139,9 @@ const zh = {
 			upvote: '赞',
 			downvote: '踩',
 			score: '得分',
+			rateLimited: '评论太多，请在以下时间后重试：',
+			seconds: '秒',
+			voteCooldown: '可再次投票还需',
 		},
 	},
 	workExperience: [

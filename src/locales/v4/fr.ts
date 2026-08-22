@@ -138,6 +138,9 @@ const fr = {
 			upvote: "vote positif",
 			downvote: "vote négatif",
 			score: "score",
+			rateLimited: "Trop de commentaires. Réessayez dans",
+			seconds: "secondes",
+			voteCooldown: "Le vote sera de nouveau disponible dans",
 		},
 	},
 	workExperience: [

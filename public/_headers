@@ -1,5 +1,14 @@
+/*
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://kit.fontawesome.com; style-src 'self' 'unsafe-inline' https://ka-f.fontawesome.com; font-src 'self' data: https://ka-f.fontawesome.com; img-src 'self' data: blob:; media-src 'self'; connect-src 'self' blob: https://ka-f.fontawesome.com; frame-src https://blog.patrickdeniso.com; worker-src 'self' blob:; upgrade-insecure-requests
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-XSS-Protection: 0
+
 /photos/v4/*
-  X-Robots-Tag: noindex, noimageindex, noarchive
+  X-Robots-Tag: noindex, noimageindex, noarchive, nosnippet
 
 /photos/v4-thumbnails/*
-  X-Robots-Tag: noindex, noimageindex, noarchive
+  X-Robots-Tag: noindex, noimageindex, noarchive, nosnippet

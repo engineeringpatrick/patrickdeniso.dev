@@ -138,6 +138,9 @@ const it = {
 			upvote: "voto positivo",
 			downvote: "voto negativo",
 			score: "punteggio",
+			rateLimited: "Troppi commenti. Riprova tra",
+			seconds: "secondi",
+			voteCooldown: "Si potrà votare di nuovo tra",
 		},
 	},
 	workExperience: [

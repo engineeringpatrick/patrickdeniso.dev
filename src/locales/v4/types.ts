@@ -118,6 +118,9 @@ export type V4Copy = {
 		upvote: string;
 		downvote: string;
 		score: string;
+		rateLimited: string;
+		seconds: string;
+		voteCooldown: string;
 	};
 };
 

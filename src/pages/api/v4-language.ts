@@ -3,16 +3,10 @@ import { languageForRegion } from '../../locales/v4/regions';
 
 export const prerender = false;
 
-type CloudflareLocals = {
-	runtime?: {
-		cf?: { country?: string; regionCode?: string };
-	};
-};
-
-export const GET: APIRoute = ({ locals, request }) => {
-	const cf = (locals as CloudflareLocals).runtime?.cf;
-	const country = request.headers.get('cf-ipcountry') ?? cf?.country ?? '';
-	const regionCode = request.headers.get('cf-region-code') ?? cf?.regionCode ?? '';
+export const GET: APIRoute = ({ request }) => {
+	const cf = (request as Request & { cf?: { country?: string; regionCode?: string } }).cf;
+	const country = cf?.country ?? request.headers.get('cf-ipcountry') ?? '';
+	const regionCode = cf?.regionCode ?? request.headers.get('cf-region-code') ?? '';
 	return Response.json(
 		{ language: languageForRegion(country, regionCode), located: Boolean(country) },
 		{ headers: { 'Cache-Control': 'private, no-store' } },

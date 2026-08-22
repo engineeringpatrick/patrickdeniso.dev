@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
-import type { Runtime } from '@astrojs/cloudflare';
+import { env } from 'cloudflare:workers';
+import { v4CommentPolicy } from '../../data/v4CommentPolicy';
 
 export const prerender = false;
 
@@ -14,11 +15,10 @@ type CommentRow = {
 	device: string;
 	score: number;
 	viewer_vote: number;
+	last_vote_at: number;
 };
 
-type CommentsRuntime = Runtime<Pick<Cloudflare.Env, 'COMMENTS_DB'>>['runtime'];
 type CommentsDatabase = Cloudflare.Env['COMMENTS_DB'];
-type CloudflareLocals = { runtime?: CommentsRuntime };
 
 type PublicComment = {
 	id: number;
@@ -29,18 +29,30 @@ type PublicComment = {
 	device: string;
 	score: number;
 	viewerVote: -1 | 0 | 1;
+	voteAvailableAt: string | null;
 };
 
-const maxCommentLength = 500;
-const maxNameLength = 40;
-const maxRequestBytes = 4096;
+type PostingLimit = { remaining: number; resetAt: string | null };
+type CloudflareRequest = Request & {
+	cf?: { city?: string; region?: string; regionCode?: string; country?: string };
+};
+
 const voterCookieName = 'v4_voter';
 const voterCookieMaxAge = 60 * 60 * 24 * 365;
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const forbiddenControlCharacters = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/;
+const requestTooLarge = Symbol('request-too-large');
 
 const json = (body: unknown, status = 200, headers?: Record<string, string>) => Response.json(body, {
 	status,
-	headers: { 'Cache-Control': 'private, no-store', ...headers },
+	headers: {
+		'Cache-Control': 'private, no-store',
+		'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'",
+		'Referrer-Policy': 'no-referrer',
+		'X-Content-Type-Options': 'nosniff',
+		'X-Robots-Tag': 'noindex, noarchive',
+		...headers,
+	},
 });
 
 const cleanMetadata = (value: unknown) => typeof value === 'string' ? value.trim().slice(0, 80) || null : null;
@@ -75,13 +87,32 @@ const getOrCreateVoter = async (request: Request) => {
 	};
 };
 
+const readBoundedText = async (request: Request) => {
+	if (!request.body) return '';
+	const reader = request.body.getReader();
+	const decoder = new TextDecoder();
+	let bytesRead = 0;
+	let value = '';
+	while (true) {
+		const chunk = await reader.read();
+		if (chunk.done) return value + decoder.decode();
+		bytesRead += chunk.value.byteLength;
+		if (bytesRead > v4CommentPolicy.maxRequestBytes) {
+			await reader.cancel('Request body too large');
+			return null;
+		}
+		value += decoder.decode(chunk.value, { stream: true });
+	}
+};
+
 const readJsonObject = async (request: Request) => {
-	const contentType = request.headers.get('content-type') ?? '';
+	const contentType = request.headers.get('content-type')?.split(';', 1)[0].trim().toLowerCase() ?? '';
 	const contentLength = request.headers.get('content-length');
-	if (!contentType.toLowerCase().startsWith('application/json') || (contentLength && Number(contentLength) > maxRequestBytes)) return null;
+	if (contentType !== 'application/json') return null;
+	if (contentLength && (!/^\d+$/.test(contentLength) || Number(contentLength) > v4CommentPolicy.maxRequestBytes)) return requestTooLarge;
 	try {
-		const rawBody = await request.text();
-		if (new TextEncoder().encode(rawBody).byteLength > maxRequestBytes) return null;
+		const rawBody = await readBoundedText(request);
+		if (rawBody === null) return requestTooLarge;
 		const value: unknown = JSON.parse(rawBody);
 		return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null;
 	} catch {
@@ -89,8 +120,13 @@ const readJsonObject = async (request: Request) => {
 	}
 };
 
-const getRequestContext = (request: Request, locals: CloudflareLocals) => {
-	const cf = locals.runtime?.cf;
+const isSameOriginRequest = (request: Request) => {
+	const origin = request.headers.get('origin');
+	return !origin || origin === new URL(request.url).origin;
+};
+
+const getRequestContext = (request: Request) => {
+	const cf = (request as CloudflareRequest).cf;
 	const city = cleanMetadata(cf?.city);
 	const region = cleanMetadata(cf?.region ?? cf?.regionCode ?? request.headers.get('cf-region-code'));
 	const country = cleanMetadata(cf?.country ?? request.headers.get('cf-ipcountry'));
@@ -113,7 +149,28 @@ const toPublicComment = (row: CommentRow): PublicComment => ({
 	device: row.device,
 	score: row.score,
 	viewerVote: row.viewer_vote === 1 ? 1 : row.viewer_vote === -1 ? -1 : 0,
+	voteAvailableAt: row.last_vote_at > 0 ? new Date((row.last_vote_at + v4CommentPolicy.voteCooldownSeconds) * 1000).toISOString() : null,
 });
+
+const getPostingLimit = async (database: CommentsDatabase, now: number): Promise<PostingLimit> => {
+	const recent = await database.prepare(`
+		SELECT COUNT(*) AS count, MIN(created_at) AS oldest
+		FROM (
+			SELECT created_at
+			FROM v4_comments
+			WHERE created_at > ?1
+			ORDER BY created_at DESC
+			LIMIT ?2
+		)
+	`).bind(now - v4CommentPolicy.commentWindowSeconds, v4CommentPolicy.commentsPerWindow).first<{ count: number; oldest: number | null }>();
+	const count = recent?.count ?? 0;
+	return {
+		remaining: Math.max(0, v4CommentPolicy.commentsPerWindow - count),
+		resetAt: count >= v4CommentPolicy.commentsPerWindow && recent?.oldest
+			? new Date((recent.oldest + v4CommentPolicy.commentWindowSeconds) * 1000).toISOString()
+			: null,
+	};
+};
 
 const getStoredComments = async (database: CommentsDatabase, voterHash: string | null) => {
 	const result = await database.prepare(`
@@ -127,12 +184,14 @@ const getStoredComments = async (database: CommentsDatabase, voterHash: string |
 			comments.country,
 			comments.device,
 			COALESCE(totals.score, 0) AS score,
-			COALESCE(viewer.vote, 0) AS viewer_vote
+			COALESCE(viewer.vote, 0) AS viewer_vote,
+			COALESCE(totals.last_vote_at, 0) AS last_vote_at
 		FROM v4_comments AS comments
 		LEFT JOIN (
 			SELECT
 				comment_id,
-				SUM(vote) AS score
+				SUM(vote) AS score,
+				MAX(updated_at) AS last_vote_at
 			FROM v4_comment_votes
 			GROUP BY comment_id
 		) AS totals ON totals.comment_id = comments.id
@@ -152,56 +211,77 @@ const getVoteCounts = async (database: CommentsDatabase, commentId: number, vote
 	WHERE comment_id = ?2
 `).bind(voterHash, commentId).first<{ score: number; viewer_vote: number }>();
 
-export const GET: APIRoute = async ({ locals, request }) => {
-	const runtime = (locals as CloudflareLocals).runtime;
-	const database = runtime?.env?.COMMENTS_DB;
+export const GET: APIRoute = async ({ request }) => {
+	const database = env.COMMENTS_DB;
 	if (!database) return json({ error: 'UNAVAILABLE' }, 503);
 	try {
+		const now = Math.floor(Date.now() / 1000);
 		const voterHash = await getExistingVoterHash(request);
-		const comments = await getStoredComments(database, voterHash);
-		return json({ comments: comments.map(toPublicComment) });
+		const [comments, posting] = await Promise.all([getStoredComments(database, voterHash), getPostingLimit(database, now)]);
+		return json({ comments: comments.map(toPublicComment), posting });
 	} catch (error) {
 		logDatabaseError('read', error);
 		return json({ error: 'UNAVAILABLE' }, 503);
 	}
 };
 
-export const POST: APIRoute = async ({ locals, request }) => {
-	const runtime = (locals as CloudflareLocals).runtime;
-	const database = runtime?.env?.COMMENTS_DB;
+export const POST: APIRoute = async ({ request }) => {
+	const database = env.COMMENTS_DB;
 	if (!database) return json({ error: 'UNAVAILABLE' }, 503);
+	if (!isSameOriginRequest(request)) return json({ error: 'FORBIDDEN' }, 403);
 	const payload = await readJsonObject(request);
+	if (payload === requestTooLarge) return json({ error: 'REQUEST_TOO_LARGE' }, 413);
 	if (!payload) return json({ error: 'INVALID_REQUEST' }, 400);
 
 	if (typeof payload.website === 'string' && payload.website.trim()) return json({ ok: true }, 201);
 	const name = typeof payload.name === 'string' ? payload.name.trim().replace(/\s+/g, ' ') : '';
-	const body = typeof payload.body === 'string' ? payload.body.trim() : '';
-	if (name.length > maxNameLength) return json({ error: 'INVALID_NAME' }, 400);
-	if (!body || body.length > maxCommentLength) return json({ error: 'INVALID_COMMENT' }, 400);
+	const body = typeof payload.body === 'string' ? payload.body.replace(/\r\n?/g, '\n').trim() : '';
+	if (name.length > v4CommentPolicy.maxNameLength || forbiddenControlCharacters.test(name)) return json({ error: 'INVALID_NAME' }, 400);
+	if (!body || body.length > v4CommentPolicy.maxCommentLength || forbiddenControlCharacters.test(body)) return json({ error: 'INVALID_COMMENT' }, 400);
 
 	try {
 		const now = Math.floor(Date.now() / 1000);
-		const context = getRequestContext(request, { runtime });
+		const context = getRequestContext(request);
 		const row = await database.prepare(`
 			INSERT INTO v4_comments (name, body, created_at, city, region, country, device)
-			VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
+			SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7
+			WHERE (
+				SELECT COUNT(*)
+				FROM v4_comments
+				WHERE created_at > ?8
+			) < ?9
 			RETURNING id, name, body, created_at, city, region, country, device,
-				0 AS score, 0 AS viewer_vote
-		`).bind(name || null, body, now, context.location.city, context.location.region, context.location.country, context.device).first<CommentRow>();
-		if (!row) return json({ error: 'SAVE_FAILED' }, 500);
+				0 AS score, 0 AS viewer_vote, 0 AS last_vote_at
+		`).bind(
+			name || null,
+			body,
+			now,
+			context.location.city,
+			context.location.region,
+			context.location.country,
+			context.device,
+			now - v4CommentPolicy.commentWindowSeconds,
+			v4CommentPolicy.commentsPerWindow,
+		).first<CommentRow>();
+		const posting = await getPostingLimit(database, now);
+		if (!row) {
+			const retryAfter = posting.resetAt ? Math.max(1, Math.ceil((Date.parse(posting.resetAt) - Date.now()) / 1000)) : v4CommentPolicy.commentWindowSeconds;
+			return json({ error: 'RATE_LIMITED', posting }, 429, { 'Retry-After': String(retryAfter) });
+		}
 
-		return json({ comment: toPublicComment(row) }, 201);
+		return json({ comment: toPublicComment(row), posting }, 201);
 	} catch (error) {
 		logDatabaseError('write', error);
 		return json({ error: 'UNAVAILABLE' }, 503);
 	}
 };
 
-export const PUT: APIRoute = async ({ locals, request }) => {
-	const runtime = (locals as CloudflareLocals).runtime;
-	const database = runtime?.env?.COMMENTS_DB;
+export const PUT: APIRoute = async ({ request }) => {
+	const database = env.COMMENTS_DB;
 	if (!database) return json({ error: 'UNAVAILABLE' }, 503);
+	if (!isSameOriginRequest(request)) return json({ error: 'FORBIDDEN' }, 403);
 	const payload = await readJsonObject(request);
+	if (payload === requestTooLarge) return json({ error: 'REQUEST_TOO_LARGE' }, 413);
 	if (!payload) return json({ error: 'INVALID_REQUEST' }, 400);
 	const commentId = payload.commentId;
 	const vote = payload.vote;
@@ -211,19 +291,40 @@ export const PUT: APIRoute = async ({ locals, request }) => {
 		const comment = await database.prepare('SELECT id FROM v4_comments WHERE id = ?1').bind(commentId).first<{ id: number }>();
 		if (!comment) return json({ error: 'NOT_FOUND' }, 404);
 		const voter = await getOrCreateVoter(request);
-		await database.prepare(`
+		const now = Math.floor(Date.now() / 1000);
+		const savedVote = await database.prepare(`
 			INSERT INTO v4_comment_votes (comment_id, voter_hash, vote, updated_at)
-			VALUES (?1, ?2, ?3, ?4)
+			SELECT ?1, ?2, ?3, ?4
+			WHERE COALESCE((
+				SELECT MAX(updated_at)
+				FROM v4_comment_votes
+				WHERE comment_id = ?1
+			), 0) <= ?5
 			ON CONFLICT (comment_id, voter_hash) DO UPDATE SET
 				vote = excluded.vote,
 				updated_at = excluded.updated_at
-		`).bind(commentId, voter.hash, vote, Math.floor(Date.now() / 1000)).run();
+			WHERE COALESCE((
+				SELECT MAX(updated_at)
+				FROM v4_comment_votes
+				WHERE comment_id = ?1
+			), 0) <= ?5
+			RETURNING comment_id
+		`).bind(commentId, voter.hash, vote, now, now - v4CommentPolicy.voteCooldownSeconds).first<{ comment_id: number }>();
+		if (!savedVote) {
+			const latestVote = await database.prepare('SELECT MAX(updated_at) AS updated_at FROM v4_comment_votes WHERE comment_id = ?1')
+				.bind(commentId)
+				.first<{ updated_at: number | null }>();
+			const voteAvailableAt = new Date(((latestVote?.updated_at ?? now) + v4CommentPolicy.voteCooldownSeconds) * 1000).toISOString();
+			const retryAfter = Math.max(1, Math.ceil((Date.parse(voteAvailableAt) - Date.now()) / 1000));
+			return json({ error: 'RATE_LIMITED', commentId, voteAvailableAt }, 429, { 'Retry-After': String(retryAfter), 'Set-Cookie': voter.cookie });
+		}
 		const counts = await getVoteCounts(database, commentId, voter.hash);
 		if (!counts) return json({ error: 'SAVE_FAILED' }, 500);
 		return json({
 			commentId,
 			score: counts.score ?? 0,
 			viewerVote: counts.viewer_vote === 1 ? 1 : -1,
+			voteAvailableAt: new Date((now + v4CommentPolicy.voteCooldownSeconds) * 1000).toISOString(),
 		}, 200, { 'Set-Cookie': voter.cookie });
 	} catch (error) {
 		logDatabaseError('vote', error);

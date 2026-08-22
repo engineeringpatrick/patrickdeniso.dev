@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /photos/v4/
+Disallow: /photos/v4-thumbnails/
 
 Sitemap: https://patrickdeniso.dev/sitemap.xml

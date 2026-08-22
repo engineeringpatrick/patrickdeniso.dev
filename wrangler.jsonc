@@ -1,6 +1,6 @@
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
-	"main": "dist/_worker.js/index.js",
+	"main": "@astrojs/cloudflare/entrypoints/server",
 	"name": "dev-patrickdeniso-dev2-0",
 	"workers_dev": false,
 	"routes": [
@@ -9,7 +9,7 @@
 			"zone_name": "patrickdeniso.com"
 		}
 	],
-	"compatibility_date": "2025-12-03",
+	"compatibility_date": "2026-08-21",
 	"compatibility_flags": [
 		"nodejs_compat",
 		"global_fetch_strictly_public"
