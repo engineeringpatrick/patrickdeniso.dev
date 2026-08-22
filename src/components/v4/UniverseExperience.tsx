@@ -77,7 +77,7 @@ export default function UniverseExperience() {
 					<div
 						className="universe-experience__panel"
 						onClick={(event) => {
-							if (event.target === event.currentTarget) closeWindow();
+							if (!(event.target instanceof Element) || !event.target.closest('.v4-window')) closeWindow();
 						}}
 					>
 						<div className="universe-experience__window">
