@@ -127,7 +127,24 @@ const positionHtmlAtObject = (
 	element.style.visibility = 'visible';
 };
 
-const getLayout = (width: number): SceneLayout => {
+const getLayout = (width: number, height: number): SceneLayout => {
+	const aspect = width / height;
+	if (width >= 600 && aspect < 1) {
+		return {
+			compact: false,
+			showSun: false,
+			planetSize: Math.min(1.8, aspect * 2.3),
+			astronautSize: Math.min(1.4, aspect * 1.8),
+			astronautPosition: [-2.7 * aspect, -3, 2.05],
+			astronautDriftAmplitude: 0.12,
+			positions: {
+				work: [-2.7 * aspect, 2.3, 1.1],
+				posts: [2.7 * aspect, 2.3, 0.45],
+				photos: [2.7 * aspect, -3, 1.3],
+				comments: [0, 3.8, 0.25],
+			},
+		};
+	}
 	if (width < 600) {
 		return {
 			compact: true,
@@ -352,12 +369,13 @@ type PlanetProps = {
 	hintElement: HtmlElementRef | null;
 };
 
-function Planet({ planet, position, size, hovered, reducedMotion, onHover, onSelect, hintElement }: PlanetProps) {
+function Planet({ planet, position, size, hovered, reducedMotion, onHover, onSelect, hintElement, labelElement }: PlanetProps & { labelElement?: HtmlElementRef }) {
 	const group = useRef<THREE.Group>(null);
 	const body = useRef<THREE.Group>(null);
 	const projectedPosition = useMemo(() => new THREE.Vector3(), []);
 	const floatOffset = planetFloatOffsets[planet.id];
 	const renderedSize = size * planet.sizeScale;
+	useEffect(() => () => labelElement?.current?.removeAttribute('style'), [labelElement]);
 
 	useFrame(({ camera, clock, size: viewport }, delta) => {
 		if (!group.current || !body.current) return;
@@ -374,6 +392,7 @@ function Planet({ planet, position, size, hovered, reducedMotion, onHover, onSel
 		}
 
 		if (hintElement?.current) positionHtmlAtObject(hintElement.current, group.current, camera, viewport, projectedPosition);
+		if (labelElement?.current) positionHtmlAtObject(labelElement.current, group.current, camera, viewport, projectedPosition, renderedSize * 0.65 + 0.15);
 	});
 
 	const handleOver = (event: ThreeEvent<PointerEvent>) => {
@@ -480,6 +499,7 @@ function UniverseContents({
 	onSelect,
 	onAstronautSelect,
 	astronautLabelElement,
+	planetLabelElements,
 	clickHintTarget,
 	clickHintElement,
 }: {
@@ -490,11 +510,13 @@ function UniverseContents({
 	onSelect: (id: PlanetId) => void;
 	onAstronautSelect: () => void;
 	astronautLabelElement: HtmlElementRef;
+	planetLabelElements: Record<PlanetId, HtmlElementRef>;
 	clickHintTarget: SceneTargetId;
 	clickHintElement: HtmlElementRef;
 }) {
 	const width = useThree((state) => state.size.width);
-	const layout = useMemo(() => getLayout(width), [width]);
+	const height = useThree((state) => state.size.height);
+	const layout = useMemo(() => getLayout(width, height), [width, height]);
 	return (
 		<>
 			<color attach="background" args={['#050617']} />
@@ -513,6 +535,7 @@ function UniverseContents({
 				<Planet
 					key={id}
 					planet={planets[id]}
+					labelElement={width >= 600 && width < height ? planetLabelElements[id] : undefined}
 					position={layout.positions[id]}
 					size={layout.planetSize}
 					hovered={hovered === id}
@@ -534,6 +557,7 @@ export default function UniverseScene({ onPlanetSelect, onAstronautSelect, roomO
 	const compact = useMediaQuery('(max-width: 599px)');
 	const coarsePointer = useMediaQuery('(hover: none), (pointer: coarse)');
 	const astronautLabelElement = useRef<HTMLDivElement>(null);
+	const planetLabelElements = useMemo<Record<PlanetId, HtmlElementRef>>(() => ({ work: { current: null }, posts: { current: null }, photos: { current: null }, comments: { current: null } }), []);
 	const clickHintElement = useRef<HTMLDivElement>(null);
 	const roomWasOpen = useRef(roomOpen);
 	const camera = useMemo(() => ({ position: [0, 0.2, compact ? 14.8 : 13.5] as [number, number, number], fov: 42, near: 0.1, far: 100 }), [compact]);
@@ -581,12 +605,13 @@ export default function UniverseScene({ onPlanetSelect, onAstronautSelect, roomO
 					onSelect={onPlanetSelect}
 					onAstronautSelect={onAstronautSelect}
 					astronautLabelElement={astronautLabelElement}
+					planetLabelElements={planetLabelElements}
 					clickHintTarget={clickHintTarget}
 					clickHintElement={clickHintElement}
 				/>
 			</Canvas>
 			<div className="universe-scene__labels" aria-hidden="true">
-				{visibleLabels.map((id) => <div className={`universe-planet-label universe-planet-label--${id}`} key={id}><strong>{labels[id]}</strong></div>)}
+				{visibleLabels.map((id) => <div ref={planetLabelElements[id]} className={`universe-planet-label universe-planet-label--${id}`} key={id}><strong>{labels[id]}</strong></div>)}
 				{showAstronautLabel ? <div ref={astronautLabelElement} className="universe-planet-label universe-planet-label--about"><strong>{labels.about}</strong></div> : null}
 			</div>
 			<div className="universe-scene__click-hints" aria-hidden="true">
