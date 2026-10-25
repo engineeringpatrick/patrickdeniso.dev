@@ -7,13 +7,23 @@ export const photoCollections: PhotoCollection[] = [
 		"title": "California",
 		"photos": [
 			{
-				"id": "IMG_0558.jpg",
-				"src": "/photos/v4/california/IMG_0558.jpg",
-				"thumbnail": "/photos/v4-thumbnails/california/IMG_0558.jpg.webp",
+				"id": "crab.jpg",
+				"src": "/photos/v4/california/crab.jpg",
+				"thumbnail": "/photos/v4-thumbnails/california/crab.jpg.webp",
 				"metadata": {
 					"width": 1170,
 					"height": 1560,
-					"bytes": 421308
+					"bytes": 222938
+				}
+			},
+			{
+				"id": "image.webp",
+				"src": "/photos/v4/california/image.webp",
+				"thumbnail": "/photos/v4-thumbnails/california/image.webp.webp",
+				"metadata": {
+					"width": 1200,
+					"height": 1600,
+					"bytes": 154816
 				}
 			},
 			{
@@ -29,13 +39,13 @@ export const photoCollections: PhotoCollection[] = [
 		]
 	},
 	{
-		"slug": "china-1",
-		"title": "China 1",
+		"slug": "china",
+		"title": "China",
 		"photos": [
 			{
 				"id": "3.webp",
-				"src": "/photos/v4/china-1/3.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-1/3.webp.webp",
+				"src": "/photos/v4/china/3.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/3.webp.webp",
 				"metadata": {
 					"width": 1600,
 					"height": 1200,
@@ -44,8 +54,8 @@ export const photoCollections: PhotoCollection[] = [
 			},
 			{
 				"id": "4.webp",
-				"src": "/photos/v4/china-1/4.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-1/4.webp.webp",
+				"src": "/photos/v4/china/4.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/4.webp.webp",
 				"metadata": {
 					"width": 1600,
 					"height": 1200,
@@ -54,8 +64,8 @@ export const photoCollections: PhotoCollection[] = [
 			},
 			{
 				"id": "40.webp",
-				"src": "/photos/v4/china-1/40.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-1/40.webp.webp",
+				"src": "/photos/v4/china/40.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/40.webp.webp",
 				"metadata": {
 					"width": 1600,
 					"height": 1011,
@@ -63,85 +73,9 @@ export const photoCollections: PhotoCollection[] = [
 				}
 			},
 			{
-				"id": "IMG_2105.webp",
-				"src": "/photos/v4/china-1/IMG_2105.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-1/IMG_2105.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 68168
-				}
-			},
-			{
-				"id": "IMG_3378.webp",
-				"src": "/photos/v4/china-1/IMG_3378.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-1/IMG_3378.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 239970
-				}
-			},
-			{
-				"id": "IMG_5371.webp",
-				"src": "/photos/v4/china-1/IMG_5371.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-1/IMG_5371.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 244530
-				}
-			},
-			{
-				"id": "IMG_5478.webp",
-				"src": "/photos/v4/china-1/IMG_5478.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-1/IMG_5478.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 217238
-				}
-			},
-			{
-				"id": "IMG_5558.webp",
-				"src": "/photos/v4/china-1/IMG_5558.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-1/IMG_5558.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 144980
-				}
-			},
-			{
-				"id": "IMG_6252.webp",
-				"src": "/photos/v4/china-1/IMG_6252.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-1/IMG_6252.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 248614
-				}
-			},
-			{
-				"id": "IMG_6725.webp",
-				"src": "/photos/v4/china-1/IMG_6725.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-1/IMG_6725.webp.webp",
-				"metadata": {
-					"width": 1200,
-					"height": 1600,
-					"bytes": 78286
-				}
-			}
-		]
-	},
-	{
-		"slug": "china-2",
-		"title": "China 2",
-		"photos": [
-			{
 				"id": "50b0b97a17c04397dcdecfbf60054123_livephoto.webp",
-				"src": "/photos/v4/china-2/50b0b97a17c04397dcdecfbf60054123_livephoto.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-2/50b0b97a17c04397dcdecfbf60054123_livephoto.webp.webp",
+				"src": "/photos/v4/china/50b0b97a17c04397dcdecfbf60054123_livephoto.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/50b0b97a17c04397dcdecfbf60054123_livephoto.webp.webp",
 				"metadata": {
 					"width": 1200,
 					"height": 1600,
@@ -150,8 +84,8 @@ export const photoCollections: PhotoCollection[] = [
 			},
 			{
 				"id": "74.webp",
-				"src": "/photos/v4/china-2/74.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-2/74.webp.webp",
+				"src": "/photos/v4/china/74.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/74.webp.webp",
 				"metadata": {
 					"width": 960,
 					"height": 1280,
@@ -160,8 +94,8 @@ export const photoCollections: PhotoCollection[] = [
 			},
 			{
 				"id": "215.webp",
-				"src": "/photos/v4/china-2/215.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-2/215.webp.webp",
+				"src": "/photos/v4/china/215.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/215.webp.webp",
 				"metadata": {
 					"width": 1600,
 					"height": 1200,
@@ -170,8 +104,8 @@ export const photoCollections: PhotoCollection[] = [
 			},
 			{
 				"id": "10512d5f8d9bcc279087b10f101d092b.webp",
-				"src": "/photos/v4/china-2/10512d5f8d9bcc279087b10f101d092b.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-2/10512d5f8d9bcc279087b10f101d092b.webp.webp",
+				"src": "/photos/v4/china/10512d5f8d9bcc279087b10f101d092b.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/10512d5f8d9bcc279087b10f101d092b.webp.webp",
 				"metadata": {
 					"width": 1600,
 					"height": 1067,
@@ -180,8 +114,8 @@ export const photoCollections: PhotoCollection[] = [
 			},
 			{
 				"id": "d3cd2bd94a55a282ff5003dc4278bc58.webp",
-				"src": "/photos/v4/china-2/d3cd2bd94a55a282ff5003dc4278bc58.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-2/d3cd2bd94a55a282ff5003dc4278bc58.webp.webp",
+				"src": "/photos/v4/china/d3cd2bd94a55a282ff5003dc4278bc58.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/d3cd2bd94a55a282ff5003dc4278bc58.webp.webp",
 				"metadata": {
 					"width": 1600,
 					"height": 1200,
@@ -190,8 +124,8 @@ export const photoCollections: PhotoCollection[] = [
 			},
 			{
 				"id": "FullSizeRender.webp",
-				"src": "/photos/v4/china-2/FullSizeRender.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-2/FullSizeRender.webp.webp",
+				"src": "/photos/v4/china/FullSizeRender.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/FullSizeRender.webp.webp",
 				"metadata": {
 					"width": 1200,
 					"height": 1600,
@@ -200,8 +134,8 @@ export const photoCollections: PhotoCollection[] = [
 			},
 			{
 				"id": "IMG_1345.webp",
-				"src": "/photos/v4/china-2/IMG_1345.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-2/IMG_1345.webp.webp",
+				"src": "/photos/v4/china/IMG_1345.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_1345.webp.webp",
 				"metadata": {
 					"width": 1600,
 					"height": 1200,
@@ -210,8 +144,8 @@ export const photoCollections: PhotoCollection[] = [
 			},
 			{
 				"id": "IMG_1604.webp",
-				"src": "/photos/v4/china-2/IMG_1604.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-2/IMG_1604.webp.webp",
+				"src": "/photos/v4/china/IMG_1604.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_1604.webp.webp",
 				"metadata": {
 					"width": 1200,
 					"height": 1600,
@@ -219,29 +153,49 @@ export const photoCollections: PhotoCollection[] = [
 				}
 			},
 			{
-				"id": "IMG_8047.webp",
-				"src": "/photos/v4/china-2/IMG_8047.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-2/IMG_8047.webp.webp",
+				"id": "IMG_2105.webp",
+				"src": "/photos/v4/china/IMG_2105.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_2105.webp.webp",
 				"metadata": {
 					"width": 1600,
 					"height": 1200,
-					"bytes": 201590
+					"bytes": 68168
 				}
 			},
 			{
-				"id": "IMG_8090.webp",
-				"src": "/photos/v4/china-2/IMG_8090.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-2/IMG_8090.webp.webp",
+				"id": "IMG_5558.webp",
+				"src": "/photos/v4/china/IMG_5558.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_5558.webp.webp",
 				"metadata": {
 					"width": 1600,
 					"height": 1200,
-					"bytes": 232232
+					"bytes": 144980
+				}
+			},
+			{
+				"id": "IMG_6252.webp",
+				"src": "/photos/v4/china/IMG_6252.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_6252.webp.webp",
+				"metadata": {
+					"width": 1600,
+					"height": 1200,
+					"bytes": 248614
+				}
+			},
+			{
+				"id": "IMG_6725.webp",
+				"src": "/photos/v4/china/IMG_6725.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_6725.webp.webp",
+				"metadata": {
+					"width": 1200,
+					"height": 1600,
+					"bytes": 78286
 				}
 			},
 			{
 				"id": "IMG_8439.webp",
-				"src": "/photos/v4/china-2/IMG_8439.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-2/IMG_8439.webp.webp",
+				"src": "/photos/v4/china/IMG_8439.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_8439.webp.webp",
 				"metadata": {
 					"width": 1600,
 					"height": 1200,
@@ -250,8 +204,8 @@ export const photoCollections: PhotoCollection[] = [
 			},
 			{
 				"id": "IMG_8541.webp",
-				"src": "/photos/v4/china-2/IMG_8541.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-2/IMG_8541.webp.webp",
+				"src": "/photos/v4/china/IMG_8541.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_8541.webp.webp",
 				"metadata": {
 					"width": 1600,
 					"height": 1200,
@@ -260,8 +214,8 @@ export const photoCollections: PhotoCollection[] = [
 			},
 			{
 				"id": "IMG_8756.webp",
-				"src": "/photos/v4/china-2/IMG_8756.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-2/IMG_8756.webp.webp",
+				"src": "/photos/v4/china/IMG_8756.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_8756.webp.webp",
 				"metadata": {
 					"width": 1200,
 					"height": 1600,
@@ -270,38 +224,12 @@ export const photoCollections: PhotoCollection[] = [
 			},
 			{
 				"id": "IMG_9987.webp",
-				"src": "/photos/v4/china-2/IMG_9987.webp",
-				"thumbnail": "/photos/v4-thumbnails/china-2/IMG_9987.webp.webp",
+				"src": "/photos/v4/china/IMG_9987.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_9987.webp.webp",
 				"metadata": {
 					"width": 1200,
 					"height": 1600,
 					"bytes": 250050
-				}
-			}
-		]
-	},
-	{
-		"slug": "datacurve",
-		"title": "Datacurve",
-		"photos": [
-			{
-				"id": "image.webp",
-				"src": "/photos/v4/datacurve/image.webp",
-				"thumbnail": "/photos/v4-thumbnails/datacurve/image.webp.webp",
-				"metadata": {
-					"width": 1200,
-					"height": 1600,
-					"bytes": 154816
-				}
-			},
-			{
-				"id": "IMG_1751.webp",
-				"src": "/photos/v4/datacurve/IMG_1751.webp",
-				"thumbnail": "/photos/v4-thumbnails/datacurve/IMG_1751.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 900,
-					"bytes": 149738
 				}
 			}
 		]
@@ -496,39 +424,13 @@ export const photoCollections: PhotoCollection[] = [
 		]
 	},
 	{
-		"slug": "notion",
-		"title": "Notion",
-		"photos": [
-			{
-				"id": "crab.jpg",
-				"src": "/photos/v4/notion/crab.jpg",
-				"thumbnail": "/photos/v4-thumbnails/notion/crab.jpg.webp",
-				"metadata": {
-					"width": 1170,
-					"height": 1560,
-					"bytes": 222938
-				}
-			},
-			{
-				"id": "fishing.jpg",
-				"src": "/photos/v4/notion/fishing.jpg",
-				"thumbnail": "/photos/v4-thumbnails/notion/fishing.jpg.webp",
-				"metadata": {
-					"width": 1170,
-					"height": 1560,
-					"bytes": 210251
-				}
-			}
-		]
-	},
-	{
-		"slug": "other-travels",
-		"title": "Other Travels",
+		"slug": "usa-misc",
+		"title": "Usa Misc",
 		"photos": [
 			{
 				"id": "rocky.webp",
-				"src": "/photos/v4/other-travels/rocky.webp",
-				"thumbnail": "/photos/v4-thumbnails/other-travels/rocky.webp.webp",
+				"src": "/photos/v4/usa-misc/rocky.webp",
+				"thumbnail": "/photos/v4-thumbnails/usa-misc/rocky.webp.webp",
 				"metadata": {
 					"width": 1200,
 					"height": 1600,
