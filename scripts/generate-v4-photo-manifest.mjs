@@ -2,6 +2,7 @@ import { mkdir, readFile, readdir, rename, rm, stat, writeFile } from 'node:fs/p
 import { basename, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
+import { readCaptureDate } from './v4-capture-date.mjs';
 
 const projectRoot = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const photosDirectory = join(projectRoot, 'public', 'photos', 'v4');
@@ -43,12 +44,14 @@ const createThumbnail = async (folder, filename) => {
 	}
 
 	const sourceMetadata = await sharp(sourcePath).metadata();
+	const capturedAt = readCaptureDate(sourceMetadata.exif);
 	return {
 		thumbnail: thumbnailPublicPath(folder, thumbnailName),
 		metadata: {
 			width: sourceMetadata.width ?? 0,
 			height: sourceMetadata.height ?? 0,
 			bytes: sourceInfo.size,
+			...(capturedAt ? { date: capturedAt } : {}),
 		},
 	};
 };
@@ -75,7 +78,6 @@ const collections = await Promise.all(
 			const photos = files
 				.filter((entry) => entry.isFile() && imageExtensions.has(extname(entry.name).toLowerCase()))
 				.map((entry) => entry.name)
-				.sort(filenameOrder.compare)
 				.map(async (filename) => {
 					const captionPath = join(photosDirectory, folder.name, `${basename(filename, extname(filename))}.txt`);
 					const [caption, thumbnail, customMetadata] = await Promise.all([
@@ -92,11 +94,30 @@ const collections = await Promise.all(
 					};
 				});
 
-			return { slug: folder.name, title: displayName(folder.name), photos: await Promise.all(photos) };
+			const resolvedPhotos = await Promise.all(photos);
+			resolvedPhotos.sort((left, right) => {
+				if (left.metadata.date !== right.metadata.date) {
+					if (!left.metadata.date) return 1;
+					if (!right.metadata.date) return -1;
+					return left.metadata.date < right.metadata.date ? -1 : 1;
+				}
+				return filenameOrder.compare(left.id, right.id);
+			});
+			return { slug: folder.name, title: displayName(folder.name), photos: resolvedPhotos };
 		}),
 );
 
-collections.sort((left, right) => filenameOrder.compare(left.slug, right.slug));
+const earliestCapture = (collection) => collection.photos.find((photo) => photo.metadata.date)?.metadata.date ?? '';
+collections.sort((left, right) => {
+	const leftDate = earliestCapture(left);
+	const rightDate = earliestCapture(right);
+	if (leftDate !== rightDate) {
+		if (!leftDate) return 1;
+		if (!rightDate) return -1;
+		return leftDate < rightDate ? -1 : 1;
+	}
+	return filenameOrder.compare(left.slug, right.slug);
+});
 
 // Drop thumbnails for photos and folders that are no longer in public/photos/v4.
 const pruneThumbnails = async (directory) => {

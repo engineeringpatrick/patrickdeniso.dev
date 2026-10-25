@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, readdir, readFile, rename, stat, unlink, writeFile } from 'node:fs/promises';
 import { extname, join, relative } from 'node:path';
 import sharp from 'sharp';
+import { exifDateTime, readCaptureDate } from './v4-capture-date.mjs';
 
 const photosDirectory = join(process.cwd(), 'public', 'photos', 'v4');
 const statePath = join(process.cwd(), 'src', 'data', 'v4-photo-optimization.json');
@@ -22,10 +23,12 @@ const optimize = async (sourcePath) => {
 	if (state[key] === sourceDigest) return 0;
 
 	const before = await stat(sourcePath);
+	const capturedAt = readCaptureDate((await sharp(sourcePath).metadata()).exif);
 	const temporaryPath = `${sourcePath}.${process.pid}.optimized`;
 	const image = sharp(sourcePath)
 		.rotate()
 		.resize(1600, 1600, { fit: 'inside', withoutEnlargement: true });
+	if (capturedAt) image.withMetadata({ exif: { IFD0: { DateTime: exifDateTime(capturedAt) } } });
 
 	if (extension === '.png') {
 		await image.png({ palette: true, quality: 90, effort: 8, dither: 0.6 }).toFile(temporaryPath);

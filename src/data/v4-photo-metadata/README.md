@@ -20,4 +20,4 @@ Supported fields are `date`, `location`, and `camera`:
 
 Dimensions and file size are generated automatically from the sanitized public image. Missing optional values show the localized “not set” label. Keep precise GPS coordinates out of these files unless you intentionally want to publish them.
 
-When adding new photos, run `npm run optimize:photos` before building. It keeps the existing filename, strips metadata again, caps the long edge at 1600px, and only replaces a file when the result is smaller. A SHA-256 state file prevents repeatedly recompressing unchanged images.
+When adding new photos, run `npm run optimize:photos` before building. It keeps the existing filename and the capture date, strips location and other metadata, and caps the long edge at 1600px. It only replaces a file when the result is smaller. A SHA-256 state file prevents repeatedly recompressing unchanged images. Photos in a collection are ordered by that capture date.

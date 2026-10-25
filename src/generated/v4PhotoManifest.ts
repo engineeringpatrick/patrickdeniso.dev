@@ -3,37 +3,186 @@ import type { PhotoCollection } from '../components/v4/v4Content';
 
 export const photoCollections: PhotoCollection[] = [
 	{
-		"slug": "california",
-		"title": "California",
+		"slug": "montreal",
+		"title": "Montreal",
 		"photos": [
 			{
-				"id": "crab.jpg",
-				"src": "/photos/v4/california/crab.jpg",
-				"thumbnail": "/photos/v4-thumbnails/california/crab.jpg.webp",
-				"metadata": {
-					"width": 1170,
-					"height": 1560,
-					"bytes": 222938
-				}
-			},
-			{
-				"id": "image.webp",
-				"src": "/photos/v4/california/image.webp",
-				"thumbnail": "/photos/v4-thumbnails/california/image.webp.webp",
-				"metadata": {
-					"width": 1200,
-					"height": 1600,
-					"bytes": 154816
-				}
-			},
-			{
-				"id": "IMG_0578.webp",
-				"src": "/photos/v4/california/IMG_0578.webp",
-				"thumbnail": "/photos/v4-thumbnails/california/IMG_0578.webp.webp",
+				"id": "IMG_1614.webp",
+				"src": "/photos/v4/montreal/IMG_1614.webp",
+				"thumbnail": "/photos/v4-thumbnails/montreal/IMG_1614.webp.webp",
 				"metadata": {
 					"width": 1600,
 					"height": 1200,
-					"bytes": 189870
+					"bytes": 190744,
+					"date": "2026-01-08T19:05:28"
+				}
+			},
+			{
+				"id": "IMG_8631.webp",
+				"src": "/photos/v4/montreal/IMG_8631.webp",
+				"thumbnail": "/photos/v4-thumbnails/montreal/IMG_8631.webp.webp",
+				"metadata": {
+					"width": 1200,
+					"height": 1600,
+					"bytes": 70322,
+					"date": "2026-01-12T19:57:57"
+				}
+			},
+			{
+				"id": "IMG_1747.webp",
+				"src": "/photos/v4/montreal/IMG_1747.webp",
+				"thumbnail": "/photos/v4-thumbnails/montreal/IMG_1747.webp.webp",
+				"metadata": {
+					"width": 1600,
+					"height": 1200,
+					"bytes": 130162,
+					"date": "2026-01-15T13:28:35"
+				}
+			},
+			{
+				"id": "678908887_N.webp",
+				"src": "/photos/v4/montreal/678908887_N.webp",
+				"thumbnail": "/photos/v4-thumbnails/montreal/678908887_N.webp.webp",
+				"metadata": {
+					"width": 1067,
+					"height": 1600,
+					"bytes": 56654
+				}
+			},
+			{
+				"id": "678908887_O.webp",
+				"src": "/photos/v4/montreal/678908887_O.webp",
+				"thumbnail": "/photos/v4-thumbnails/montreal/678908887_O.webp.webp",
+				"metadata": {
+					"width": 1067,
+					"height": 1600,
+					"bytes": 60408
+				}
+			}
+		]
+	},
+	{
+		"slug": "japan",
+		"title": "Japan",
+		"photos": [
+			{
+				"id": "IMG_2620.webp",
+				"src": "/photos/v4/japan/IMG_2620.webp",
+				"thumbnail": "/photos/v4-thumbnails/japan/IMG_2620.webp.webp",
+				"metadata": {
+					"width": 1600,
+					"height": 1200,
+					"bytes": 127482,
+					"date": "2026-03-17T22:20:21"
+				}
+			},
+			{
+				"id": "IMG_2814.webp",
+				"src": "/photos/v4/japan/IMG_2814.webp",
+				"thumbnail": "/photos/v4-thumbnails/japan/IMG_2814.webp.webp",
+				"metadata": {
+					"width": 1600,
+					"height": 1200,
+					"bytes": 200798,
+					"date": "2026-03-19T20:31:46"
+				}
+			},
+			{
+				"id": "IMG_2850.webp",
+				"src": "/photos/v4/japan/IMG_2850.webp",
+				"thumbnail": "/photos/v4-thumbnails/japan/IMG_2850.webp.webp",
+				"metadata": {
+					"width": 1200,
+					"height": 1600,
+					"bytes": 178960,
+					"date": "2026-03-20T09:31:18"
+				}
+			},
+			{
+				"id": "IMG_2900.webp",
+				"src": "/photos/v4/japan/IMG_2900.webp",
+				"thumbnail": "/photos/v4-thumbnails/japan/IMG_2900.webp.webp",
+				"metadata": {
+					"width": 1200,
+					"height": 1600,
+					"bytes": 676762,
+					"date": "2026-03-20T13:26:18"
+				}
+			},
+			{
+				"id": "IMG_2947.webp",
+				"src": "/photos/v4/japan/IMG_2947.webp",
+				"thumbnail": "/photos/v4-thumbnails/japan/IMG_2947.webp.webp",
+				"metadata": {
+					"width": 1200,
+					"height": 1600,
+					"bytes": 468332,
+					"date": "2026-03-20T16:11:09"
+				}
+			},
+			{
+				"id": "IMG_3056.webp",
+				"src": "/photos/v4/japan/IMG_3056.webp",
+				"thumbnail": "/photos/v4-thumbnails/japan/IMG_3056.webp.webp",
+				"metadata": {
+					"width": 1200,
+					"height": 1600,
+					"bytes": 540246,
+					"date": "2026-03-21T15:25:36"
+				}
+			},
+			{
+				"id": "IMG_3229.webp",
+				"src": "/photos/v4/japan/IMG_3229.webp",
+				"thumbnail": "/photos/v4-thumbnails/japan/IMG_3229.webp.webp",
+				"metadata": {
+					"width": 1600,
+					"height": 1200,
+					"bytes": 225084,
+					"date": "2026-03-21T19:01:43"
+				}
+			},
+			{
+				"id": "IMG_3308.webp",
+				"src": "/photos/v4/japan/IMG_3308.webp",
+				"thumbnail": "/photos/v4-thumbnails/japan/IMG_3308.webp.webp",
+				"metadata": {
+					"width": 1200,
+					"height": 1600,
+					"bytes": 151642,
+					"date": "2026-03-22T11:26:56"
+				}
+			},
+			{
+				"id": "IMG_3461.webp",
+				"src": "/photos/v4/japan/IMG_3461.webp",
+				"thumbnail": "/photos/v4-thumbnails/japan/IMG_3461.webp.webp",
+				"metadata": {
+					"width": 1600,
+					"height": 1200,
+					"bytes": 166954,
+					"date": "2026-03-23T12:44:08"
+				}
+			},
+			{
+				"id": "IMG_3765.webp",
+				"src": "/photos/v4/japan/IMG_3765.webp",
+				"thumbnail": "/photos/v4-thumbnails/japan/IMG_3765.webp.webp",
+				"metadata": {
+					"width": 1200,
+					"height": 1600,
+					"bytes": 319970,
+					"date": "2026-03-28T12:07:01"
+				}
+			},
+			{
+				"id": "55F68A43-D7E0-4B2A-BDF3-572693367976.webp",
+				"src": "/photos/v4/japan/55F68A43-D7E0-4B2A-BDF3-572693367976.webp",
+				"thumbnail": "/photos/v4-thumbnails/japan/55F68A43-D7E0-4B2A-BDF3-572693367976.webp.webp",
+				"metadata": {
+					"width": 1170,
+					"height": 1560,
+					"bytes": 286668
 				}
 			}
 		]
@@ -42,6 +191,160 @@ export const photoCollections: PhotoCollection[] = [
 		"slug": "china",
 		"title": "China",
 		"photos": [
+			{
+				"id": "IMG_5558.webp",
+				"src": "/photos/v4/china/IMG_5558.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_5558.webp.webp",
+				"metadata": {
+					"width": 1600,
+					"height": 1200,
+					"bytes": 145158,
+					"date": "2026-05-22T17:32:58"
+				}
+			},
+			{
+				"id": "IMG_2105.webp",
+				"src": "/photos/v4/china/IMG_2105.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_2105.webp.webp",
+				"metadata": {
+					"width": 1600,
+					"height": 1200,
+					"bytes": 68346,
+					"date": "2026-05-29T04:18:48"
+				}
+			},
+			{
+				"id": "IMG_6252.webp",
+				"src": "/photos/v4/china/IMG_6252.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_6252.webp.webp",
+				"metadata": {
+					"width": 1600,
+					"height": 1200,
+					"bytes": 248792,
+					"date": "2026-05-31T21:04:28"
+				}
+			},
+			{
+				"id": "IMG_6725.webp",
+				"src": "/photos/v4/china/IMG_6725.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_6725.webp.webp",
+				"metadata": {
+					"width": 1200,
+					"height": 1600,
+					"bytes": 78464,
+					"date": "2026-06-06T06:37:19"
+				}
+			},
+			{
+				"id": "IMG_8439.webp",
+				"src": "/photos/v4/china/IMG_8439.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_8439.webp.webp",
+				"metadata": {
+					"width": 1600,
+					"height": 1200,
+					"bytes": 235782,
+					"date": "2026-07-02T18:52:08"
+				}
+			},
+			{
+				"id": "IMG_8541.webp",
+				"src": "/photos/v4/china/IMG_8541.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_8541.webp.webp",
+				"metadata": {
+					"width": 1600,
+					"height": 1200,
+					"bytes": 236624,
+					"date": "2026-07-03T20:58:15"
+				}
+			},
+			{
+				"id": "50b0b97a17c04397dcdecfbf60054123_livephoto.webp",
+				"src": "/photos/v4/china/50b0b97a17c04397dcdecfbf60054123_livephoto.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/50b0b97a17c04397dcdecfbf60054123_livephoto.webp.webp",
+				"metadata": {
+					"width": 1200,
+					"height": 1600,
+					"bytes": 206082,
+					"date": "2026-07-04T04:54:59"
+				}
+			},
+			{
+				"id": "IMG_8756.webp",
+				"src": "/photos/v4/china/IMG_8756.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_8756.webp.webp",
+				"metadata": {
+					"width": 1200,
+					"height": 1600,
+					"bytes": 111994,
+					"date": "2026-07-06T19:19:56"
+				}
+			},
+			{
+				"id": "d3cd2bd94a55a282ff5003dc4278bc58.webp",
+				"src": "/photos/v4/china/d3cd2bd94a55a282ff5003dc4278bc58.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/d3cd2bd94a55a282ff5003dc4278bc58.webp.webp",
+				"metadata": {
+					"width": 1600,
+					"height": 1200,
+					"bytes": 206568,
+					"date": "2026-07-09T19:22:31"
+				}
+			},
+			{
+				"id": "10512d5f8d9bcc279087b10f101d092b.webp",
+				"src": "/photos/v4/china/10512d5f8d9bcc279087b10f101d092b.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/10512d5f8d9bcc279087b10f101d092b.webp.webp",
+				"metadata": {
+					"width": 1600,
+					"height": 1067,
+					"bytes": 83600,
+					"date": "2026-07-12T01:03:47"
+				}
+			},
+			{
+				"id": "IMG_1345.webp",
+				"src": "/photos/v4/china/IMG_1345.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_1345.webp.webp",
+				"metadata": {
+					"width": 1600,
+					"height": 1200,
+					"bytes": 272576,
+					"date": "2026-07-13T13:23:15"
+				}
+			},
+			{
+				"id": "FullSizeRender.webp",
+				"src": "/photos/v4/china/FullSizeRender.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/FullSizeRender.webp.webp",
+				"metadata": {
+					"width": 1200,
+					"height": 1600,
+					"bytes": 349546,
+					"date": "2026-07-13T16:33:04"
+				}
+			},
+			{
+				"id": "IMG_1604.webp",
+				"src": "/photos/v4/china/IMG_1604.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_1604.webp.webp",
+				"metadata": {
+					"width": 1200,
+					"height": 1600,
+					"bytes": 341620,
+					"date": "2026-07-14T14:39:22"
+				}
+			},
+			{
+				"id": "IMG_9987.webp",
+				"src": "/photos/v4/china/IMG_9987.webp",
+				"thumbnail": "/photos/v4-thumbnails/china/IMG_9987.webp.webp",
+				"metadata": {
+					"width": 1200,
+					"height": 1600,
+					"bytes": 250228,
+					"date": "2026-07-16T22:33:42"
+				}
+			},
 			{
 				"id": "3.webp",
 				"src": "/photos/v4/china/3.webp",
@@ -73,16 +376,6 @@ export const photoCollections: PhotoCollection[] = [
 				}
 			},
 			{
-				"id": "50b0b97a17c04397dcdecfbf60054123_livephoto.webp",
-				"src": "/photos/v4/china/50b0b97a17c04397dcdecfbf60054123_livephoto.webp",
-				"thumbnail": "/photos/v4-thumbnails/china/50b0b97a17c04397dcdecfbf60054123_livephoto.webp.webp",
-				"metadata": {
-					"width": 1200,
-					"height": 1600,
-					"bytes": 205904
-				}
-			},
-			{
 				"id": "74.webp",
 				"src": "/photos/v4/china/74.webp",
 				"thumbnail": "/photos/v4-thumbnails/china/74.webp.webp",
@@ -101,135 +394,42 @@ export const photoCollections: PhotoCollection[] = [
 					"height": 1200,
 					"bytes": 309356
 				}
-			},
+			}
+		]
+	},
+	{
+		"slug": "california",
+		"title": "California",
+		"photos": [
 			{
-				"id": "10512d5f8d9bcc279087b10f101d092b.webp",
-				"src": "/photos/v4/china/10512d5f8d9bcc279087b10f101d092b.webp",
-				"thumbnail": "/photos/v4-thumbnails/china/10512d5f8d9bcc279087b10f101d092b.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1067,
-					"bytes": 83422
-				}
-			},
-			{
-				"id": "d3cd2bd94a55a282ff5003dc4278bc58.webp",
-				"src": "/photos/v4/china/d3cd2bd94a55a282ff5003dc4278bc58.webp",
-				"thumbnail": "/photos/v4-thumbnails/china/d3cd2bd94a55a282ff5003dc4278bc58.webp.webp",
+				"id": "IMG_0578.webp",
+				"src": "/photos/v4/california/IMG_0578.webp",
+				"thumbnail": "/photos/v4-thumbnails/california/IMG_0578.webp.webp",
 				"metadata": {
 					"width": 1600,
 					"height": 1200,
-					"bytes": 206390
+					"bytes": 190048,
+					"date": "2026-08-15T16:53:23"
 				}
 			},
 			{
-				"id": "FullSizeRender.webp",
-				"src": "/photos/v4/china/FullSizeRender.webp",
-				"thumbnail": "/photos/v4-thumbnails/china/FullSizeRender.webp.webp",
+				"id": "crab.jpg",
+				"src": "/photos/v4/california/crab.jpg",
+				"thumbnail": "/photos/v4-thumbnails/california/crab.jpg.webp",
+				"metadata": {
+					"width": 1170,
+					"height": 1560,
+					"bytes": 222938
+				}
+			},
+			{
+				"id": "image.webp",
+				"src": "/photos/v4/california/image.webp",
+				"thumbnail": "/photos/v4-thumbnails/california/image.webp.webp",
 				"metadata": {
 					"width": 1200,
 					"height": 1600,
-					"bytes": 349368
-				}
-			},
-			{
-				"id": "IMG_1345.webp",
-				"src": "/photos/v4/china/IMG_1345.webp",
-				"thumbnail": "/photos/v4-thumbnails/china/IMG_1345.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 272398
-				}
-			},
-			{
-				"id": "IMG_1604.webp",
-				"src": "/photos/v4/china/IMG_1604.webp",
-				"thumbnail": "/photos/v4-thumbnails/china/IMG_1604.webp.webp",
-				"metadata": {
-					"width": 1200,
-					"height": 1600,
-					"bytes": 341442
-				}
-			},
-			{
-				"id": "IMG_2105.webp",
-				"src": "/photos/v4/china/IMG_2105.webp",
-				"thumbnail": "/photos/v4-thumbnails/china/IMG_2105.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 68168
-				}
-			},
-			{
-				"id": "IMG_5558.webp",
-				"src": "/photos/v4/china/IMG_5558.webp",
-				"thumbnail": "/photos/v4-thumbnails/china/IMG_5558.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 144980
-				}
-			},
-			{
-				"id": "IMG_6252.webp",
-				"src": "/photos/v4/china/IMG_6252.webp",
-				"thumbnail": "/photos/v4-thumbnails/china/IMG_6252.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 248614
-				}
-			},
-			{
-				"id": "IMG_6725.webp",
-				"src": "/photos/v4/china/IMG_6725.webp",
-				"thumbnail": "/photos/v4-thumbnails/china/IMG_6725.webp.webp",
-				"metadata": {
-					"width": 1200,
-					"height": 1600,
-					"bytes": 78286
-				}
-			},
-			{
-				"id": "IMG_8439.webp",
-				"src": "/photos/v4/china/IMG_8439.webp",
-				"thumbnail": "/photos/v4-thumbnails/china/IMG_8439.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 235604
-				}
-			},
-			{
-				"id": "IMG_8541.webp",
-				"src": "/photos/v4/china/IMG_8541.webp",
-				"thumbnail": "/photos/v4-thumbnails/china/IMG_8541.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 236446
-				}
-			},
-			{
-				"id": "IMG_8756.webp",
-				"src": "/photos/v4/china/IMG_8756.webp",
-				"thumbnail": "/photos/v4-thumbnails/china/IMG_8756.webp.webp",
-				"metadata": {
-					"width": 1200,
-					"height": 1600,
-					"bytes": 111816
-				}
-			},
-			{
-				"id": "IMG_9987.webp",
-				"src": "/photos/v4/china/IMG_9987.webp",
-				"thumbnail": "/photos/v4-thumbnails/china/IMG_9987.webp.webp",
-				"metadata": {
-					"width": 1200,
-					"height": 1600,
-					"bytes": 250050
+					"bytes": 154816
 				}
 			}
 		]
@@ -248,178 +448,6 @@ export const photoCollections: PhotoCollection[] = [
 					"bytes": 1181543
 				},
 				"caption": "My sister and my nephew"
-			}
-		]
-	},
-	{
-		"slug": "japan",
-		"title": "Japan",
-		"photos": [
-			{
-				"id": "55F68A43-D7E0-4B2A-BDF3-572693367976.webp",
-				"src": "/photos/v4/japan/55F68A43-D7E0-4B2A-BDF3-572693367976.webp",
-				"thumbnail": "/photos/v4-thumbnails/japan/55F68A43-D7E0-4B2A-BDF3-572693367976.webp.webp",
-				"metadata": {
-					"width": 1170,
-					"height": 1560,
-					"bytes": 286668
-				}
-			},
-			{
-				"id": "IMG_2620.webp",
-				"src": "/photos/v4/japan/IMG_2620.webp",
-				"thumbnail": "/photos/v4-thumbnails/japan/IMG_2620.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 127304
-				}
-			},
-			{
-				"id": "IMG_2814.webp",
-				"src": "/photos/v4/japan/IMG_2814.webp",
-				"thumbnail": "/photos/v4-thumbnails/japan/IMG_2814.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 200620
-				}
-			},
-			{
-				"id": "IMG_2850.webp",
-				"src": "/photos/v4/japan/IMG_2850.webp",
-				"thumbnail": "/photos/v4-thumbnails/japan/IMG_2850.webp.webp",
-				"metadata": {
-					"width": 1200,
-					"height": 1600,
-					"bytes": 178782
-				}
-			},
-			{
-				"id": "IMG_2900.webp",
-				"src": "/photos/v4/japan/IMG_2900.webp",
-				"thumbnail": "/photos/v4-thumbnails/japan/IMG_2900.webp.webp",
-				"metadata": {
-					"width": 1200,
-					"height": 1600,
-					"bytes": 676584
-				}
-			},
-			{
-				"id": "IMG_2947.webp",
-				"src": "/photos/v4/japan/IMG_2947.webp",
-				"thumbnail": "/photos/v4-thumbnails/japan/IMG_2947.webp.webp",
-				"metadata": {
-					"width": 1200,
-					"height": 1600,
-					"bytes": 468154
-				}
-			},
-			{
-				"id": "IMG_3056.webp",
-				"src": "/photos/v4/japan/IMG_3056.webp",
-				"thumbnail": "/photos/v4-thumbnails/japan/IMG_3056.webp.webp",
-				"metadata": {
-					"width": 1200,
-					"height": 1600,
-					"bytes": 540068
-				}
-			},
-			{
-				"id": "IMG_3229.webp",
-				"src": "/photos/v4/japan/IMG_3229.webp",
-				"thumbnail": "/photos/v4-thumbnails/japan/IMG_3229.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 224906
-				}
-			},
-			{
-				"id": "IMG_3308.webp",
-				"src": "/photos/v4/japan/IMG_3308.webp",
-				"thumbnail": "/photos/v4-thumbnails/japan/IMG_3308.webp.webp",
-				"metadata": {
-					"width": 1200,
-					"height": 1600,
-					"bytes": 151464
-				}
-			},
-			{
-				"id": "IMG_3461.webp",
-				"src": "/photos/v4/japan/IMG_3461.webp",
-				"thumbnail": "/photos/v4-thumbnails/japan/IMG_3461.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 166776
-				}
-			},
-			{
-				"id": "IMG_3765.webp",
-				"src": "/photos/v4/japan/IMG_3765.webp",
-				"thumbnail": "/photos/v4-thumbnails/japan/IMG_3765.webp.webp",
-				"metadata": {
-					"width": 1200,
-					"height": 1600,
-					"bytes": 319792
-				}
-			}
-		]
-	},
-	{
-		"slug": "montreal",
-		"title": "Montreal",
-		"photos": [
-			{
-				"id": "678908887_N.webp",
-				"src": "/photos/v4/montreal/678908887_N.webp",
-				"thumbnail": "/photos/v4-thumbnails/montreal/678908887_N.webp.webp",
-				"metadata": {
-					"width": 1067,
-					"height": 1600,
-					"bytes": 56654
-				}
-			},
-			{
-				"id": "678908887_O.webp",
-				"src": "/photos/v4/montreal/678908887_O.webp",
-				"thumbnail": "/photos/v4-thumbnails/montreal/678908887_O.webp.webp",
-				"metadata": {
-					"width": 1067,
-					"height": 1600,
-					"bytes": 60408
-				}
-			},
-			{
-				"id": "IMG_1614.webp",
-				"src": "/photos/v4/montreal/IMG_1614.webp",
-				"thumbnail": "/photos/v4-thumbnails/montreal/IMG_1614.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 190566
-				}
-			},
-			{
-				"id": "IMG_1747.webp",
-				"src": "/photos/v4/montreal/IMG_1747.webp",
-				"thumbnail": "/photos/v4-thumbnails/montreal/IMG_1747.webp.webp",
-				"metadata": {
-					"width": 1600,
-					"height": 1200,
-					"bytes": 129984
-				}
-			},
-			{
-				"id": "IMG_8631.webp",
-				"src": "/photos/v4/montreal/IMG_8631.webp",
-				"thumbnail": "/photos/v4-thumbnails/montreal/IMG_8631.webp.webp",
-				"metadata": {
-					"width": 1200,
-					"height": 1600,
-					"bytes": 70144
-				}
 			}
 		]
 	},
